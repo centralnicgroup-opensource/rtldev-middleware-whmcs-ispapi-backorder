@@ -1,0 +1,34 @@
+##########################################
+######        COMMAND LIST         #######
+##########################################
+
+COMMAND = CreateBackorder
+DOMAIN = string
+DROPDATE = date
+TYPE = full|lite
+
+##########################################
+
+COMMAND = DeleteBackorder
+DOMAIN = string
+
+##########################################
+
+COMMAND = QueryBackorderList
+FIRST = int
+LIMIT = int
+
+##########################################
+
+COMMAND = QueryDeletedDomainsList
+(todo)
+
+##########################################
+
+COMMAND = QueryDeletedDomainsStats
+
+##########################################
+
+COMMAND = QueryPriceList
+
+##########################################

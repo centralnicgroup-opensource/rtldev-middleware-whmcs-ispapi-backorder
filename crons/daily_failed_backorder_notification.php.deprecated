@@ -1,0 +1,37 @@
+<?php
+$cronname = "DAILY_FAILED_BACKORDER_NOTIFICATION";
+require_once dirname(__FILE__)."/../../../../init.php";
+require_once dirname(__FILE__)."/../backend/api.php";
+
+$list = array();
+
+$result = select_query('backorder_domains','*', array("status" => "FAILED"));
+while ($local = mysql_fetch_array($result)) {
+	$today = new DateTime(date("Y-m-d H:i:s"));
+	$updateddate = new DateTime($local["updateddate"]);
+
+	$diff_timestamp = $today->getTimestamp() - $updateddate->getTimestamp();
+
+	//CHECK IF UPDATEDDATE < 24 hours
+	if($diff_timestamp >=0 && $diff_timestamp <= 86400){
+		if(!isset($list[$local["userid"]])){
+			$list[$local["userid"]]["backorders"] = array();
+		}
+		$list[$local["userid"]]["backorders"][] = array("domain" => $local["domain"].".".$local["tld"], "dropdate" => $local["dropdate"], "status" => $local["status"]);
+	}
+}
+
+
+//SEND BACKORDER FAILED NOTIFICATION TO ALL USERS
+foreach($list as $key => $l){
+	$command = "sendemail";
+	$adminuser = "admin";
+	$values["messagename"] = "backorder_failed_notification";
+	$values["id"] = $key;
+	$values["customvars"] = array("list"=> $l["backorders"]);
+	$results = localAPI($command, $values, $adminuser);
+}
+
+logmessage($cronname, "ok", "DAILY_FAILED_BACKORDER_NOTIFICATION done");
+echo date("Y-m-d H:i:s")." DAILY_FAILED_BACKORDER_NOTIFICATION done.\n";
+?>

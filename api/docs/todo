@@ -1,0 +1,38 @@
+
+TODO Daniel:
+	Responsive design
+	Manage Backorders
+	Bulk form
+	new server? only for whmcs.Backorder.de (live server?)
+	email templates
+	datatable language options
+	umlautdomains
+	qbk-db-slave.fs.de.hexonet.net server nicht erreichbar
+	externe js/css local
+	mod_pagespeed?
+	sendmail langsam
+ 
+ 
+TODO Anthony
+	install/config github
+	Täglich Drop-Listen in eine lokale SQLITE DB speichern
+	Admin Interface um Backorders zu verwalten
+	Kreditkarte Autorisierung? später?
+	Cron für Admin
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+Already Done
+	new server? only for whmcs.Backorder.de (live server?) (Daniel 30.07.2015)
+	
+	

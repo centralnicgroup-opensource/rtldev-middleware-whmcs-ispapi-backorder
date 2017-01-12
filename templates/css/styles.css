@@ -1,0 +1,66 @@
+
+
+.dataTables_wrapper .dataTables_info {
+    background-color: #f26522;
+    width:100%;
+    color: #fff;
+}
+
+.panel-default > .panel-heading {
+    background-color: #f26522;
+    border-color: #ddd;
+    color: #ffffff;
+}
+
+.dataTables_scrollHead, .dataTables_wrapper {
+    background-color: #e6e6e6;
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    background-color: #f26522;
+    border-color: #ddd;
+}
+
+.notacitve {
+    color: #ccc;
+}
+
+.active {
+    font-weight: bold;
+}
+
+table.dataTable thead th {
+    vertical-align: middle;
+    padding: 8px;
+}
+
+#settingsdiv {
+    display: none;
+}
+
+.navbar-footer {
+    position: fixed;
+}
+
+#overviewbackorderstatus tr:hover {
+    background-color: #ddd;
+    cursor:pointer;
+}
+
+#overviewlist tr:hover {
+    background-color: #ddd;
+    cursor:pointer;
+}
+
+.badge {
+    background-color: #ddd;
+    color:#555;
+}
+
+#droppingdomains div.row {
+    cursor:pointer;
+}
+
+.ui-widget {
+    font-size:0.9em;
+}

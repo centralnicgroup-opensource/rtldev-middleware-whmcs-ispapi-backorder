@@ -1,0 +1,49 @@
+##########################################
+######     CRON DOCUMENTATION      #######
+##########################################
+
+daily_dropdate_synch.php (once a day) at 1:30
+Synchronize the dropdate of the local backorder table with the online droplist database.
+##########################################
+daily_user_notification.php (once a day) at 1:45
+The customer will be notified if he has backorders with dropdates that are within the next 3 days
+##########################################
+daily_admin_notification.php (once a day) at 1:45
+The admin will be notified if customers have backorders with dropdates that are within the next 3 days.
+##########################################
+daily_failed_backorder_notification.php (once a day) at 00:01
+The customer will be notified for all failed backorders.
+##########################################
+hourly_user_notification.php (once a hour) at *:02
+The customer will be notified if he has backorders with dropdates that are within the next 2 hours.
+##########################################
+batch_requested_active.php (once a hour) at *:01
+The backorders with status "Requested" will change to "Active" if the dropdate is withing the next 3 days and if the customer has enough credit on his WHMCS account.
+##########################################
+batch_processing_application.php (every 5 minutes)
+The backorders with status "Processing" will be send to the Hexonet BACKEND (AddDomainApplication).
+##########################################
+batch_active_processing.php (every 5 minutes)
+The backorders with status "Active" will change to "Processing" if the dropdate is withing the next 2 hours.
+Backorder with status "Processing" cannot be deleted.
+##########################################
+batch_polling.php (every 5 minutes)
+Backorder status will be checked with the StatusDomainApplication command and updated in the local database.
+WHMCS will generate the invoice for a successful application.
+Domain will be imported for all paid invoices and for winning auctions.
+##########################################
+batch_import_pendingdomainlist.php (once a day) at 00:10
+Import the complete pending deleted domain list from HEXONET in WHMCS dabatabe (table: pending_domains)
+##########################################
+
+CRONTAB:
+30 1 * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/daily_dropdate_synch.php >> cron.log 2>&1
+45 1 * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/daily_admin_notification.php >> cron.log 2>&1
+45 1 * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/daily_user_notification.php >> cron.log 2>&1
+01 0 * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/daily_failed_backorder_notification.php >> cron.log 2>&1
+2 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/hourly_user_notification.php >> cron.log 2>&1
+1 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_requested_active.php >> cron.log 2>&1
+*/5 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_processing_application.php >> cron.log 2>&1
+*/5 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_active_processing.php >> cron.log 2>&1
+*/5 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_polling.php >> cron.log 2>&1
+10 0 * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_import_pendingdomainlist.php >> cron.log 2>&1
