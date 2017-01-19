@@ -55,12 +55,16 @@ $_LANG['deletebutton'] = "LÖSCHEN";
 $_LANG['creditbalance'] = "Kontostand";
 $_LANG['reservedamount'] = "Reserv. Guthaben";
 $_LANG['unpaidinvoices'] = "Unbez. Rechnungen";
-$_LANG['amountavailable'] = "Verfügbares Guthaben";
+$_LANG['amountavailable'] = "Verfüg. Guthaben";
 $_LANG['creditvolume'] = "Konto";
-
-
-
-
-
-
+$_LANG['from'] = "Von";
+$_LANG['to'] = "Bis";
+$_LANG['min'] = "Min";
+$_LANG['max'] = "Max";
+$_LANG['domainname'] = "Domain Name";
+$_LANG['dropdate'] = "L&oumlschdatum";
+$_LANG['chars'] = "Zeichen";
+$_LANG['digits'] = "Zahlen";
+$_LANG['hyphens'] = "Bindestriche";
+$_LANG['status'] = "Status";
 ?>

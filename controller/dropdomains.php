@@ -5,13 +5,13 @@ include(dirname(__FILE__)."/_language.php");
 $statusheader = $_LANG['setallbackorder'];
 
 $fields = array(); //fieldname, apifieldname
-$fields[]=array ("fieldname" => $statusheader, 	"apifieldname" => "BACKORDERTYPE");
-$fields[]=array ("fieldname" => "Domain Name", 	"apifieldname" => "DOMAIN");
-$fields[]=array ("fieldname" => "Drop Date", 	"apifieldname" => "DROPDATE");
-$fields[]=array ("fieldname" => "Chars", 		"apifieldname" => "NUMBEROFCHARACTERS");
-$fields[]=array ("fieldname" => "Digits", 		"apifieldname" => "NUMBEROFDIGITS");
-$fields[]=array ("fieldname" => "Hyphens", 		"apifieldname" => "NUMBEROFHYPHENS");
-$fields[]=array ("fieldname" => "Umlauts", 		"apifieldname" => "NUMBEROFUMLAUTS");
+$fields[]=array ("fieldname" => "", 	"apifieldname" => "BACKORDERTYPE");
+$fields[]=array ("fieldname" => $_LANG['domainname'], 	"apifieldname" => "DOMAIN");
+$fields[]=array ("fieldname" => $_LANG['dropdate'], 	"apifieldname" => "DROPDATE");
+$fields[]=array ("fieldname" => $_LANG['chars'], 		"apifieldname" => "NUMBEROFCHARACTERS");
+$fields[]=array ("fieldname" => $_LANG['digits'], 		"apifieldname" => "NUMBEROFDIGITS");
+$fields[]=array ("fieldname" => $_LANG['hyphens'], 		"apifieldname" => "NUMBEROFHYPHENS");
+//$fields[]=array ("fieldname" => "Umlauts", 		"apifieldname" => "NUMBEROFUMLAUTS");
 
 $vars["fields"] = $fields;
 

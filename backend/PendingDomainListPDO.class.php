@@ -131,7 +131,6 @@ class PendingDomainListPDO
 			$handle = fopen('zip://../tmp/pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
 		}
 
-
 		$sql = 'INSERT IGNORE INTO pending_domains (domain, zone, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits) VALUES ';
 
 		if ($handle !== FALSE) {
@@ -146,6 +145,7 @@ class PendingDomainListPDO
 
 				$domain_number_of_hyphens = substr_count ($domain, '-');
 				$domain_number_of_digits = preg_match_all( "/[0-9]/", $domain );
+				//$domain_number_of_umlauts = preg_match_all( "/[äüö]/", utf8_encode($domain))/2;
 
 				//EXCLUDE SOME TLDS
 				if(!in_array($zone, $tlds)){

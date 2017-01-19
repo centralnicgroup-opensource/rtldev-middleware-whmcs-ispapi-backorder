@@ -57,7 +57,14 @@ $_LANG['reservedamount'] = "Reserved Deposits";
 $_LANG['unpaidinvoices'] = "Unpaid Invoices";
 $_LANG['amountavailable'] = "Funds available";
 $_LANG['creditvolume'] = "Credit Volume";
-
-
-
+$_LANG['from'] = "From";
+$_LANG['to'] = "To";
+$_LANG['min'] = "Min";
+$_LANG['max'] = "Max";
+$_LANG['domainname'] = "Domain Name";
+$_LANG['dropdate'] = "Drop Date";
+$_LANG['chars'] = "Chars";
+$_LANG['digits'] = "Digits";
+$_LANG['hyphens'] = "Hyphens";
+$_LANG['status'] = "Status";
 ?>

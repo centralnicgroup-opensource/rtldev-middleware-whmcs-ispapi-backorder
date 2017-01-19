@@ -318,13 +318,13 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Min:</span>
+                                    <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="chars_count_min" id="chars_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Max:</span>
+                                    <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="chars_count_max" id="chars_count_max" value="">
                                 </div>
                             </div>
@@ -337,13 +337,13 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Min:</span>
+                                    <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="letters_count_min" id="letters_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Max:</span>
+                                    <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="letters_count_max" id="letters_count_max" value="">
                                 </div>
                             </div>
@@ -356,13 +356,13 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Min:</span>
+                                    <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="digits_count_min" id="digits_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Max:</span>
+                                    <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="digits_count_max" id="digits_count_max" value="">
                                 </div>
                             </div>
@@ -381,13 +381,13 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Min:</span>
+                                    <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="hyphens_count_min" id="hyphens_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Max:</span>
+                                    <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="hyphens_count_max" id="hyphens_count_max" value="">
                                 </div>
                             </div>
@@ -399,19 +399,19 @@
                         </div>
                     </div>
 
-                    <hr style="margin:10px 0px 10px 0px;">
+                    <!--<hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:5px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainumlaute}</label>
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Min:</span>
+                                    <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="umlaute_count_min" id="umlaute_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">Max:</span>
+                                    <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="umlaute_count_max" id="umlaute_count_max" value="">
                                 </div>
                             </div>
@@ -422,7 +422,7 @@
                                 <input name="umlaute_only" id="umlaute_only" type="checkbox" /> {$LANG.umlautsonly}
                             </div>
                         </div>
-                    </div>
+                    </div>-->
 
 
                     <hr style="margin:10px 0px 10px 0px;">
@@ -431,7 +431,7 @@
                         <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-12">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon" style="width:70px;">From:</span>
+                                    <span class="input-group-addon" style="width:70px;">{$LANG.from}:</span>
                                     <input class="form-control input-sm" name="dropdate_from" id="dropdate_from" value="">
                                 </div>
                             </div>
@@ -439,7 +439,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon" style="width:70px;">To:</span>
+                                    <span class="input-group-addon" style="width:70px;">{$LANG.to}:</span>
                                     <input class="form-control input-sm" name="dropdate_to" id="dropdate_to" value="">
                                 </div>
                             </div>
