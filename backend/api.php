@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__).'/../../../../init.php';
 require_once dirname(__FILE__).'/idna_convert.class.php';
+require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
 
 //############################
 //HELPER FUNCTIONS
@@ -69,12 +70,18 @@ function ispapi_api_call($command){
 	return $response;
 }
 
-//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CUSTOMER
+//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CUSTOMER OR FOR THE ADMIN
 function backorder_api_call($command) {
 	$time = microtime(true);
 	$ca = new WHMCS_ClientArea();
 
 	$userid = $ca->getUserID();
+
+	//CHECK IF ADMIN LOGGED AND AUTHORIZE PASSING USERID TO COMMAND
+	if(isset($_SESSION['adminid']) && $_SESSION['adminid'] > 0 && isset($command["USERID"])){
+		$userid = $command["USERID"];
+	}
+
 	$dir = opendir(dirname(__FILE__)."/../api");
 	$files = array();
 	while ( ($file = readdir($dir)) !== false ) {
@@ -98,10 +105,11 @@ function backorder_api_call($command) {
 			$response["RUNTIME"] = sprintf("%0.3f", microtime(true) - $time);
 		}
 	}
+
 	return $response;
 }
 
-//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR ADMIN CALLS
+//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CRONS LIKE BATCH_REQUESTED_ACTIVE
 //$userid WILL TAKE THE VALUE OF $command["USER"]
 function backorder_backend_api_call($command) {
 	$time = microtime(true);

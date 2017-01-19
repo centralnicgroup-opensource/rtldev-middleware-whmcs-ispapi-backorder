@@ -1,15 +1,12 @@
-<!--############################### MAIN AREA #######################################-->
-
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
-<script src="modules/addons/backorder/templates/js/backorder.js"></script>
-<link rel="stylesheet" href="modules/addons/backorder/templates/css/styles.css">
+<script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
+<link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
-
+<!--############################### MAIN AREA #######################################-->
 <div class="col-md-9 pull-md-right">
-
     {if $error}
         <div class="alert alert-error">
             <p>{$error}</p>
@@ -21,13 +18,11 @@
         </div>
     {/if}
 
-    <table id="DeletedDomainsList" class="table table-striped table-framed" cellspacing="0" width="100%"><thead><tr>
-        {foreach $fields as $field}
-        <th>{$field['fieldname']}</th>
-        {/foreach}
-    </tr></thead></table>
+    <table id="DeletedDomainsList" class="table table-striped table-framed" cellspacing="0" width="100%">
+        <thead><tr>{foreach $fields as $field}<th>{$field['fieldname']}</th>{/foreach}</tr></thead>
+    </table>
 
-    {literal}
+    {LITERAL}
     <script>
 
         function setdate(tmpdate)
@@ -65,9 +60,8 @@
                           {
                               var output ='';
                               output +='<a onclick="setdate(\''+data.PROPERTY.DROPDAY[i]+'\');" class="list-group-item">';
-                              output +='<div class="row"><div class="col-lg-6"> <i class="fa fa-circle-o"></i>&nbsp;';
+                              output +='<div class="row"><div class="col-lg-8"> <i class="fa fa-circle-o"></i>&nbsp;';
                               output +='	<span>'+data.PROPERTY.DROPDAY[i]+'</span></div>';
-                              //output +='	<div class="col-lg-6" style="text-align:right"><span class="badge">'+obj+' Domains</span></div></div>';
                               output +='</div>';
                               output +='</a>';
                               $("#droppingdomains").append(output);
@@ -75,9 +69,8 @@
                     });
                     var output ='';
                     output +='<a onclick="setdate(\'last7\');" class="list-group-item">';
-                    output +='	<div class="row"><div class="col-lg-6"><i class="fa fa-circle-o"></i>&nbsp;';
+                    output +='	<div class="row"><div class="col-lg-8"><i class="fa fa-circle-o"></i>&nbsp;';
                     output +='	<span>{/literal}{$LANG.total7days}{literal}</span></div>';
-                    //output +='	<div class="col-lg-6" style="text-align:right"><span class="badge">'+data.PROPERTY.TOTAL7DAY[0]+' Domains</span></div></div>';
                     output +='</div>';
                     output +='</a>';
                     $("#droppingdomains").append(output);
@@ -115,11 +108,114 @@
                 $("#settingsdiv").toggle("slideDown");
             });
 
+            $(document).on('click', '.setbackorder', function (e) {
+                var button = $(this);
+                var command = "CreateBackorder";
+                if ($(this).hasClass("active"))
+                    command = "DeleteBackorder";
+
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    dataType: "json",
+                    url: "{/literal}{$modulepath}{literal}backend/call.php",
+                    data: {
+                        COMMAND: command,
+                        DOMAIN: $(this).attr("value"),
+                        DROPDATE: $(this).attr("placeholder2"),
+                        TYPE: "FULL"
+                    },
+                    success: function(data) {
+                        if(command=="CreateBackorder" && data["CODE"]==200)
+                            button.addClass("active btn-success");
+                        else if(command=="DeleteBackorder" && data["CODE"]==200)
+                            button.removeClass("active btn-success");
+                        else{
+                            $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
+                            $("#dialogerror").dialog({
+                                modal: true,
+                                width: "400px"
+                            });
+                        }
+                    },
+                    error: function(data) {
+                    }
+                });
+            });
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                dataType: "json",
+                url: "{/literal}{$modulepath}{literal}backend/call.php",
+                data: {COMMAND : "QueryPriceList"},
+                success: function(data){
+                    $("#pricelist").html();
+                    $.each(data.PROPERTY, function(i, obj) {
+                          var output="";
+                          output += '<tr>';
+                          output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
+                          output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
+                          output += '</tr>';
+                          $("#pricelist").append(output);
+                    });
+                },
+                error: function(data){
+                }
+            });
+
+
+			$.ajax({
+			type: "POST",
+			async: false,
+			dataType: "json",
+			url: "{/literal}{$modulepath}{literal}backend/call.php",
+			data: {COMMAND : "QueryPriceList"},
+			success: function(data){
+                var output="";
+				$.each(data.PROPERTY, function(i, obj) {
+					  output += '<option value="'+obj.TLD+'">'+obj.TLD+'</option>';
+				});
+                $("#tld").append(output);
+			},
+			error: function(data){
+			}
+		});
+
+
+            $(document).on('click', '#createnewbackorderbutton', function (e) {
+                $.ajax({
+                        type: "POST",
+                        async: false,
+                        dataType: "json",
+                        url: "{/LITERAL}{$modulepath}{LITERAL}backend/call.php",
+                        data: {
+                            COMMAND: "CreateBackorder",
+                            DOMAIN: $("#createnewbackorder").val()
+                        },
+                        success: function(data) {
+                            $(".createnewbackorderdomain").html($("#createnewbackorder").val());
+                                if (data['CODE']=="200") {
+                                    $("#dialog").dialog({modal: true, width: "400px"});
+                                    oTable.fnDraw();
+                                } else {
+                                    $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
+                                    $("#dialogerror").dialog({modal: true, width: "400px"});
+                                }
+                        },
+                        error: function(data) {
+                            $(".createnewbackorderdomain").html($("#createnewbackorder").val());
+                            $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
+                            $("#dialogerror").dialog({modal: true, width: "400px"});
+                        }
+                });
+            });
+
             oTable = $('#DeletedDomainsList').dataTable({
                 scrollX: true,
                 "dom": '<"clear">ilfrtpC',
                 "oLanguage": {
-                    sProcessing: "<img src='modules/addons/backorder/templates/img/loading.gif'>"
+                    sProcessing: "<img src='modules/addons/ispapibackorder/templates/img/loading.gif'>"
                 },
                 "processing": true,
                 "serverSide": true,
@@ -147,65 +243,43 @@
                 "fnDrawCallback": function(oSettings) {
                     var oSettings = oTable.fnSettings();
                     $("#results").val(oSettings._iDisplayLength);
-
-                    $( "button.setbackorder" ).hover(
-                        /*function() {
-                            if($(this).hasClass("active")){
-                                $(this).html("DELETE");
-                            }
-                        }, function() {
-                            $(this).html("BACKORDER");
-                        }*/
-                    );
-
-                    $("button.setbackorder").click(function() {
-                        var button = $(this);
-                        var command = "CreateBackorder";
-                        if ($(this).hasClass("active"))
-                            command = "DeleteBackorder";
-
-                        $.ajax({
-                            type: "POST",
-                            async: false,
-                            dataType: "json",
-                            url: "{/literal}{$modulepath}{literal}backend/call.php",
-                            data: {
-                                COMMAND: command,
-                                DOMAIN: $(this).attr("value"),
-                                DROPDATE: $(this).attr("placeholder2"),
-                                TYPE: "FULL"
-                            },
-                            success: function(data) {
-                                if(command=="CreateBackorder" && data["CODE"]==200)
-                                    button.addClass("active btn-success");
-                                else if(command=="DeleteBackorder" && data["CODE"]==200)
-                                    button.removeClass("active btn-success");
-                                else{
-                                    $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
-                                    $("#dialogerror").dialog({
-                                        modal: true,
-                                        width: "400px"
-                                    });
-                                }
-                            },
-                            error: function(data) {
-                            }
-                        });
-                    });
                 }
             });
 
-
-
         });
     </script>
-    {/literal}
+    {/LITERAL}
 
 </div>
-<!--############################### / MAIN AREA #######################################-->
+<!--###############################################################################-->
+
 
 <!--############################### SIDEBAR #######################################-->
 <div class="col-md-3 pull-md-left sidebar">
+
+    <!-- ########## CREDIT VOLUME ########## -->
+    <div menuitemname="Client Details" class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-money"></i>&nbsp;{$LANG.creditvolume}</h3>
+        </div>
+        <div class="panel-body">
+            <div id="creditvolume" class="row" style="padding:0px 10px;">
+                <div style="float:left;">{$LANG.creditbalance}:</div>
+                <div style="float:right;"><span id="creditbalance"></span></div>
+                <div style="clear:both"></div>
+                <div style="float:left;">{$LANG.reservedamount}:</div>
+                <div style="float:right;">- <span id="reservedamount"></span></div>
+                <div style="clear:both"></div>
+                <div style="float:left;">{$LANG.unpaidinvoices}:</div>
+                <div style="float:right;">- <span id="unpaidinvoices"></span></div>
+                <div style="clear:both"></div>
+                <div style="border-bottom:1px solid grey;"></div>
+                <div style="float:left;font-weight:bold;">{$LANG.amountavailable}:</div>
+                <div style="float:right;font-weight:bold;"><span id="amountavailable"></span></div>
+            </div>
+        </div>
+    </div>
+    <!-- ###################################### -->
 
     <!--############################## REFINE SEARCH ##############################-->
     <div menuitemname="Client Details" class="panel panel-default">
@@ -383,30 +457,16 @@
         </form>
 
     </div>
-    {literal}
-    <script>
-    	$(document).ready(function() {
-    			$.ajax({
-    			type: "POST",
-    			async: false,
-    			dataType: "json",
-    			url: "{/literal}{$modulepath}{literal}backend/call.php",
-    			data: {COMMAND : "QueryPriceList"},
-    			success: function(data){
-                    var output="";
-    				$.each(data.PROPERTY, function(i, obj) {
-    					  output += '<option value="'+obj.TLD+'">'+obj.TLD+'</option>';
-    				});
-                    $("#tld").append(output);
-    			},
-    			error: function(data){
-    			}
-    		});
-    	});
-    </script>
-    {/literal}
-    <!--############################## / REFINE SEARCH ##############################-->
+    <!--############################## END REFINE SEARCH ##############################-->
 
+    <!-- ########## DROP DATES ########## -->
+    <div menuitemname="Client Details" class="panel panel-default">
+        <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-calendar"></i>&nbsp; {$LANG.upcomingdrops}</h3>
+        </div>
+        <div class="list-group" id="droppingdomains"></div>
+    </div>
+    <!-- ###################################### -->
 
     <!--############################### BACKORDERS PRICING #######################################-->
     <div menuitemname="Client Details" class="panel panel-default">
@@ -425,36 +485,7 @@
         	</table>
         </div>
     </div>
-
-    {literal}
-    <script>
-    	$(document).ready(function() {
-    			$.ajax({
-    			type: "POST",
-    			async: false,
-    			dataType: "json",
-    			url: "{/literal}{$modulepath}{literal}backend/call.php",
-    			data: {COMMAND : "QueryPriceList"},
-    			success: function(data){
-    				$("#pricelist").html();
-    				$.each(data.PROPERTY, function(i, obj) {
-    					  var output="";
-    					  output += '<tr>';
-    					  output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
-    					  output += '<td align="center">'+obj.PRICEFULL + obj.CURRENCYSUFFIX+'</td>';
-    					  output += '</tr>';
-    					  $("#pricelist").append(output);
-    				});
-    			},
-    			error: function(data){
-    			}
-    		});
-    	});
-    </script>
-    {/literal}
-    <!--############################### / BACKORDERS PRICING #######################################-->
-
-    {$BackorderSidebar}
+    <!--############################### END BACKORDERS PRICING #######################################-->
 
     <!--############################### CREATE BACKORDER #######################################-->
     <div menuitemname="Client Details" class="panel panel-default">
@@ -468,58 +499,13 @@
             <input type="submit" value="{$LANG.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
         </div>
     </div>
-
     <div id="dialog" title="{$LANG.createbackordersuccess}" style="display:none;">
         <p>{$LANG.createbackordersuccesstext}</p>
     </div>
     <div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
         <p>{$LANG.createbackordererrortext}</p>
     </div>
-
-    {literal}
-    <script>
-
-        $("#createnewbackorderbutton").click(function() {
-            var type = "FULL";
-
-            $.ajax({
-                    type: "POST",
-                    async: false,
-                    dataType: "json",
-                    url: "{/literal}{$modulepath}{literal}backend/call.php",
-                    data: {
-                        COMMAND: "CreateBackorder",
-                        DOMAIN: $("#createnewbackorder").val(),
-                        TYPE: type
-                    },
-                    success: function(data) {
-                        $(".createnewbackorderdomain").html($("#createnewbackorder").val());
-                            if (data['CODE']=="200") {
-                                $("#dialog").dialog({
-                                    modal: true,
-                                    width: "400px"
-                                });
-                            } else {
-                                $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
-                                $("#dialogerror").dialog({
-                                    modal: true,
-                                    width: "400px"
-                                });
-                            }
-                    },
-                    error: function(data) {
-                        $(".createnewbackorderdomain").html($("#createnewbackorder").val());
-                        $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
-                        $("#dialogerror").dialog({
-                            modal: true,
-                            width: "400px"
-                        });
-                    }
-            });
-        });
-    </script>
-    {/literal}
-    <!--############################### / CREATE BACKORDER #######################################-->
+    <!--############################### END CREATE BACKORDER #######################################-->
 
 </div>
-<!--############################### / SIDEBAR #######################################-->
+<!--############################### END SIDEBAR #######################################-->

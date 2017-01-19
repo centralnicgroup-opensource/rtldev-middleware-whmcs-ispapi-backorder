@@ -13,7 +13,7 @@ $_LANG['createbackordersuccess'] = "Backorder erfolgreich erstellt";
 $_LANG['createbackordersuccesstext'] = 'Backorder erfolgreich erstellt.';
 $_LANG['createbackordererror'] = "Es ist ein Fehler aufgetreten";
 $_LANG['createbackordererrortext'] = 'Erstellen der Backorder fehlgeschlagen. <br><br>Fehler: <strong id="createnewbackorderdomainerrortext"></strong> ';
-$_LANG['freedomains'] = "Freiwerdende Domains";
+$_LANG['upcomingdrops'] = "Freiwerdende Domains";
 $_LANG['today'] = "Heute";
 $_LANG['tommorrow'] = "Morgen";
 $_LANG['total7days'] = "Nächsten 7 Tagen";
@@ -52,6 +52,11 @@ $_LANG['overviewbackorderstatus'] = "Backorders Status";
 $_LANG['overviewbackorderdays'] = "Backorders Dropdate";
 $_LANG['backorder_nav'] = "Backorders";
 $_LANG['deletebutton'] = "LÖSCHEN";
+$_LANG['creditbalance'] = "Kontostand";
+$_LANG['reservedamount'] = "Reserv. Guthaben";
+$_LANG['unpaidinvoices'] = "Unbez. Rechnungen";
+$_LANG['amountavailable'] = "Verfügbares Guthaben";
+$_LANG['creditvolume'] = "Konto";
 
 
 

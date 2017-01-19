@@ -18,12 +18,15 @@ while ($local = mysql_fetch_array($result)) {
 		if(!isset($list[$local["userid"]])){
 			$list[$local["userid"]]["backorders"] = array();
 		}
-		$list[$local["userid"]]["backorders"][] = array("id" => $local["id"], "tld" => $local["tld"], "type" => $local["type"] );
+		$list[$local["userid"]]["backorders"][] = array("id" => $local["id"],
+														"tld" => $local["tld"],
+														"type" => $local["type"],
+														"domain" => $local["domain"].".".$local["tld"],
+														"dropdate" => $local["dropdate"],
+														"status" => $local["status"],
+														"lowbalance_notification" => $local["lowbalance_notification"] );
 	}
 }
-
-//echo "<pre>";
-//print_r($list);
 
 //CHANGE STATUS FROM REQUESTED TO ACTIVE FOR CUSTOMER WITH CREDIT
 foreach($list as $key => $l){ //for each user
@@ -42,6 +45,7 @@ foreach($list as $key => $l){ //for each user
 				$backorder_price = $result["PROPERTY"][$backorder["tld"]]["PRICEFULL"];
 			}
 		}
+
 		if(isset($backorder_price)){
 			//echo "Backorder id=".$backorder["id"]." costs ".$backorder_price."<br>";
 
@@ -52,7 +56,11 @@ foreach($list as $key => $l){ //for each user
 			);
 			$result = backorder_backend_api_call($command);
 			if($result["CODE"] == 200){
-				$current_credit = $result["PROPERTY"]["AMOUNT"];
+				if(isset($result["PROPERTY"]["AMOUNT"]["VALUE"])){
+					$current_credit = $result["PROPERTY"]["AMOUNT"]["VALUE"];
+				}else{
+					$current_credit = 0;
+				}
 			}else{
 				$current_credit = 0;
 			}
@@ -66,14 +74,16 @@ foreach($list as $key => $l){ //for each user
 					if($data["status"] == "REQUESTED"){
 						$oldstatus = $data["status"];
 						if(update_query('backorder_domains',array("status" => "ACTIVE", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $data["id"]) )){
-							$message = "BACKORDER ".$data["domain"].".".$data["tld"]." (backorderid=".$data["id"].") set from ".$oldstatus." to ACTIVE";
+							$message = "BACKORDER ".$data["domain"].".".$data["tld"]." (backorderid=".$data["id"].", userid=".$key.") set from ".$oldstatus." to ACTIVE";
 							logmessage($cronname, "ok", $message);
 						}
 					}
 				}
 				##########################################
 			}else  {
-				array_push($notactivated, $backorder);
+				if($backorder["lowbalance_notification"] == 0){
+					array_push($notactivated, $backorder);
+				}
 			}
 		}
 	}
@@ -82,9 +92,25 @@ foreach($list as $key => $l){ //for each user
 	}
 }
 
-//echo "<pre>";
-//print_r($could_not_be_set_to_active);
+//HANDLE ALL LOW BALANCE NOTIFICATIONS
+foreach($could_not_be_set_to_active as $key => $backorders){
+		#SEND LOW BALANCE NOTIFICATION TO THE CUSTOMER
+		$command = "sendemail";
+		$adminuser = "admin";
+		$values["messagename"] = "backorder_lowbalance_notification";
+		$values["id"] = $key;
+		$values["customvars"] = array("list"=> $backorders);
+		$results = localAPI($command, $values, $adminuser);
 
-logmessage($cronname, "ok", "BATCH_REQUESTED_ACTIVE done");
+		#SET THE LOWBALANCENOTIFICATION FLAG TO 1
+		foreach($backorders as $backorder){
+			if(update_query('backorder_domains',array("updateddate" => date("Y-m-d H:i:s"), "lowbalance_notification" => 1) , array("id" => $backorder["id"]) )){
+				$message = "BACKORDER ".$backorder["domain"]." (backorderid=".$backorder["id"].", userid=".$key.") insufficient funds - low balance notification sent";
+				logmessage($cronname, "error", $message);
+			}
+		}
+}
+
+//logmessage($cronname, "ok", "BATCH_REQUESTED_ACTIVE done");
 echo date("Y-m-d H:i:s")." BATCH_REQUESTED_ACTIVE done.\n";
 ?>

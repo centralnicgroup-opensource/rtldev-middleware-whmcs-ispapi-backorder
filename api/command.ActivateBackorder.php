@@ -1,6 +1,6 @@
 <?php // $command, $userid
 
-if ( !$userid )	return backorder_api_response(531);
+if ( !$userid )	return backorder_api_response(531, "AUTHORIZATION FAILED");
 
 if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) )
 	return backorder_api_response(504, "DOMAIN");

@@ -82,10 +82,6 @@ while ($local = mysql_fetch_array($result)) {
 			"BILLINGCONTACT0" => get_contact_details("USER", $local["userid"])//get_contact_details("SYSTEM")
 		);
 
-		/*if($local["type"] == "LITE"){
-			$command["X-BACKORDER-LITE"] = 1;
-		}*/
-
 		$backorder = ispapi_api_call($command);
 		if($backorder["CODE"] == 200){
 			//SET BACKORDER REFERENCE
@@ -100,6 +96,6 @@ while ($local = mysql_fetch_array($result)) {
 	}
 }
 
-logmessage($cronname, "ok", "BATCH_PROCESSING_APPLICATION done");
+//logmessage($cronname, "ok", "BATCH_PROCESSING_APPLICATION done");
 echo date("Y-m-d H:i:s")." BATCH_PROCESSING_APPLICATION done.\n";
 ?>

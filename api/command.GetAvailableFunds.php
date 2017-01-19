@@ -1,19 +1,25 @@
 <?php // $command
-
 //RETURN THE CURRENT AVAILABLE CREDIT !
 //AVAILABLE CREDIT = CURRENT CREDIT BALANCE - UNPAID INVOICES - RESERVED AMOUNT
-
 //LIST OF ALL STATUS: 'REQUESTED','ACTIVE','PROCESSING','SUCCESSFUL','FAILED','CANCELLED','AUCTION-PENDING','AUCTION-WON','AUCTION-LOST','PENDING-PAYMENT'
 
 if ( !$userid )	return backorder_api_response(531);
 
+$r = backorder_api_response(200);
+
+//GET THE CLIENT CURRENCY
+$result = full_query("SELECT cur.* FROM tblcurrencies cur, tblclients cli WHERE cli.currency = cur.id AND cli.id=".$userid);
+$cur = mysql_fetch_array($result);
+
 //GET THE CURRENT CREDIT BALANCE
 #######################################################
-$r = localAPI("getclientsdetails", array("clientid" => $userid, "stats" => true), "admin");
+$d = localAPI("getclientsdetails", array("clientid" => $userid, "stats" => true), "admin");
 $credit = 0;
-if($r["client"]["credit"]){
-	$credit = $r["client"]["credit"];
+if($d["client"]["credit"]){
+	$credit = $d["client"]["credit"];
 }
+$r["PROPERTY"]["CREDITBALANCE"]["VALUE"] = $credit;
+$r["PROPERTY"]["CREDITBALANCE"]["VALUE_FORMATED"] = formatPrice($credit, $cur);
 //echo "CREDIT BALANCE: ".$credit;
 //echo "<br>";
 #######################################################
@@ -38,6 +44,8 @@ foreach($results["invoices"]["invoice"] as $invoice){
 			$unpaidamount = $unpaidamount + $invoice["total"];
 		}
 }
+$r["PROPERTY"]["UNPAIDINVOICES"]["VALUE"] = $unpaidamount;
+$r["PROPERTY"]["UNPAIDINVOICES"]["VALUE_FORMATED"] = formatPrice($unpaidamount, $cur);
 //echo "UNPAID INVOICES: ".$unpaidamount;
 //echo "<br>";
 #######################################################
@@ -73,6 +81,8 @@ if($credit > 0){
 		}
 	}
 }
+$r["PROPERTY"]["RESERVEDAMOUNT"]["VALUE"] = $reserved_amount;
+$r["PROPERTY"]["RESERVEDAMOUNT"]["VALUE_FORMATED"] = formatPrice($reserved_amount, $cur);
 //echo "RESERVED AMOUNT: ".$reserved_amount;
 //echo "<br>";
 #######################################################
@@ -83,8 +93,8 @@ if($available_credit <= 0){
 	$available_credit = 0;
 }
 
-$r = backorder_api_response(200);
-$r["PROPERTY"]["AMOUNT"] = $available_credit;
+$r["PROPERTY"]["AMOUNT"]["VALUE"] = $available_credit; //property used to activated backorders
+$r["PROPERTY"]["AMOUNT"]["VALUE_FORMATED"] = formatPrice($available_credit, $cur);
 
 return $r;
 

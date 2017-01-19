@@ -1,13 +1,13 @@
 
 
 .dataTables_wrapper .dataTables_info {
-    background-color: #f26522;
+    background-color: #23527c;
     width:100%;
     color: #fff;
 }
 
 .panel-default > .panel-heading {
-    background-color: #f26522;
+    background-color: #23527c;
     border-color: #ddd;
     color: #ffffff;
 }
@@ -17,7 +17,7 @@
 }
 
 .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
-    background-color: #f26522;
+    background-color: #23527c;
     border-color: #ddd;
 }
 

@@ -3,7 +3,23 @@ $cronname = "BATCH_POLLING";
 require_once dirname(__FILE__)."/../../../../init.php";
 require_once dirname(__FILE__)."/../backend/api.php";
 
-logmessage($cronname, "ok", "BATCH_POLLING started");
+function getRenewPrice($userid, $tld){
+	$pricereq = full_query("SELECT p.msetupfee FROM tblpricing p, tbldomainpricing dp, tblclients c
+							WHERE dp.id=p.relid
+							AND c.currency=p.currency
+							AND c.id=".$userid."
+							AND dp.extension='.".$tld."'
+							AND p.type='domainrenew'");
+	$renewprice = mysql_fetch_array($pricereq);
+	if(isset($renewprice["msetupfee"])){
+		$renewprice = $renewprice["msetupfee"];
+	}else{
+		$renewprice = 0;
+	}
+	return $renewprice;
+}
+
+//logmessage($cronname, "ok", "BATCH_POLLING started");
 
 //ITERATE OVER PROCESSING APPLICATIONS
 $result = full_query("SELECT * FROM backorder_domains WHERE (status = 'PROCESSING' OR status = 'AUCTION-PENDING') AND  reference != '' ");
@@ -28,7 +44,7 @@ while ($local = mysql_fetch_array($result)) {
 				//SET BACKORDER STATUS TO AUCTION-PENDING
 				if(update_query('backorder_domains', array("status" => "AUCTION-PENDING", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
 					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ".$oldstatus." to AUCTION-PENDING";
-;					logmessage($cronname, "ok", $message);
+					logmessage($cronname, "ok", $message);
 				}
 			}
 
@@ -68,22 +84,40 @@ while ($local = mysql_fetch_array($result)) {
 				);
 				$status = ispapi_api_call($command);
 
+				$createddate = "";
 				if($status["CODE"] == 200){
 					$createddate = substr($status["PROPERTY"]["CREATEDDATE"][0], 0, -9);
+					$expirationdate = substr($status["PROPERTY"]["EXPIRATIONDATE"][0], 0, -9);
+
+					$tmpdate = new DateTime($expirationdate);
+					$tmpdate->modify('-15 days');
+					$nextduedate = $tmpdate->format('Y-m-d');
+
+					//GET RENEW PRICE OF TLD
+					$renewprice = getRenewPrice($local["userid"], $local["tld"]);
+
 					//IMPORT DOMAIN IN WHMCS
-					insert_query("tbldomains",array(
+					if(insert_query("tbldomains",array(
 							"userid" => $local["userid"],
 							"domain" => $local["domain"].".".$local["tld"],
 							"registrar" => "ispapi",
 							"registrationdate" => $createddate,
+							"expirydate" => $expirationdate,
+							"nextduedate" => $nextduedate,
+							"nextinvoicedate" => $nextduedate,
 							"dnsmanagement" => 1,
 							"emailforwarding" => 1,
 							"status" => "Active",
-					));
-					if(update_query('backorder_domains', array("status" => "AUCTION-WON", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-						$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$oldstatus." to AUCTION-WON, DOMAIN IMPORTED IN USER ACCOUNT";
-						logmessage($cronname, "ok", $message);
+							//"donotrenew" => 1, //THIS ATTRIBUT IS REQUIRED TO BLOCK THE SENDING OF A SECOND PAYMENT CONFIRMATION OF 0€
+							"donotrenew" => 0,
+							"recurringamount" => $renewprice
+					))){
+						if(update_query('backorder_domains', array("status" => "AUCTION-WON", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
+							$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$oldstatus." to AUCTION-WON, domain imported in user account";
+							logmessage($cronname, "ok", $message);
+						}
 					}
+
 				}else{
 					$message = "StatusDomain for ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") currently not possible (Please wait)";
 					logmessage($cronname, "error", $message);
@@ -120,6 +154,21 @@ while ($local = mysql_fetch_array($result)) {
 	}else{
 		$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") NOT FOUND (".$backorder["CODE"].", ".$backorder["DESCRIPTION"].")";
 		logmessage($cronname, "error", $message);
+
+		//IF APPLICATION NOT FOUND (545), THEN SET THE BACKORDER TO CANCELLED. (MEANS THE BACKORDER HAS BEEN DELETED BY THE ADMIN)
+		if($backorder["CODE"] == 545){
+			//GET OLD STATUS
+			$r = select_query("backorder_domains","*",array("id" => $local["id"]));
+			$d = mysql_fetch_array($r);
+			$oldstatus = $d["status"];
+
+			//SET BACKORDER TO CANCELLED
+			if(update_query('backorder_domains', array("status" => "CANCELLED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
+				$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$oldstatus." to CANCELLED (backorder application deleted by admin)";
+				logmessage($cronname, "ok", $message);
+			}
+		}
+
 	}
 
 }
@@ -155,6 +204,9 @@ while ($backorder = mysql_fetch_array($result)) {
 
 
 			if($invoice["status"] == "Paid"){
+				//GET RENEW PRICE OF TLD
+				$renewprice = getRenewPrice($backorder["userid"], $backorder["tld"]);
+
 				//IMPORT DOMAIN IN WHMCS
 				if(insert_query("tbldomains",array(
 						"userid" => $backorder["userid"],
@@ -196,6 +248,6 @@ while ($backorder = mysql_fetch_array($result)) {
 
 }
 
-logmessage($cronname, "ok", "BATCH_POLLING done");
+//logmessage($cronname, "ok", "BATCH_POLLING done");
 echo date("Y-m-d H:i:s")." BATCH_POLLING done.\n";
 ?>

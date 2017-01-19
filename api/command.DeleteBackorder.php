@@ -1,6 +1,6 @@
 <?php // $command, $userid
 
-if ( !$userid )	return backorder_api_response(531);
+if ( !$userid )	return backorder_api_response(531, "AUTHORIZATION FAILED");
 
 if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) )
 	return backorder_api_response(504, "DOMAIN");
@@ -12,7 +12,7 @@ $result = select_query('backorder_domains','*',array("userid" => $userid, "domai
 if (!($data = mysql_fetch_assoc($result))) {
 	return backorder_api_response(545, "DOMAIN");
 }else{
-	if(in_array($data["status"], array("PROCESSING", "PENDING-PAYMENT", "AUCTION-PENDING"))){
+	if(in_array($data["status"], array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($data["status"]=="PROCESSING" && !empty($data["reference"]) ) ){
 		return backorder_api_response(549, "THIS BACKORDER CANNOT BE DELETED");
 	}
 	delete_query('backorder_domains', array('id' => $data['id']) );

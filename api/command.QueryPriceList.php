@@ -1,4 +1,5 @@
 <?php // $command, $userid - DM 30.07.2015 / MODIFIED SA 17.08.2015
+//require_once dirname(__FILE__)."/../backend/helper.php";
 
 $currencyid=NULL;
 $result = select_query('tblclients','currency',array("id" => $userid ));
@@ -29,8 +30,8 @@ if(isset($command["TLD"])){
 
 $result = select_query('backorder_pricing','*',$params);
 while ( $data = mysql_fetch_assoc($result) ) {
-	$r["PROPERTY"][$data["extension"]]["PRICELITE"] = $data["liteprice"];
 	$r["PROPERTY"][$data["extension"]]["PRICEFULL"] = $data["fullprice"];
+	$r["PROPERTY"][$data["extension"]]["PRICEFULL_FORMATED"] = formatPrice($data["fullprice"], $currency);
 	$r["PROPERTY"][$data["extension"]]["CURRENCYSUFFIX"] = $currency["suffix"];
 	$r["PROPERTY"][$data["extension"]]["CURRENCY"] = $currency["code"];
 	$r["PROPERTY"][$data["extension"]]["TLD"] = $data["extension"];

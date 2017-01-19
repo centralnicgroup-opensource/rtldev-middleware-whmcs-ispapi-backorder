@@ -46,13 +46,13 @@ add_hook('ClientAreaPrimaryNavbar', 1, function (MenuItem $primaryNavbar)
 
 		$primaryNavbar->getChild($_LANG['backorder_nav'])->addChild($_LANG['managebackorders'], array(
 				'label' => $_LANG['managebackorders'],
-				'uri' => 'index.php?m=backorder&p=manage',
+				'uri' => 'index.php?m=ispapibackorder&p=manage',
 				'order' => '20',
 		));
 
 		$primaryNavbar->getChild($_LANG['backorder_nav'])->addChild($_LANG['domainheader'], array(
 				'label' => $_LANG['domainheader'],
-				'uri' => 'index.php?m=backorder&p=dropdomains',
+				'uri' => 'index.php?m=ispapibackorder&p=dropdomains',
 				'order' => '10',
 		));
 

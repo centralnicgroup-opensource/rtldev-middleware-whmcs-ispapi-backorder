@@ -1,7 +1,5 @@
 <?php
 
-$module_version = "1.0";
-
 if (!defined("WHMCS"))
     die("This file cannot be accessed directly");
 
@@ -9,7 +7,7 @@ function ispapibackorder_config() {
     $configarray = array(
     "name" => "ISPAPI Backorder",
     "description" => "This addon allows you to provide backorders to your customers.",
-    "version" => $module_version,
+    "version" => "1.0",
     "author" => "",
     "language" => "english");
     return $configarray;
@@ -17,54 +15,78 @@ function ispapibackorder_config() {
 
 function ispapibackorder_activate() {
 
-	//Create backorder_domains table
-	$query = "CREATE TABLE backorder_domains (
-	id int(11) NOT NULL AUTO_INCREMENT,
-	userid int(11) NOT NULL,
-	domain varchar(255) NOT NULL,
-	tld varchar(32) NOT NULL,
-	type enum('FULL','LITE') CHARACTER SET ascii NOT NULL,
-	status enum('REQUESTED','ACTIVE','PROCESSING','SUCCESSFUL','FAILED','CANCELLED','AUCTION-PENDING','AUCTION-WON','AUCTION-LOST','PENDING-PAYMENT') CHARACTER SET ascii NOT NULL,
-	createddate datetime NOT NULL,
-	updateddate datetime NOT NULL,
-	dropdate datetime NOT NULL,
-	provider varchar(255) NOT NULL,
-	reference varchar(255) NOT NULL,
-	invoice varchar(255) NOT NULL,
-	PRIMARY KEY (id),
-	UNIQUE KEY userid (userid,domain,tld)
-	) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;";
-  $result = full_query($query);
+    //CREATE backorder_domains TABLE IF NOT EXISTING
+    $r = full_query("SHOW TABLES LIKE 'backorder_domains'");
+    $exist = mysql_num_rows($r) > 0;
+    if(!$exist){
+        //Create backorder_domains table
+    	$query = "CREATE TABLE backorder_domains (
+                    	id int(11) NOT NULL AUTO_INCREMENT,
+                    	userid int(11) NOT NULL,
+                    	domain varchar(255) NOT NULL,
+                    	tld varchar(32) NOT NULL,
+                    	type enum('FULL','LITE') CHARACTER SET ascii NOT NULL,
+                    	status enum('REQUESTED','ACTIVE','PROCESSING','SUCCESSFUL','FAILED','CANCELLED','AUCTION-PENDING','AUCTION-WON','AUCTION-LOST','PENDING-PAYMENT') CHARACTER SET ascii NOT NULL,
+                    	createddate datetime NOT NULL,
+                    	updateddate datetime NOT NULL,
+                    	dropdate datetime NOT NULL,
+                    	reference varchar(255) NOT NULL,
+                    	invoice varchar(255) NOT NULL,
+                        lowbalance_notification INT(11) NOT NULL,
+                    	PRIMARY KEY (id),
+                    	UNIQUE KEY userid (userid,domain,tld)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        $result = full_query($query);
+    }
 
-  $query = "CREATE TABLE `backorder_logs` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron` varchar(255) NOT NULL, `date` datetime, `status` varchar(20) NOT NULL, `message` text, `query` text, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;";
-  $result = full_query($query);
+    //CREATE backorder_logs TABLE IF NOT EXISTING
+    $r = full_query("SHOW TABLES LIKE 'backorder_logs'");
+    $exist = mysql_num_rows($r) > 0;
+    if(!$exist){
+        $query = "CREATE TABLE `backorder_logs` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron` varchar(255) NOT NULL, `date` datetime, `status` varchar(20) NOT NULL, `message` text, `query` text, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        $result = full_query($query);
+    }
 
-  $query = "CREATE TABLE `backorder_pricing` ( `id` int(11) NOT NULL AUTO_INCREMENT, `extension` varchar(20) NOT NULL, `currency_id` int(11) NOT NULL, `fullprice` float, `liteprice` float, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;";
-  $result = full_query($query);
+    //CREATE backorder_pricing TABLE IF NOT EXISTING
+    $r = full_query("SHOW TABLES LIKE 'backorder_pricing'");
+    $exist = mysql_num_rows($r) > 0;
+    if(!$exist){
+        $query = "CREATE TABLE `backorder_pricing` ( `id` int(11) NOT NULL AUTO_INCREMENT, `extension` varchar(20) NOT NULL, `currency_id` int(11) NOT NULL, `fullprice` float, `liteprice` float, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        $result = full_query($query);
+    }
 
-  $query = 'INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES (\'general\', \'backorder_failed_notification\', \'Backorder Failded Notification\', \'Hello {$client_name} ,&lt;br /&gt;&lt;br /&gt;The following backorders have failed today:&lt;br /&gt;{foreach from=$list item=data}&lt;br /&gt; - &lt;strong&gt;{$data.domain} &lt;/strong&gt;({$data.status}) &lt;br /&gt; {/foreach}&lt;br /&gt;&lt;br /&gt;&lt;span&gt;{$signature}&lt;/span&gt;\', 0, 1, 0)';
-  $result = full_query($query);
+    //ADD backorder_lowbalance_notification TEMPLATE IF NOT EXISTING
+    $r = full_query("SELECT * FROM tblemailtemplates WHERE name='backorder_lowbalance_notification'");
+    $exist = mysql_num_rows($r) > 0;
+    if(!$exist){
+        $query = 'INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES ("general", "backorder_lowbalance_notification", "Low Balance Notification from {$company_name}", "<p>Hello {$client_name},<br /><br />unfortunately, your account has insufficient funds. You need to charge your account with the required funds, so that we can process your backorder requests.<br />If you fail to charge your account, the following backorders will be ignored:<br />{foreach from=$list item=data}<br />- <strong>{$data.domain} </strong>({$data.dropdate}){/foreach}<br /><br /><span>{$signature}</span></p>", 0, 1, 0)';
+        $result = full_query($query);
+    }
 
-  $query = 'INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES (\'general\', \'backorder_2_hours_before\', \'Backorder Notification from {$company_name}\', \'Hello {$client_name} ,&lt;br /&gt;&lt;br /&gt;The following domains will be backordered within the next 2 hours:&lt;br /&gt;{foreach from=$list item=data}&lt;br /&gt; - &lt;strong&gt;{$data.domain} &lt;/strong&gt;({$data.dropdate} / {$data.status}) &lt;br /&gt; {/foreach}&lt;br /&gt;&lt;br /&gt;&lt;span&gt;{$signature}&lt;/span&gt;\', 0, 1, 0)';
-  $result = full_query($query);
-
-  $query = 'INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES (\'general\', \'backorder_3_days_before\', \'Backorder Notification from {$company_name}\',\'&lt;p&gt;Dear {$client_name},&lt;/p&gt;&lt;p&gt;The following domains will be backordered within the next 3 days:&lt;/p&gt;{foreach from=$list item=data}&lt;p&gt; - &lt;strong&gt;{$data.domain} &lt;/strong&gt;({$data.dropdate} / {$data.status})&lt;/p&gt;{/foreach}&lt;br /&gt;&lt;p&gt;{$client_credit}&lt;/p&gt;&lt;p&gt;{$signature}&lt;/p&gt;\', 0, 1, 0)';
-  $result = full_query($query);
-
-	return array('status'=>'success','description'=>'Installed');
+    return array('status'=>'success','description'=>'Installed');
 
 }
 
 function ispapibackorder_deactivate() {
-  //full_query("DROP TABLE backorder_domains");
-  //full_query("DROP TABLE backorder_pricing");
-  //full_query("DROP TABLE backorder_logs");
-  //full_query("DROP TABLE pending_domains");
-  //full_query("DELETE FROM tblemailtemplates WHERE name='backorder_failed_notification' or name='backorder_2_hours_before' or name='backorder_3_days_before'");
-
-  return array('status'=>'success','description'=>'Uninstalled');
+    //DO NOT DELETE TABLES WHEN DEACTIVATING DOMAINS - DEVELOPPER HAS TO DO IT MANUALLY IF WANTED
+    //full_query("DROP TABLE backorder_domains");
+    //full_query("DROP TABLE backorder_pricing");
+    //full_query("DROP TABLE backorder_logs");
+    //full_query("DROP TABLE pending_domains");
+    //full_query("DELETE FROM tblemailtemplates WHERE name='backorder_lowbalance_notification'");
+    return array('status'=>'success','description'=>'Uninstalled');
 }
 
+function ispapibackorder_upgrade($vars) {
+    $version = $vars['version'];
+
+    # Run SQL Updates for V1.0 to V1.1
+    /*if ($version < 1.1) {
+        $query = "CREATE TABLE `mylogs4` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron` varchar(255) NOT NULL, `date` datetime, `status` varchar(20) NOT NULL, `message` text, `query` text, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        $result = mysql_query($query);
+    }*/
+
+}
 
 function ispapibackorder_output($vars) {
 	if(!isset($_GET["tab"])){
@@ -158,33 +180,32 @@ function ispapibackorder_output($vars) {
 		padding:5px;
 	}
 
-
 	</style>';
 
 	echo '<div id="tabs"><ul class="nav nav-tabs admin-tabs" role="tablist">';
-	echo '<!--<li id="tab0" class="tab" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">General Settings</a></li>-->';
-	if($_GET["tab"] == 0){$active = "active";}else{$active="";}
+    if($_GET["tab"] == 0){$active = "active";}else{$active="";}
 	echo '<li id="tab0" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Manage Backorders</a></li>';
 	if($_GET["tab"] == 1){$active = "active";}else{$active="";}
 	echo '<li id="tab1" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Backorder Pricing</a></li>';
-
+    if($_GET["tab"] == 2){$active = "active";}else{$active="";}
+	echo '<li id="tab2" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Backorder Logs</a></li>';
 	echo '</ul></div>';
 
-
-	//ispapibackorder_generalsettings_content($modulelink."&tab=0");
-	ispapibackorder_manage_backorders($modulelink."&tab=0");
+	ispapibackorder_managebackorders_content($modulelink."&tab=0");
 	ispapibackorder_pricing_content($modulelink."&tab=1");
+	ispapibackorder_logs_content($modulelink."&tab=2");
 }
 
-function ispapibackorder_generalsettings_content($modulelink){
+function ispapibackorder_managebackorders_content($modulelink){
 	echo '<div id="tab0box" class="tabbox tab-content">';
-	echo "<H2>TAB1</H2>";
+	echo "<H2>Manage Backorders</H2>";
+    include(dirname(__FILE__)."/controller/backend.managebackorders.php");
 	echo '</div>';
 }
 
 function ispapibackorder_pricing_content($modulelink){
 	echo '<div id="tab1box" class="tabbox tab-content">';
-
+	echo "<H2>Backorder Pricing</H2>";
 	//Delete pricing
 	###############################################################################
 	if(isset($_REQUEST["deletepricing"])){
@@ -230,7 +251,7 @@ function ispapibackorder_pricing_content($modulelink){
 	###############################################################################
 
 	echo '<form action="'.$modulelink.'" method="post">';
-	echo '<div class="tablebg" align="center"><table id="domainpricing" class="datatable" cellspacing="1" cellpadding="3" border="0"><thead><th>Extension</th><th>Currency</th><th>Backorder Price</th><th></th></thead><tbody>';
+	echo '<div class="tablebg" align="center"><table id="domainpricing" class="table table-bordered table-hover table-condensed dt-bootstrap" cellspacing="1" cellpadding="3" border="0"><thead><th>Extension</th><th>Currency</th><th>Backorder Price</th><th></th></thead><tbody>';
 	foreach($extensions as $extension){
 		echo '<tr><td width="50"><input style="font-weight:bold;" type="text" name="EXT['.$extension["id"].'][EXT]" value="'.$extension["extension"].'"/></td>';
 		//echo '<td width="50"><input type="text" name="EXT['.$extension["id"].'][CURRENCY]" value="'.$extension["currency_id"].'"/></td>';
@@ -265,79 +286,16 @@ function ispapibackorder_pricing_content($modulelink){
 	echo '</div>';
 }
 
-
-function ispapibackorder_manage_backorders($modulelink){
-	echo '<div id="tab0box" class="tabbox tab-content">';
-	echo "<H2>Manage Backorders</H2>";
-
-	if(isset($_REQUEST["delete"])){
-		require_once dirname(__FILE__)."/../../../init.php";
-		require_once dirname(__FILE__).'/backend/api.php';
-
-		$command = array(
-				"COMMAND" => "DeleteBackorder",
-				"DOMAIN" => $_GET["delete"],
-				"USER" => $_GET["user"]
-		);
-
-		$result = backorder_backend_api_call($command);
-		if($result["CODE"] == 200){
-			echo '<div class="infobox"><strong><span class="title">Backorder deleted!</span></strong><br>The backorder has been successfuly deleted.</div>';
-		}else{
-			echo '<div class="errorbox"><strong><span class="title">Error!</span></strong><br>'.$result["DESCRIPTION"].'</div>';
-		}
-	}
-
-	if(isset($_REQUEST["activate"])){
-		require_once dirname(__FILE__)."/../../../init.php";
-		require_once dirname(__FILE__).'/backend/api.php';
-
-		$command = array(
-				"COMMAND" => "ActivateBackorder",
-				"DOMAIN" => $_GET["activate"],
-				"USER" => $_GET["user"]
-		);
-
-		$result = backorder_backend_api_call($command);
-
-		if($result["CODE"] == 200){
-			echo '<div class="infobox"><strong><span class="title">Backorder Activated!</span></strong><br>The backorder has been successfuly activated.</div>';
-		}else{
-			echo '<div class="errorbox"><strong><span class="title">Error!</span></strong><br>'.$result["DESCRIPTION"].'</div>';
-		}
-	}
-
-	$backorders = array();
-	$result = mysql_query("SELECT bd.*, bd.id as backorder_id, c.id as client_id, c.firstname as firstname, c.lastname as lastname FROM backorder_domains as bd LEFT JOIN tblclients AS c ON bd.userid = c.id order by bd.domain asc");
-	while ($data = mysql_fetch_array($result)) {
-		array_push($backorders, $data);
-	}
-
-	echo '<form action="'.$modulelink.'" method="post">';
-	echo '<div class="tablebg" align="center">';
-	echo '<table id="domainpricing" class="datatable" cellspacing="1" cellpadding="3" border="0" width="100%"><thead><th>Domain</th><th>Client</th><th>Drop Date</th><th>Created Date</th><th>Updated Date</th><th>Status</th><th>Provider</th><th>Reference</th><th>Actions</th></thead><tbody>';
-
-	foreach($backorders as $backorder){
-		if($backorder["status"] == "REQUESTED"){
-			$activate_link = "<a href='".$modulelink."&activate=".$backorder["domain"].".".$backorder["tld"]."&user=".$backorder["client_id"]."'>Activate</a>";
-		}else{
-			$activate_link = "";
-		}
-		if($backorder["status"] == "PROCESSING"){
-			$delete_link = "";
-		}else{
-			$delete_link = "<a href='".$modulelink."&delete=".$backorder["domain"].".".$backorder["tld"]."&user=".$backorder["client_id"]."'>Delete</a>";
-		}
-		echo "<tr class='".$backorder["status"]."'><td class='".$backorder["type"]."'>".$backorder["domain"].".".$backorder["tld"]."</td><td><a href='clientssummary.php?userid=".$backorder["client_id"]."'>".$backorder["firstname"]." ".$backorder["lastname"]."</a></td><td>".$backorder["dropdate"]."</td><td>".$backorder["createddate"]."</td><td>".$backorder["updateddate"]."</td><td>".$backorder["status"]."</td><td>".$backorder["provider"]."</td><td>".$backorder["reference"]."</td><td>".$delete_link." ".$activate_link."</td></tr>";
-	}
-
-	echo '</tbody></table></div>';
+function ispapibackorder_logs_content($modulelink){
+	echo '<div id="tab2box" class="tabbox tab-content">';
+	echo "<H2>Backorder Logs</H2>";
+    include(dirname(__FILE__)."/controller/backend.logs.php");
 	echo '</div>';
-	echo '</form>';
 }
 
+
 function ispapibackorder_clientarea($vars) {
-	$modulename = "backorder";
+	$modulename = "ispapibackorder";
 	$modulepath = "../modules/addons/".$modulename;
 
 	//include language files
@@ -346,15 +304,15 @@ function ispapibackorder_clientarea($vars) {
 		$language = "english";
 	}
 	$file = getcwd()."/lang/".$language.".php";
-	$file_backorder = getcwd()."/modules/addons/backorder/lang/".$language.".php";
+	$file_backorder = getcwd()."/modules/addons/ispapibackorder/lang/".$language.".php";
 	include($file);
 	if ( file_exists($file_backorder) ) {
 		include($file_backorder);
 	}
 
-	if(!isset($_GET["p"])){
-		$_GET["p"] = "test1"; //"pendingdomainlist";
-	}
+	/*if(!isset($_GET["p"])){
+		$_GET["p"] = "test1";
+	}*/
 
 	//include controller file
 	$vars = array();
@@ -365,7 +323,7 @@ function ispapibackorder_clientarea($vars) {
 
 	return array(
 			'pagetitle' => "Backorder",
-			'breadcrumb' => array('index.php?m=backorder'=>'Backorder'),
+			'breadcrumb' => array('index.php?m=ispapibackorder'=>'Backorder'),
 			'templatefile' => "templates/".$_GET["p"],
 			'requirelogin' => true,
 			'vars' => array_merge($vars, array(

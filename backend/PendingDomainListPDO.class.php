@@ -120,7 +120,7 @@ class PendingDomainListPDO
 	 *
 	 * @param string $file Path of the file you want to import
 	 */
-	public function import($file=null){
+	public function import($tlds=array(), $file=null){
 		$values = "";
 		$line = 0;
 
@@ -146,6 +146,11 @@ class PendingDomainListPDO
 
 				$domain_number_of_hyphens = substr_count ($domain, '-');
 				$domain_number_of_digits = preg_match_all( "/[0-9]/", $domain );
+
+				//EXCLUDE SOME TLDS
+				if(!in_array($zone, $tlds)){
+					continue;
+				}
 
 				$values .= "('".$domain."', '".$zone."', '".$data[1]."', ".strlen($domain).", ".$domain_number_of_hyphens.", ".$domain_number_of_digits."),";
 
