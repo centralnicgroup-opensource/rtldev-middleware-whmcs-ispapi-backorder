@@ -9,7 +9,9 @@ function ispapibackorder_config() {
     "description" => "This addon allows you to provide backorders to your customers.",
     "version" => "1.0",
     "author" => "",
-    "language" => "english");
+    "language" => "english",
+    "fields" => array("username" => array ("FriendlyName" => "Admin username", "Type" => "text", "Size" => "30", "Description" => "[REQUIRED]", "Default" => "admin"))
+    );
     return $configarray;
 }
 
@@ -184,16 +186,16 @@ function ispapibackorder_output($vars) {
 
 	echo '<div id="tabs"><ul class="nav nav-tabs admin-tabs" role="tablist">';
     if($_GET["tab"] == 0){$active = "active";}else{$active="";}
-	echo '<li id="tab0" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Manage Backorders</a></li>';
-	if($_GET["tab"] == 1){$active = "active";}else{$active="";}
-	echo '<li id="tab1" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Backorder Pricing</a></li>';
+	echo '<li id="tab0" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Manage</a></li>';
+    if($_GET["tab"] == 1){$active = "active";}else{$active="";}
+	echo '<li id="tab1" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Logs</a></li>';
     if($_GET["tab"] == 2){$active = "active";}else{$active="";}
-	echo '<li id="tab2" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Backorder Logs</a></li>';
+	echo '<li id="tab2" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Pricing</a></li>';
 	echo '</ul></div>';
 
 	ispapibackorder_managebackorders_content($modulelink."&tab=0");
-	ispapibackorder_pricing_content($modulelink."&tab=1");
-	ispapibackorder_logs_content($modulelink."&tab=2");
+	ispapibackorder_logs_content($modulelink."&tab=1");
+	ispapibackorder_pricing_content($modulelink."&tab=2");
 }
 
 function ispapibackorder_managebackorders_content($modulelink){
@@ -204,7 +206,7 @@ function ispapibackorder_managebackorders_content($modulelink){
 }
 
 function ispapibackorder_pricing_content($modulelink){
-	echo '<div id="tab1box" class="tabbox tab-content">';
+	echo '<div id="tab2box" class="tabbox tab-content">';
 	echo "<H2>Backorder Pricing</H2>";
 	//Delete pricing
 	###############################################################################
@@ -287,7 +289,7 @@ function ispapibackorder_pricing_content($modulelink){
 }
 
 function ispapibackorder_logs_content($modulelink){
-	echo '<div id="tab2box" class="tabbox tab-content">';
+	echo '<div id="tab1box" class="tabbox tab-content">';
 	echo "<H2>Backorder Logs</H2>";
     include(dirname(__FILE__)."/controller/backend.logs.php");
 	echo '</div>';
