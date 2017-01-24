@@ -56,7 +56,7 @@
                 success: function(data){
                     $("#droppingdomains").html();
                     $.each(data.PROPERTY.DROPCOUNT, function(i, obj) {
-                          if(i<7)
+                          if(i<3)
                           {
                               var output ='';
                               output +='<a onclick="setdate(\''+data.PROPERTY.DROPDAY[i]+'\');" class="list-group-item">';
@@ -67,13 +67,13 @@
                               $("#droppingdomains").append(output);
                           }
                     });
-                    var output ='';
+                    /*var output ='';
                     output +='<a onclick="setdate(\'last7\');" class="list-group-item">';
                     output +='	<div class="row"><div class="col-lg-8"><i class="fa fa-circle-o"></i>&nbsp;';
                     output +='	<span>{/literal}{$LANG.total7days}{literal}</span></div>';
                     output +='</div>';
-                    output +='</a>';
-                    $("#droppingdomains").append(output);
+                    output +='</a>';*/
+                    //$("#droppingdomains").append(output);
 
                 },
                 error: function(data){
@@ -304,7 +304,6 @@
                 <div class="form-group" style="margin-bottom:5px;">
                     <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainresults}</label>
                     <select class="form-control input-sm" name="results" id="results">
-                        <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
@@ -399,32 +398,6 @@
                         </div>
                     </div>
 
-                    <!--<hr style="margin:10px 0px 10px 0px;">
-                    <div class="form-group" style="margin-bottom:5px;">
-                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainumlaute}</label>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.min}:</span>
-                                    <input class="form-control input-sm" name="umlaute_count_min" id="umlaute_count_min" value="">
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.max}:</span>
-                                    <input class="form-control input-sm" name="umlaute_count_max" id="umlaute_count_max" value="">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <input name="umlaute_no" id="umlaute_no" type="checkbox" /> {$LANG.noumlauts}
-                                <input name="umlaute_only" id="umlaute_only" type="checkbox" /> {$LANG.umlautsonly}
-                            </div>
-                        </div>
-                    </div>-->
-
-
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:5px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindropdate}</label>
@@ -494,15 +467,15 @@
             <h3 class="panel-title"><i class="fa fa-usd"></i> {$LANG.pricelist}</h3>
         </div>
         <div class="panel-body">
-        	<table width="100%">
-        		<tr>
-        			<td align="center" width="33%"><b>TLD</b></td>
-        			<td align="center"><b>{$LANG.tldprice}</b></td>
-        		</tr>
-        	</table>
-        	<hr style="margin:5px;">
-        	<table width="100%" id="pricelist">
-        	</table>
+            <table width="100%">
+                <tr>
+                    <td align="center" width="33%"><b>TLD</b></td>
+                    <td align="center"><b>{$LANG.tldprice}</b></td>
+                </tr>
+            </table>
+            <hr style="margin:5px;">
+            <table width="100%" id="pricelist">
+            </table>
         </div>
     </div>
     <!--############################### END BACKORDERS PRICING #######################################-->

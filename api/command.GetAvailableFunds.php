@@ -15,8 +15,8 @@ $cur = mysql_fetch_array($result);
 #######################################################
 
 //GET ADMIN USERNAME
-$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
-$adminuser = $r["value"];
+$admin_request = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
+$adminuser = $admin_request["value"];
 if(empty($adminuser)){
 	return backorder_api_response(549, "MISSING ADMIN USERNAME IN MODULE CONFIGURATION");
 }

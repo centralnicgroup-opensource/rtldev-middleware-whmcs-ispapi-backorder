@@ -31,47 +31,32 @@ if(isset($command['TYPE']) && $command['TYPE']!="")
 
 
 
-
-
-
 $orderby = "";
 $orders = array(
 	"ID" => "id",
+	"IDDESC" => "id",
 	"DOMAIN" => "domain",
 	"DOMAINDESC" => "domain",
-	"DROPDATE" => "DATE(whois_updated_date)",
-	"DROPDATEDESC" => "DATE(whois_updated_date)",
+	"DROPDATE" => "dropdate",
+	"DROPDATEDESC" => "dropdate",
 	"NUMBEROFCHARACTERS" => "domain_number_of_characters",
 	"NUMBEROFCHARACTERSDESC" => "domain_number_of_characters",
 	"NUMBEROFDIGITS" => "domain_number_of_digitse",
 	"NUMBEROFDIGITSDESC" => "domain_number_of_digits",
 	"NUMBEROFHYPHENS" => "domain_number_of_hyphens",
 	"NUMBEROFHYPHENSDESC" => "domain_number_of_hyphens",
-	"NUMBEROFUMLAUTS" => "domain_number_of_umlauts",
-	"NUMBEROFUMLAUTSDESC" => "domain_number_of_umlauts",
-	"GOOGLEPAGERANK" => "google_pagerank",
-	"GOOGLEPAGERANKDESC" => "google_pagerank",
-	"ALEXATRAFFICGLOBALRANK" => "alexa_traffic_global_rank",
-	"ALEXATRAFFICGLOBALRANKDESC" => "alexa_traffic_global_rank",
-	"ALEXATRAFFICSITESLINKINGIN" => "alexa_traffic_sites_linking_in",
-	"ALEXATRAFFICSITESLINKINGINDESC" => "alexa_traffic_sites_linking_in",
 );
 
 if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
 	$order = $orders[$command["ORDERBY"]];
 	$sortorder = "ASC";
-	if($command["ORDERBY"]=="ID") $sortorder = "DESC";
+	if($command["ORDERBY"]=="IDDESC") $sortorder = "DESC";
 	if($command["ORDERBY"]=="DOMAINDESC") $sortorder = "DESC";
 	if($command["ORDERBY"]=="DROPDATEDESC") $sortorder = "DESC";
 	if($command["ORDERBY"]=="NUMBEROFCHARACTERSDESC") $sortorder = "DESC";
 	if($command["ORDERBY"]=="NUMBEROFDIGITSDESC") $sortorder = "DESC";
 	if($command["ORDERBY"]=="NUMBEROFHYPHENSDESC") $sortorder = "DESC";
-	if($command["ORDERBY"]=="GOOGLEPAGERANKDESC") $sortorder = "DESC";
-	if($command["ORDERBY"]=="ALEXATRAFFICGLOBALRANKDESC") $sortorder = "DESC";
-	if($command["ORDERBY"]=="ALEXATRAFFICSITESLINKINGINDESC") $sortorder = "DESC";
 }
-
-
 
 
 

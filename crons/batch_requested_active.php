@@ -55,6 +55,7 @@ foreach($list as $key => $l){ //for each user
 					"USER" => $key
 			);
 			$result = backorder_backend_api_call($command);
+
 			if($result["CODE"] == 200){
 				if(isset($result["PROPERTY"]["AMOUNT"]["VALUE"])){
 					$current_credit = $result["PROPERTY"]["AMOUNT"]["VALUE"];
@@ -64,6 +65,7 @@ foreach($list as $key => $l){ //for each user
 			}else{
 				$current_credit = 0;
 			}
+			//echo "<br>Current credit:".$current_credit;
 
 			if(($current_credit - $backorder_price) >= 0){
 				//SET BACKORDER STATUS TO ACTIVE

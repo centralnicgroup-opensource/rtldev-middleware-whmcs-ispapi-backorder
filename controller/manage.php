@@ -64,7 +64,21 @@ if(isset($_POST['COMMAND'])){
 					$tmpfield .= '</div>';
 					$newitem[] = $tmpfield;
 				}
-				else if($field['apifieldname']!=""){
+				else if($field['apifieldname']=="STATUS"){
+					if(in_array($item['STATUS'], array("SUCCESSFUL", "AUCTION-WON"))){
+						$newitem[]= '<span class="badge badge-success">'.$item['STATUS'].'</span>';
+					}elseif(in_array($item['STATUS'], array("FAILED", "AUCTION-LOST"))){
+						$newitem[]= '<span class="badge badge-danger">'.$item['STATUS'].'</span>';
+					}elseif(in_array($item['STATUS'], array("AUCTION-PENDING", "ACTIVE", "PROCESSING", "PENDING-PAYMENT"))){
+						$newitem[]= '<span class="badge badge-warning">'.$item['STATUS'].'</span>';
+					}else{
+						$newitem[]= '<span class="badge badge-default">'.$item['STATUS'].'</span>';
+					}
+
+
+
+
+				}else if($field['apifieldname']!=""){
 					$newitem[]= $item[$field['apifieldname']];
 				}else{
 					$newitem[]= '';
