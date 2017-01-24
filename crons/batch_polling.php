@@ -173,11 +173,19 @@ while ($local = mysql_fetch_array($result)) {
 
 }
 
+//GET ADMIN USERNAME
+$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
+$adminuser = $r["value"];
+if(empty($adminuser)){
+	$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
+	logmessage($cronname, "error", $message);
+}
+
 //ITERATE OVER PENDING-PAYMENT APPLICATIONS
 $result = select_query("backorder_domains", "*", array("status" => "PENDING-PAYMENT"));
 while ($backorder = mysql_fetch_array($result)) {
 
-	$invoice = localAPI("getinvoice", array("invoiceid" => $backorder["invoice"]), "admin");
+	$invoice = localAPI("getinvoice", array("invoiceid" => $backorder["invoice"]), $adminuser);
 	if($invoice["status"] == "error"){
 		//INVOICE NOT FOUND = INVOICE DELETED BY THE ADMIN
 		if(update_query('backorder_domains', array("status" => "CANCELLED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $backorder["id"]))){

@@ -11,6 +11,13 @@ if ( !preg_match('/^(.*)\.(.*)$/', $command["DOMAIN"], $m) )
 $domain = $m[1];
 $tld = $m[2];
 
+//GET ADMIN USERNAME
+$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
+$adminuser = $r["value"];
+if(empty($adminuser)){
+	return backorder_api_response(549, "MISSING ADMIN USERNAME IN MODULE CONFIGURATION");
+}
+
 //GET TLD PRICING
 $querypricelist = array(
 		"COMMAND" => "QueryPriceList",
@@ -28,6 +35,8 @@ if($result["CODE"] == 200){
 		$backorder_price = $result["PROPERTY"][$tld]["PRICELITE"];
 	}
 
+
+
 	//SEND INVOICE AND CHANGE STATUS TO PENDING-PAYMENT
 	$invoicing = localAPI("createinvoice",array(
 			"userid" => $userid,
@@ -39,7 +48,7 @@ if($result["CODE"] == 200){
 			"itemdescription1" => $command["TYPE"]." BACKORDER: ".$command["DOMAIN"],
 			"itemamount1" => $backorder_price,
 			"itemtaxed1" => 0
-	), "admin");
+	), $adminuser);
 
 	if ($invoicing["result"] == "success"){
 		//GET OLD STATUS

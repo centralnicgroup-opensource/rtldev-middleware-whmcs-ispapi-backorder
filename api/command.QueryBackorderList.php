@@ -36,6 +36,7 @@ if(isset($command['TYPE']) && $command['TYPE']!="")
 
 $orderby = "";
 $orders = array(
+	"ID" => "id",
 	"DOMAIN" => "domain",
 	"DOMAINDESC" => "domain",
 	"DROPDATE" => "DATE(whois_updated_date)",
@@ -59,6 +60,7 @@ $orders = array(
 if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
 	$order = $orders[$command["ORDERBY"]];
 	$sortorder = "ASC";
+	if($command["ORDERBY"]=="ID") $sortorder = "DESC";
 	if($command["ORDERBY"]=="DOMAINDESC") $sortorder = "DESC";
 	if($command["ORDERBY"]=="DROPDATEDESC") $sortorder = "DESC";
 	if($command["ORDERBY"]=="NUMBEROFCHARACTERSDESC") $sortorder = "DESC";
@@ -76,6 +78,7 @@ if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
 $result = select_query('backorder_domains',$fields,$condition, $order, $sortorder, $limit);
 
 while ($data = mysql_fetch_assoc($result)) {
+	$r["PROPERTY"]["ID"][] = $data["id"];
 	$r["PROPERTY"]["DOMAIN"][] = $data["domain"].".".$data["tld"];
 	$r["PROPERTY"]["LABEL"][] = $data["domain"];
 	$r["PROPERTY"]["TLD"][] = $data["tld"];

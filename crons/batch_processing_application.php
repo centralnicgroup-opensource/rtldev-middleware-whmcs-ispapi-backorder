@@ -5,11 +5,19 @@ require_once dirname(__FILE__)."/../backend/api.php";
 
 
 function get_contact_details($type="USER", $userid = NULL){
+	//GET ADMIN USERNAME
+	$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
+	$adminuser = $r["value"];
+	if(empty($adminuser)){
+		$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
+		logmessage($cronname, "error", $message);
+	}
+
 	if($type == "USER"){
 
 		$command = "getclientsdetails";
 		$params["clientid"] = $userid;
-		$results = localAPI($command,$params,"admin");
+		$results = localAPI($command, $params, $adminuser);
 
 		$values["FIRSTNAME"] = $results["firstname"];
 		$values["LASTNAME"] = $results["lastname"];

@@ -10,6 +10,7 @@ $statusheader = $_LANG['setallbackorder'];
 
 $fields = array(); //fieldname, apifieldname
 $fields[]=array ("fieldname" => "", 	"apifieldname" => "BACKORDERTYPE");
+$fields[]=array ("fieldname" => "ID", 	"apifieldname" => "ID");
 $fields[]=array ("fieldname" => $_LANG["domainname"], 	"apifieldname" => "DOMAIN");
 $fields[]=array ("fieldname" => $_LANG["dropdate"], 	"apifieldname" => "DROPDATE");
 $fields[]=array ("fieldname" => $_LANG["status"], 		"apifieldname" => "STATUS");

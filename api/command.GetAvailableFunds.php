@@ -13,7 +13,16 @@ $cur = mysql_fetch_array($result);
 
 //GET THE CURRENT CREDIT BALANCE
 #######################################################
-$d = localAPI("getclientsdetails", array("clientid" => $userid, "stats" => true), "admin");
+
+//GET ADMIN USERNAME
+$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
+$adminuser = $r["value"];
+if(empty($adminuser)){
+	return backorder_api_response(549, "MISSING ADMIN USERNAME IN MODULE CONFIGURATION");
+}
+
+
+$d = localAPI("getclientsdetails", array("clientid" => $userid, "stats" => true), $adminuser);
 $credit = 0;
 if($d["client"]["credit"]){
 	$credit = $d["client"]["credit"];

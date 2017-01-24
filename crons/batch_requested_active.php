@@ -92,11 +92,18 @@ foreach($list as $key => $l){ //for each user
 	}
 }
 
+//GET ADMIN USERNAME
+$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
+$adminuser = $r["value"];
+if(empty($adminuser)){
+	$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
+	logmessage($cronname, "error", $message);
+}
+
 //HANDLE ALL LOW BALANCE NOTIFICATIONS
 foreach($could_not_be_set_to_active as $key => $backorders){
 		#SEND LOW BALANCE NOTIFICATION TO THE CUSTOMER
 		$command = "sendemail";
-		$adminuser = "admin";
 		$values["messagename"] = "backorder_lowbalance_notification";
 		$values["id"] = $key;
 		$values["customvars"] = array("list"=> $backorders);

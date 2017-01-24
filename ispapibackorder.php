@@ -91,6 +91,10 @@ function ispapibackorder_upgrade($vars) {
 }
 
 function ispapibackorder_output($vars) {
+    if(empty($vars["username"])){
+        echo '<div class="errorbox"><strong><span class="title">Missing field!</span></strong><br>MISSING ADMIN USERNAME IN MODULE CONFIGURATION</div>';
+    }
+
 	if(!isset($_GET["tab"])){
 		$_GET["tab"] = 0;
 	}
@@ -297,6 +301,10 @@ function ispapibackorder_logs_content($modulelink){
 
 
 function ispapibackorder_clientarea($vars) {
+    if(empty($vars["username"])){
+        die("USERNAME MISSING IN MODULE CONFIGURATION");
+    }
+
 	$modulename = "ispapibackorder";
 	$modulepath = "../modules/addons/".$modulename;
 
