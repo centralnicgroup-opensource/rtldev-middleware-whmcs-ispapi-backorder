@@ -31,6 +31,10 @@ if(isset($_POST['COMMAND'])){
 				$mypost[$postname]= $postvalue;
 			}
 		}
+
+		//echo "<pre>";
+		//print_r($mypost);
+
 		require_once '../backend/api.php';
 		$command = array_change_key_case($mypost,CASE_UPPER);
 		$result = backorder_api_query_list($command);
@@ -65,6 +69,7 @@ if(isset($_POST['COMMAND'])){
 					$newitem[] = $tmpfield;
 				}
 				else if($field['apifieldname']=="STATUS"){
+
 					if(in_array($item['STATUS'], array("SUCCESSFUL", "AUCTION-WON"))){
 						$newitem[]= '<span class="badge badge-success">'.$item['STATUS'].'</span>';
 					}elseif(in_array($item['STATUS'], array("FAILED", "AUCTION-LOST"))){
@@ -74,9 +79,6 @@ if(isset($_POST['COMMAND'])){
 					}else{
 						$newitem[]= '<span class="badge badge-default">'.$item['STATUS'].'</span>';
 					}
-
-
-
 
 				}else if($field['apifieldname']!=""){
 					$newitem[]= $item[$field['apifieldname']];

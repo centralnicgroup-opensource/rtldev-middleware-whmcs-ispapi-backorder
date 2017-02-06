@@ -29,7 +29,7 @@ $values = array(
 	"reference" => ""
 );
 
-if ( preg_match('/^(.*)\.(.*)$/', $command["DOMAIN"], $m) ) {
+if ( preg_match('/^[^.](.*)\.(.*)$/', $command["DOMAIN"], $m) ) {
 	$values["domain"] = strtolower($m[1]);
 	$values["tld"] = strtolower($m[2]);
 
@@ -47,8 +47,13 @@ if ( preg_match('/^(.*)\.(.*)$/', $command["DOMAIN"], $m) ) {
 		if ( !insert_query('backorder_domains', $values) )
 			return backorder_api_response(549, "CREATE FAILED");
 	}
+
+	$message = "BACKORDER ".$command["DOMAIN"]." set to REQUESTED";
+	logmessage("command.CreateBackorder", "ok", $message);
+	return backorder_api_response(200);
+}else{
+	return backorder_api_response(549, "CREATE FAILED");
 }
 
-return backorder_api_response(200);
 
 ?>

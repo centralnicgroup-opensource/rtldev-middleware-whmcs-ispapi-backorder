@@ -91,6 +91,26 @@
             }
         });
 
+        $.ajax({
+            type: "POST",
+            async: false,
+            dataType: "json",
+            url: "{/literal}{$modulepath}{literal}backend/call.php",
+            data: {COMMAND : "QueryPriceList"},
+            success: function(data){
+                $("#pricelist").html();
+                $.each(data.PROPERTY, function(i, obj) {
+                      var output="";
+                      output += '<tr>';
+                      output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
+                      output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
+                      output += '</tr>';
+                      $("#pricelist").append(output);
+                });
+            },
+            error: function(data){
+            }
+        });
 
 
         $(document).on('click', '.setValue', function (e) {
@@ -134,15 +154,15 @@
             },
             "processing": true,
             "serverSide": true,
-            "stateSave": true,
+            "stateSave": false,
             "searching": false,
             "lengthChange": false,
             "iDisplayLength": 20,
             "order": [
-                [1, "asc"]
+                [1, "desc"]
             ],
             "aoColumnDefs": [
-                  { "orderable": false, "aTargets": [ 0 ] }
+                  { "orderable": true, "aTargets": [ 0 ] }
             ],
             "ajax": {
                 "url": "{/literal}{$modulepath}{literal}controller/manage.php",
@@ -230,6 +250,26 @@
     <div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
         <p>{$LANG.createbackordererrortext}</p>
     </div>
+    <!-- ###################################### -->
+
+    <!--############################### BACKORDERS PRICING #######################################-->
+    <div menuitemname="Client Details" class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-usd"></i> {$LANG.pricelist}</h3>
+        </div>
+        <div class="panel-body">
+            <table width="100%">
+                <tr>
+                    <td align="center" width="33%"><b>TLD</b></td>
+                    <td align="center"><b>{$LANG.tldprice}</b></td>
+                </tr>
+            </table>
+            <hr style="margin:5px;">
+            <table width="100%" id="pricelist">
+            </table>
+        </div>
+    </div>
+    <!--############################### END BACKORDERS PRICING #######################################-->
 
 
 </div>

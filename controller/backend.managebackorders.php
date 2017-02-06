@@ -53,6 +53,21 @@
                     },
                 },
                 {
+                    "targets": 4,
+                    "data": null,
+                    "render": function ( data, type, row ) {
+                        if(row["status"] == "SUCCESSFUL" || row["status"] == "AUCTION-WON"){
+                            return '<span class="badge badge-success">'+row["status"]+'</span>';
+                        }else if(row["status"] == "FAILED" || row["status"] == "AUCTION-LOST") {
+                            return '<span class="badge badge-danger">'+row["status"]+'</span>';
+                        }else if(row["status"] == "AUCTION-PENDING" || row["status"] == "ACTIVE" || row["status"] == "PROCESSING" || row["status"] == "PENDING-PAYMENT"){
+                            return '<span class="badge badge-warning">'+row["status"]+'</span>';
+                        }else{
+                            return '<span class="badge badge-default">'+row["status"]+'</span>';
+                        }
+                    },
+                },
+                {
                     "targets": 6,
                     "data": null,
                     "render": function ( data, type, row ) {

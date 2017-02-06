@@ -219,12 +219,12 @@
                 },
                 "processing": true,
                 "serverSide": true,
-                "stateSave": true,
+                "stateSave": false,
                 "searching": false,
                 "lengthChange": false,
                 "iDisplayLength": 20,
                 "order": [
-                    [1, "asc"]
+                    [2, "asc"]
                 ],
                 "aoColumnDefs": [
                       { "orderable": false, "aTargets": [ 0 ] }
@@ -368,7 +368,7 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-12">
-                                <input name="digits_no" id="digits_no" type="checkbox" /> {$LANG.nodigits}
+                                <input name="digits_no" id="digits_no" type="checkbox" checked="" /> {$LANG.nodigits}
                                 <input name="digits_only" id="digits_only" type="checkbox" /> {$LANG.digitsonly}
                             </div>
                         </div>
