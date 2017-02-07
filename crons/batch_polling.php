@@ -52,8 +52,8 @@ while ($local = mysql_fetch_array($result)) {
 		}elseif(in_array($backorder["PROPERTY"]["STATUS"][0], array("FAILED", "AUCTION-LOST"))){
 			$oldstatus = $local["status"];
 
-			//CHECK IF BACKORDER STATUS ALREADY SET TO AUCTION-LOST IN WHMCS
-			$check = select_query("backorder_domains","*",array("id" => $local["id"], "status" => "AUCTION-LOST"));
+			//CHECK IF BACKORDER STATUS ALREADY SET TO FAILED OR AUCTION-LOST IN WHMCS
+			$check = full_query("SELECT * FROM backorder_domains WHERE id = ".$local["id"]." (status = 'FAILED' OR status = 'AUCTION-LOST')");
 			$data = mysql_fetch_array($check);
 			if(!$data){
 				//GET OLD STATUS
@@ -63,7 +63,7 @@ while ($local = mysql_fetch_array($result)) {
 
 				//SET BACKORDER STATUS TO AUCTION-FAILED
 				if(update_query('backorder_domains', array("status" => $backorder["PROPERTY"]["STATUS"][0], "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ".$oldstatus." to AUCTION-LOST";
+					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ".$oldstatus." to ".$backorder["PROPERTY"]["STATUS"][0];
 					logmessage($cronname, "ok", $message);
 				}
 			}
@@ -254,6 +254,16 @@ while ($backorder = mysql_fetch_array($result)) {
 
 	}
 
+}
+
+//ITERATE OVER REQUESTED AND ACTIVE APPLICATIONS WITH DROPDATE > 2 DAYS IN THE PAST
+$result = full_query("SELECT * FROM backorder_domains WHERE (status = 'REQUESTED' OR status = 'ACTIVE') AND dropdate != '0000-00-00 00:00:00' AND dropdate < DATE_SUB(NOW(), INTERVAL 2 DAY)");
+while ($local = mysql_fetch_array($result)) {
+	//SET BACKORDER TO FAILED
+	if(update_query('backorder_domains', array("status" => "FAILED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
+		$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$local["status"]." to FAILED";
+		logmessage($cronname, "ok", $message);
+	}
 }
 
 //logmessage($cronname, "ok", "BATCH_POLLING done");

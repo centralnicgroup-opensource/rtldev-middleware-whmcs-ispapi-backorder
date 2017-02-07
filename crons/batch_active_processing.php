@@ -18,17 +18,6 @@ while ($local = mysql_fetch_array($result)) {
 			logmessage($cronname, "ok", $message);
 		}
 	}
-
-	//DROPDATE IS OVER 1DAY IN THE PAST (1DAY=86400)
-	if($diff_timestamp < -86400 ){
-		//FOR SOME REASON THE BACKORDER HAS BEEN SET TO ACTIVE AND WENT NEVER TO PROCESSING
-		//CHANGE STATUS FROM ACTIVE TO FAILED
-		if(update_query('backorder_domains',array("status" => "FAILED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-			$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ACTIVE to FAILED";
-			logmessage($cronname, "ok", $message);
-		}
-	}
-
 }
 
 //logmessage($cronname, "ok", "BATCH_ACTIVE_PROCESSING done");
