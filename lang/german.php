@@ -67,4 +67,5 @@ $_LANG['chars'] = "Zeichen";
 $_LANG['digits'] = "Zahlen";
 $_LANG['hyphens'] = "Bindestriche";
 $_LANG['status'] = "Status";
+$_LANG['all'] = "Alle";
 ?>

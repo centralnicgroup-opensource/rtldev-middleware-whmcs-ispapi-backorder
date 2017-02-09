@@ -67,13 +67,13 @@
                               $("#droppingdomains").append(output);
                           }
                     });
-                    /*var output ='';
-                    output +='<a onclick="setdate(\'last7\');" class="list-group-item">';
+                    var output ='';
+                    output +='<a onclick="setdate(\'total\');" class="list-group-item">';
                     output +='	<div class="row"><div class="col-lg-8"><i class="fa fa-circle-o"></i>&nbsp;';
-                    output +='	<span>{/literal}{$LANG.total7days}{literal}</span></div>';
+                    output +='	<span>{/literal}{$LANG.all}{literal}</span></div>';
                     output +='</div>';
-                    output +='</a>';*/
-                    //$("#droppingdomains").append(output);
+                    output +='</a>';
+                    $("#droppingdomains").append(output);
 
                 },
                 error: function(data){
@@ -297,7 +297,7 @@
                 <div class="form-group" style="margin-bottom:5px;">
                     <label style="margin:0px;" for="" class="control-label">TLD</label>
                     <select class="form-control input-sm" name="tld" id="tld">
-                        <option value="_all_">All</option>
+                        <option value="_all_">{$LANG.all}</option>
                     </select>
                 </div>
 
@@ -362,16 +362,16 @@
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
-                                    <input class="form-control input-sm" name="digits_count_max" id="digits_count_max" value="">
+                                    <input class="form-control input-sm" name="digits_count_max" id="digits_count_max" value="0">
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <!--<div class="row">
                             <div class="col-lg-12">
                                 <input name="digits_no" id="digits_no" type="checkbox" checked="" /> {$LANG.nodigits}
                                 <input name="digits_only" id="digits_only" type="checkbox" /> {$LANG.digitsonly}
                             </div>
-                        </div>
+                        </div>-->
                     </div>
 
                     <hr style="margin:10px 0px 10px 0px;">
@@ -391,11 +391,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <!--<div class="row">
                             <div class="col-lg-12">
                                 <input name="hyphens_no" id="hyphens_no" type="checkbox" /> {$LANG.nohyphens}
                             </div>
-                        </div>
+                        </div>-->
                     </div>
 
                     <hr style="margin:10px 0px 10px 0px;">

@@ -46,9 +46,30 @@ $limit = isset($command["LIMIT"])? "LIMIT ".$command["FIRST"].",".$command["LIMI
 $conditions = "";
 $conditions_values = array();
 
+//TLD FILTER
 if ( isset($command["TLD"]) && $command["TLD"] != "_all_" ){
+    //TLD SELECTED
     $conditions .= "AND zone = :TLD\n";
 	$conditions_values[":TLD"] = $command["TLD"];
+}else{
+    //TLD NOT SELECTED
+    //GET LIST OF ALL EXTENSIONS AVAILABLE FOR BACKORDER TO ONLY DISPLAY THOSE ONES
+    $result = full_query("select extension from backorder_pricing GROUP BY extension");
+    $i=0;
+    while ($b = mysql_fetch_array($result)) {
+        if($i==0){
+            $conditions .= "AND ( zone = :TLD$i\n";
+        	$conditions_values[":TLD$i"] = $b["extension"];
+        }else{
+            $conditions .= "OR zone = :TLD$i\n";
+        	$conditions_values[":TLD$i"] = $b["extension"];
+        }
+        $i++;
+    }
+    //CLOSE THE PARENTHESIS
+    if($i!=0){
+        $conditions .= ")\n";
+    }
 }
 
 if ( isset($command["MAXNUMBEROFHYPHENS"]) && preg_match('/^([0-9]+)$/', $command["MAXNUMBEROFHYPHENS"]) ) {

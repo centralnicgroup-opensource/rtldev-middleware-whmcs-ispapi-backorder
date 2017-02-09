@@ -109,7 +109,22 @@ class PendingDomainListPDO
 	 * Download the PendingDeleteList file on Hexonet's website in the current working directory.
 	 */
 	public function downloadPendingDeleteList(){
-		file_put_contents("../tmp/pending_delete_list_tmp.zip", fopen(self::PENDING_DELETE_LIST_FILE_URL, 'r'));
+		set_time_limit(0);
+
+		if(!isset($GLOBALS["downloads_dir"])){
+			die("Cannot find tmp directory!");
+		}
+		$download = $GLOBALS["downloads_dir"]."pending_delete_list_tmp.zip";
+		$fp = fopen ($download, 'w+');
+		$ch = curl_init(str_replace(" ","%20",self::PENDING_DELETE_LIST_FILE_URL));
+
+		curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		$data = curl_exec($ch);
+		curl_close($ch);
+
+		//file_put_contents("../tmp/pending_delete_list_tmp.zip", fopen(self::PENDING_DELETE_LIST_FILE_URL, 'r'));
 		//exec("wget -O ../tmp/pending_delete_list_tmp.zip ".self::PENDING_DELETE_LIST_FILE_URL);
 	}
 
@@ -128,7 +143,7 @@ class PendingDomainListPDO
 			$handle = fopen($file, "r");
 		}else{
 			$this->downloadPendingDeleteList();
-			$handle = fopen('zip://../tmp/pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
+			$handle = fopen('zip://'.$GLOBALS["downloads_dir"].'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
 		}
 
 		$sql = 'INSERT IGNORE INTO pending_domains (domain, zone, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits) VALUES ';
@@ -148,9 +163,9 @@ class PendingDomainListPDO
 				//$domain_number_of_umlauts = preg_match_all( "/[äüö]/", utf8_encode($domain))/2;
 
 				//EXCLUDE SOME TLDS
-				if(!in_array($zone, $tlds)){
+				/*if(!in_array($zone, $tlds)){
 					continue;
-				}
+				}*/
 
 				$values .= "('".$domain."', '".$zone."', '".$data[1]."', ".strlen($domain).", ".$domain_number_of_hyphens.", ".$domain_number_of_digits."),";
 
@@ -167,9 +182,10 @@ class PendingDomainListPDO
 			fclose($handle);
 		}
 
-		//delete old items
-		$yesterday = date('Y-m-d 23:59:59',strtotime("-1 days"));
-		$this->instance->exec("DELETE FROM pending_domains WHERE drop_date <= '".$yesterday."'");
+		//delete domains with drop_date in the past
+		$this->instance->exec("DELETE FROM pending_domains WHERE drop_date < NOW()");
+		//$yesterday = date('Y-m-d 23:59:59',strtotime("-1 days"));
+		//$this->instance->exec("DELETE FROM pending_domains WHERE drop_date <= '".$yesterday."'");
 	}
 
 	/**
