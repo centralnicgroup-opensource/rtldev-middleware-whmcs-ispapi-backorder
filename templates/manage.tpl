@@ -43,6 +43,8 @@
     $(document).ready(function() {
 
         function setvalue(field, value, thiselement, redraw, resetform) {
+
+
             if (redraw != true && redraw != false) redraw = true;
             if (resetform != true && resetform != false) resetform = true;
 
@@ -53,6 +55,11 @@
                     $(this).val("")
                 });
             }
+
+            if(field=="status" && value=="ALL"){
+                value = "";
+            }
+
             $("#" + field).val(value);
             if (redraw) oTable.fnDraw();
         }
@@ -71,9 +78,7 @@
                 var output="";
 
                 $.each(data.PROPERTY, function(i, obj) {
-                      totallite = totallite + parseInt(obj.lite);
-                      totalfull = totalfull + parseInt(obj.full);
-                      total = total + parseInt(obj.lite) + parseInt(obj.full);
+                      total = total + parseInt(obj.anzahl);
                       output="";
                       output += '<tr value="'+obj.status+'" class="setValue" field="status">';
                       output += '<td align="center" width="75%"><strong>'+obj.status+'</strong></td>';
@@ -81,11 +86,12 @@
                       output += '</tr>';
                       $("#overviewbackorderstatus").append(output);
                 });
-
-                $("#boxbackordertotal").text(data.total);
-                $("#boxbackordersuccessful").text(data.PROPERTY['SUCCESSFUL']['anzahl']);
-                $("#boxbackordermissed").text(data.PROPERTY['FAILED']['anzahl']);
-                $("#boxbackorderrequest").text(data.PROPERTY['REQUESTED']['anzahl']);
+                output="";
+                output += '<tr value="ALL" class="setValue" field="status">';
+                output += '<td align="center" width="75%"><strong>ALL</strong></td>';
+                output += '<td align="center" >'+total+'</td>';
+                output += '</tr>';
+                $("#overviewbackorderstatus").append(output);
             },
             error: function(data){
             }
