@@ -4,24 +4,20 @@
 $currencyid=NULL;
 $result = select_query('tblclients','currency',array("id" => $userid ));
 $data = mysql_fetch_assoc($result);
-if ( $data ) {
-	$currencyid= $data["currency"];
+$currencyid= $data["currency"];
+if($currencyid==NULL){
+	return backorder_api_response(541, "PRICELIST - USER CURRENCY ERROR");
 }
-if ( $currencyid==NULL ) return backorder_api_response(541, "PRICELIST - USER CURRENCY ERROR");
 
 
 $currency=NULL;
 $result = select_query('tblcurrencies','*',array("id" => $currencyid ));
-$data = mysql_fetch_assoc($result);
-if ( $data ) {
-	$currency= $data;
+$currency = mysql_fetch_assoc($result);
+if ($currency==NULL){
+	return backorder_api_response(541, "PRICELIST - CURRENCY ERROR");
 }
-if ( $currency==NULL ) return backorder_api_response(541, "PRICELIST - CURRENCY ERROR");
-
 
 $r = backorder_api_response(200);
-$price=NULL;
-
 $params = array("currency_id" => $currencyid);
 
 if(isset($command["TLD"])){
@@ -30,11 +26,13 @@ if(isset($command["TLD"])){
 
 $result = select_query('backorder_pricing','*',$params);
 while ( $data = mysql_fetch_assoc($result) ) {
-	$r["PROPERTY"][$data["extension"]]["PRICEFULL"] = $data["fullprice"];
-	$r["PROPERTY"][$data["extension"]]["PRICEFULL_FORMATED"] = formatPrice($data["fullprice"], $currency);
-	$r["PROPERTY"][$data["extension"]]["CURRENCYSUFFIX"] = $currency["suffix"];
-	$r["PROPERTY"][$data["extension"]]["CURRENCY"] = $currency["code"];
-	$r["PROPERTY"][$data["extension"]]["TLD"] = $data["extension"];
+	if(!empty($data["fullprice"]) || $data["fullprice"]=="0"){ //ADD TO PRICING LIST ONLY IF NOT EMPTY OR PRICE IS SET TO 0 (FREE)
+		$r["PROPERTY"][$data["extension"]]["PRICEFULL"] = $data["fullprice"];
+		$r["PROPERTY"][$data["extension"]]["PRICEFULL_FORMATED"] = formatPrice($data["fullprice"], $currency);
+		$r["PROPERTY"][$data["extension"]]["CURRENCYSUFFIX"] = $currency["suffix"];
+		$r["PROPERTY"][$data["extension"]]["CURRENCY"] = $currency["code"];
+		$r["PROPERTY"][$data["extension"]]["TLD"] = $data["extension"];
+	}
 }
 return $r;
 ?>

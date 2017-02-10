@@ -27,47 +27,49 @@ $querypricelist = array(
 $result = backorder_backend_api_call($querypricelist);
 
 if($result["CODE"] == 200){
-
+	$backorder_price="";
 	if($command["TYPE"] == "FULL"){
 		$backorder_price = $result["PROPERTY"][$tld]["PRICEFULL"];
 	}
-	if($command["TYPE"] == "LITE"){
-		$backorder_price = $result["PROPERTY"][$tld]["PRICELITE"];
-	}
 
+	if(!empty($backorder_price)){ //IF PRICE SET FOR THIS TLD
+		//SEND INVOICE AND CHANGE STATUS TO PENDING-PAYMENT
+		$invoicing = localAPI("createinvoice",array(
+				"userid" => $userid,
+				"date" => date("Ymd"),
+				"duedate" => date("Ymd", strtotime(date("Ymd")." +10 days")),
+				"autoapplycredit" => true,
+				"paymentmethod" => "",
+				"sendinvoice" => true,
+				"itemdescription1" => $command["TYPE"]." BACKORDER: ".$command["DOMAIN"],
+				"itemamount1" => $backorder_price,
+				"itemtaxed1" => 0
+		), $adminuser);
 
+		if ($invoicing["result"] == "success"){
+			//GET OLD STATUS
+			$r = select_query("backorder_domains","*",array("id" =>$command["BACKORDERID"]));
+			$d = mysql_fetch_array($r);
+			$oldstatus = $d["status"];
 
-	//SEND INVOICE AND CHANGE STATUS TO PENDING-PAYMENT
-	$invoicing = localAPI("createinvoice",array(
-			"userid" => $userid,
-			"date" => date("Ymd"),
-			"duedate" => date("Ymd", strtotime(date("Ymd")." +10 days")),
-			"autoapplycredit" => true,
-			"paymentmethod" => "",
-			"sendinvoice" => true,
-			"itemdescription1" => $command["TYPE"]." BACKORDER: ".$command["DOMAIN"],
-			"itemamount1" => $backorder_price,
-			"itemtaxed1" => 0
-	), $adminuser);
+			if(update_query('backorder_domains', array("status" => "PENDING-PAYMENT", "invoice" => $invoicing["invoiceid"], "updateddate" => date("Y-m-d H:i:s")) , array("userid" => $userid, "id" => $command["BACKORDERID"] ))){
+				$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") set from ".$oldstatus." to PENDING-PAYMENT, invoice created (".$invoicing["invoiceid"].")";
+				logmessage("command.CreateInvoice", "ok", $message);
+			}
 
-	if ($invoicing["result"] == "success"){
-		//GET OLD STATUS
-		$r = select_query("backorder_domains","*",array("id" =>$command["BACKORDERID"]));
-		$d = mysql_fetch_array($r);
-		$oldstatus = $d["status"];
-
-		if(update_query('backorder_domains', array("status" => "PENDING-PAYMENT", "invoice" => $invoicing["invoiceid"], "updateddate" => date("Y-m-d H:i:s")) , array("userid" => $userid, "id" => $command["BACKORDERID"] ))){
-			$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") set from ".$oldstatus." to PENDING-PAYMENT, invoice created (".$invoicing["invoiceid"].")";
+			return backorder_api_response(200);
+		}else {
+			$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed";
 			logmessage("command.CreateInvoice", "ok", $message);
+			return backorder_api_response(549, "INVOICING FAILED");
 		}
 
-		return backorder_api_response(200);
-	}else {
-		$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed";
+	}else{ //IF NO PRICE SET FOR THIS TLD
+		$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed, can't get TLD pricing";
 		logmessage("command.CreateInvoice", "ok", $message);
-		return backorder_api_response(549, "INVOICING FAILED");
+		return backorder_api_response(549, "CAN'T GET TLD PRICING");
 	}
-
+	
 }else{
 	$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed, can't get TLD pricing";
 	logmessage("command.CreateInvoice", "ok", $message);

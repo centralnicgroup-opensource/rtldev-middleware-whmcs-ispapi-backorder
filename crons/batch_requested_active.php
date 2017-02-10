@@ -32,6 +32,7 @@ while ($local = mysql_fetch_array($result)) {
 foreach($list as $key => $l){ //for each user
 	$notactivated = array();
 	foreach($l["backorders"] as $backorder){ //for each backorder
+		$backorder_price = "";
 
 		//GET PRICE OF BACKORDER
 		$command = array(
@@ -46,7 +47,8 @@ foreach($list as $key => $l){ //for each user
 			}
 		}
 
-		if(isset($backorder_price)){
+		//echo "Backorder id=".$backorder["id"]." costs ".$backorder_price."<br>";
+		if(!empty($backorder_price) || $backorder_price=="0" ){ //IF WE REMOVE THE $backorder_price=="0" THEN FREE BACKORDER CANNOT GO TO ACTIVE
 			//echo "Backorder id=".$backorder["id"]." costs ".$backorder_price."<br>";
 
 			//GET CURRENT CREDIT BALANCE
@@ -87,6 +89,9 @@ foreach($list as $key => $l){ //for each user
 					array_push($notactivated, $backorder);
 				}
 			}
+		}else{
+			$message = "BACKORDER ".$backorder["domain"]." (userid=".$key.") cound not be set to ACTIVE (no pricing set for TLD: .".$backorder["tld"].")";
+			logmessage($cronname, "error", $message);
 		}
 	}
 	if(!empty($notactivated)){
