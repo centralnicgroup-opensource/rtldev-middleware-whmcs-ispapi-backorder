@@ -33,12 +33,38 @@ if ( preg_match('/^(.*)\.(.*)$/', $command["DOMAIN"], $m) ) {
 	$values["domain"] = strtolower($m[1]);
 	$values["tld"] = strtolower($m[2]);
 
+	//CHECK IF PRICING IS SET FOR THIS TLD
+	$querypricelist = array(
+			"COMMAND" => "QueryPriceList",
+			"USER" => $userid,
+			"TLD" => $values["tld"]
+	);
+	$result = backorder_backend_api_call($querypricelist);
+
+	if($result["CODE"] == 200){
+		$backorder_price = $result["PROPERTY"][$values["tld"]]["PRICEFULL"];
+		if(empty($backorder_price)){ //IF PRICE SET FOR THIS TLD
+			return backorder_api_response(549, "TLD NOT SUPPORTED");
+		}
+	}else{
+		return backorder_api_response(549, "TLD NOT SUPPORTED");
+	}
+	//------------------------------------------------------
+
+	//CHECK IF THERE IS A DROPDATE EXISTING IN THE DROPLIST
+	$r1 = select_query('pending_domains','*', array("domain" => $values["domain"], "zone" => $values["tld"] ));
+	$d1 = mysql_fetch_array($r1);
+	if(!empty($d1)){
+		$values["dropdate"] = $d1["drop_date"];
+	}
+	//------------------------------------------------------
+
 	$result = select_query('backorder_domains','*', array("userid" => $userid, "domain" => $values["domain"], "tld" => $values["tld"] ));
 
 	//IF BACKORDER ALREADY EXISTING, UPDATE IT
 	if ($data = mysql_fetch_assoc($result)) {
 		if (in_array($data["status"], array("REQUESTED", "ACTIVE", "FAILED", "SUCCESSFUL", "AUCTION-LOST", "AUCTION-WON"))){
-			$result = update_query('backorder_domains', array("type" => $values["type"], "updateddate" => date("Y-m-d H:i:s"), "status" => "REQUESTED", "reference" => "", "invoice" => "" ), array("userid" => $userid, "domain" => $values["domain"], "tld" => $values["tld"]));
+			return backorder_api_response(549, "BACKORDER ALREADY EXISTING");
 		}else{
 			return backorder_api_response(549, "THIS BACKORDER CANNOT BE MODIFIED");
 		}

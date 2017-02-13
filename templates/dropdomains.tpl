@@ -182,35 +182,6 @@
 			}
 		});
 
-
-            $(document).on('click', '#createnewbackorderbutton', function (e) {
-                $.ajax({
-                        type: "POST",
-                        async: false,
-                        dataType: "json",
-                        url: "{/LITERAL}{$modulepath}{LITERAL}backend/call.php",
-                        data: {
-                            COMMAND: "CreateBackorder",
-                            DOMAIN: $("#createnewbackorder").val()
-                        },
-                        success: function(data) {
-                            $(".createnewbackorderdomain").html($("#createnewbackorder").val());
-                                if (data['CODE']=="200") {
-                                    $("#dialog").dialog({modal: true, width: "400px"});
-                                    oTable.fnDraw();
-                                } else {
-                                    $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
-                                    $("#dialogerror").dialog({modal: true, width: "400px"});
-                                }
-                        },
-                        error: function(data) {
-                            $(".createnewbackorderdomain").html($("#createnewbackorder").val());
-                            $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
-                            $("#dialogerror").dialog({modal: true, width: "400px"});
-                        }
-                });
-            });
-
             oTable = $('#DeletedDomainsList').dataTable({
                 scrollX: true,
                 "dom": '<"clear">ilfrtpC',
