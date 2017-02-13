@@ -26,7 +26,7 @@ if(isset($command["TLD"])){
 
 $result = select_query('backorder_pricing','*',$params);
 while ( $data = mysql_fetch_assoc($result) ) {
-	if(!empty($data["fullprice"]) || $data["fullprice"]=="0"){ //ADD TO PRICING LIST ONLY IF NOT EMPTY OR PRICE IS SET TO 0 (FREE)
+	if(!empty($data["fullprice"])){ //USE || $data["fullprice"]=="0" IF FREE BACKORDER ARE ALLOWED TO BE DISPLAYED
 		$r["PROPERTY"][$data["extension"]]["PRICEFULL"] = $data["fullprice"];
 		$r["PROPERTY"][$data["extension"]]["PRICEFULL_FORMATED"] = formatPrice($data["fullprice"], $currency);
 		$r["PROPERTY"][$data["extension"]]["CURRENCYSUFFIX"] = $currency["suffix"];

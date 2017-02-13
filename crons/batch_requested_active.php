@@ -48,7 +48,7 @@ foreach($list as $key => $l){ //for each user
 		}
 
 		//echo "Backorder id=".$backorder["id"]." costs ".$backorder_price."<br>";
-		if(!empty($backorder_price) || $backorder_price=="0" ){ //IF WE REMOVE THE $backorder_price=="0" THEN FREE BACKORDER CANNOT GO TO ACTIVE
+		if(!empty($backorder_price)){ //USE || $backorder_price=="0" IF FREE BACKORDER ARE ALLOWED TO GO TO ACTIVE
 			//echo "Backorder id=".$backorder["id"]." costs ".$backorder_price."<br>";
 
 			//GET CURRENT CREDIT BALANCE

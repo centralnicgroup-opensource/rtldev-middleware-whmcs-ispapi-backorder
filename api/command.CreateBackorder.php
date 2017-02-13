@@ -9,7 +9,7 @@ if ( !backorder_api_check_syntax_domain($command["DOMAIN"]) )
 	return backorder_api_response(505, "DOMAIN");
 
 if ( !backorder_api_check_valid_tld($command["DOMAIN"], $userid) )
-	return backorder_api_response(541, "CURRENTLY NOT SUPPORTED");
+	return backorder_api_response(541, "NOT SUPPORTED");
 
 $backordertype = "FULL";
 
