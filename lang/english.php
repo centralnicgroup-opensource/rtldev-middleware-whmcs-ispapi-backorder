@@ -68,4 +68,7 @@ $_LANG['digits'] = "Digits";
 $_LANG['hyphens'] = "Hyphens";
 $_LANG['status'] = "Status";
 $_LANG['all'] = "All";
+$_LANG['notybackordersuccessfullycreated'] = 'Backorder successfully created.';
+$_LANG['notybackordersuccessfullydeleted'] = 'Backorder successfully deleted.';
+$_LANG['notyerroroccured'] = 'An error occured.';
 ?>

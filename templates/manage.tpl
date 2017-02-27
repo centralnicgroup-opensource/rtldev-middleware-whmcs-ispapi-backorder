@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="modules/addons/ispapibackorder/templates/js/jquery.noty.packaged.min.js"></script>
 <script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
@@ -137,14 +138,17 @@
                     DOMAIN: $(this).attr("value"),
                 },
                 success: function(data) {
-                    if(data["CODE"]==200)
+                    if(data["CODE"]==200){
                         button.closest('tr').remove();
+                        noty({text: "{/literal}{$LANG.notybackordersuccessfullydeleted}{literal}"});    
+                    }
                     else{
-                        $("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
+                        noty({text: data['DESCRIPTION'], type: "error"});
+                        /*$("#createnewbackorderdomainerrortext").html(data['DESCRIPTION'] );
                         $("#dialogerror").dialog({
                             modal: true,
                             width: "400px"
-                        });
+                        });*/
                     }
                 },
                 error: function(data) {
