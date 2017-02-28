@@ -6,6 +6,9 @@
 <script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
+
+<div class="container" style="text-align:right;padding-right:45px;margin-bottom:10px;"><a class="btn btn-default" href="index.php?m=ispapibackorder&p=dropdomains">{$LANG.domainheader}</a></div>
+
 <!--############################### MAIN AREA #######################################-->
 <div class="col-md-9 pull-md-right">
     {if $error}
@@ -34,9 +37,9 @@
             </tr>
         </thead>
     </table>
-    <div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
+    <!--<div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
         <p>{$LANG.createbackordererrortext}</p>
-    </div>
+    </div>-->
 
     {LITERAL}
     <script>
@@ -44,11 +47,8 @@
     $(document).ready(function() {
 
         function setvalue(field, value, thiselement, redraw, resetform) {
-
-
             if (redraw != true && redraw != false) redraw = true;
             if (resetform != true && resetform != false) resetform = true;
-
             if (resetform) {
                 $(".selectioactive").removeClass("selectioactive");
                 thiselement.addClass("selectioactive");
@@ -56,51 +56,96 @@
                     $(this).val("")
                 });
             }
-
             if(field=="status" && value=="ALL"){
                 value = "";
             }
-
             $("#" + field).val(value);
             if (redraw) oTable.fnDraw();
         }
 
         $.ajax({
             type: "POST",
-            async: false,
+            async: true,
             dataType: "json",
-            url: "{/literal}{$modulepath}{literal}backend/call.php",
-            data: {COMMAND : "QueryBackorderOverviewStatus"},
+            url: "modules/addons/ispapibackorder/backend/call.php",
+            data: {COMMAND : "GetAvailableFunds"},
             success: function(data){
-                $("#overviewbackorderstatus").html();
-                var totallite=0;
-                var totalfull=0;
-                var total=0;
-                var output="";
-
-                $.each(data.PROPERTY, function(i, obj) {
-                      total = total + parseInt(obj.anzahl);
-                      output="";
-                      output += '<tr value="'+obj.status+'" class="setValue" field="status">';
-                      output += '<td align="center" width="75%"><strong>'+obj.status+'</strong></td>';
-                      output += '<td align="center" >'+obj.anzahl +'</td>';
-                      output += '</tr>';
-                      $("#overviewbackorderstatus").append(output);
-                });
-                output="";
-                output += '<tr value="ALL" class="setValue" field="status">';
-                output += '<td align="center" width="75%"><strong>ALL</strong></td>';
-                output += '<td align="center" >'+total+'</td>';
-                output += '</tr>';
-                $("#overviewbackorderstatus").append(output);
+                //console.log(data);
+                $("#creditbalance").html(data.PROPERTY.CREDITBALANCE.VALUE_FORMATED);
+                $("#reservedamount").html(data.PROPERTY.RESERVEDAMOUNT.VALUE_FORMATED);
+                $("#unpaidinvoices").html(data.PROPERTY.UNPAIDINVOICES.VALUE_FORMATED);
+                $("#amountavailable").html(data.PROPERTY.AMOUNT.VALUE_FORMATED);
             },
             error: function(data){
             }
         });
 
+        $(document).on('click', '#createnewbackorderbutton', function (e) {
+            var type = "FULL";
+            $.ajax({
+                    type: "POST",
+                    async: true,
+                    dataType: "json",
+                    url: "modules/addons/ispapibackorder/backend/call.php",
+                    data: {
+                        COMMAND: "CreateBackorder",
+                        DOMAIN: $("#createnewbackorder").val(),
+                        TYPE: type
+                    },
+                    success: function(data) {
+                        if (data['CODE']=="200") {
+                            reloadBackorderOverview();
+                            noty({text: "{/literal}{$LANG.notybackordersuccessfullycreated}{literal}"});
+                            oTable.fnDraw();
+                        } else {
+                            noty({text: data['DESCRIPTION'], type: "error"});
+                        }
+                    },
+                    error: function(data) {
+                        noty({text: "{/literal}{$LANG.notyerroroccured}{literal}", type: "error"});
+                    }
+            });
+        });
+
+        function reloadBackorderOverview(){
+            $.ajax({
+                type: "POST",
+                async: true,
+                dataType: "json",
+                url: "{/literal}{$modulepath}{literal}backend/call.php",
+                data: {COMMAND : "QueryBackorderOverviewStatus"},
+                success: function(data){
+                    $("#overviewbackorderstatus").html("");
+                    var totallite=0;
+                    var totalfull=0;
+                    var total=0;
+                    var output="";
+
+                    $.each(data.PROPERTY, function(i, obj) {
+                          total = total + parseInt(obj.anzahl);
+                          output="";
+                          output += '<tr value="'+obj.status+'" class="setValue" field="status">';
+                          output += '<td align="center" width="75%"><strong>'+obj.status+'</strong></td>';
+                          output += '<td align="center" >'+obj.anzahl +'</td>';
+                          output += '</tr>';
+                          $("#overviewbackorderstatus").append(output);
+                    });
+                    output="";
+                    output += '<tr value="ALL" class="setValue" field="status">';
+                    output += '<td align="center" width="75%"><strong>ALL</strong></td>';
+                    output += '<td align="center" >'+total+'</td>';
+                    output += '</tr>';
+                    $("#overviewbackorderstatus").append(output);
+                },
+                error: function(data){
+                }
+            });
+        }
+        reloadBackorderOverview();
+
         $.ajax({
             type: "POST",
-            async: false,
+            async: true,
             dataType: "json",
             url: "{/literal}{$modulepath}{literal}backend/call.php",
             data: {COMMAND : "QueryPriceList"},
@@ -130,7 +175,7 @@
 
             $.ajax({
                 type: "POST",
-                async: false,
+                async: true,
                 dataType: "json",
                 url: "{/literal}{$modulepath}{literal}backend/call.php",
                 data: {
@@ -140,7 +185,8 @@
                 success: function(data) {
                     if(data["CODE"]==200){
                         button.closest('tr').remove();
-                        noty({text: "{/literal}{$LANG.notybackordersuccessfullydeleted}{literal}"});    
+                        reloadBackorderOverview();
+                        noty({text: "{/literal}{$LANG.notybackordersuccessfullydeleted}{literal}"});
                     }
                     else{
                         noty({text: data['DESCRIPTION'], type: "error"});
@@ -254,12 +300,12 @@
             <input type="submit" value="{$LANG.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
         </div>
     </div>
-    <div id="dialog" title="{$LANG.createbackordersuccess}" style="display:none;">
+    <!--<div id="dialog" title="{$LANG.createbackordersuccess}" style="display:none;">
         <p>{$LANG.createbackordersuccesstext}</p>
     </div>
     <div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
         <p>{$LANG.createbackordererrortext}</p>
-    </div>
+    </div>-->
     <!-- ###################################### -->
 
     <!--############################### BACKORDERS PRICING #######################################-->

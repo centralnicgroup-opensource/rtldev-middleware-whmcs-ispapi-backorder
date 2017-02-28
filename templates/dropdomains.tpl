@@ -6,6 +6,8 @@
 <script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
+<div class="container" style="text-align:right;padding-right:45px;margin-bottom:10px;"><a class="btn btn-default" href="index.php?m=ispapibackorder&p=manage">{$LANG.managebackorders} (<span style="font-weight:bold;" id="nb_backorders">0</span>)</a></div>
+
 <!--############################### MAIN AREA #######################################-->
 <div class="col-md-9 pull-md-right">
     {if $error}
@@ -50,7 +52,72 @@
 
             $.ajax({
                 type: "POST",
-                async: false,
+                async: true,
+                dataType: "json",
+                url: "modules/addons/ispapibackorder/backend/call.php",
+                data: {COMMAND : "GetAvailableFunds"},
+                success: function(data){
+                    //console.log(data);
+                    $("#creditbalance").html(data.PROPERTY.CREDITBALANCE.VALUE_FORMATED);
+                    $("#reservedamount").html(data.PROPERTY.RESERVEDAMOUNT.VALUE_FORMATED);
+                    $("#unpaidinvoices").html(data.PROPERTY.UNPAIDINVOICES.VALUE_FORMATED);
+                    $("#amountavailable").html(data.PROPERTY.AMOUNT.VALUE_FORMATED);
+                },
+                error: function(data){
+                }
+            });
+
+            $(document).on('click', '#createnewbackorderbutton', function (e) {
+                var type = "FULL";
+                $.ajax({
+                        type: "POST",
+                        async: true,
+                        dataType: "json",
+                        url: "modules/addons/ispapibackorder/backend/call.php",
+                        data: {
+                            COMMAND: "CreateBackorder",
+                            DOMAIN: $("#createnewbackorder").val(),
+                            TYPE: type
+                        },
+                        success: function(data) {
+                            if (data['CODE']=="200") {
+                                updateBackorderNumber();
+                                noty({text: "{/literal}{$LANG.notybackordersuccessfullycreated}{literal}"});
+                                oTable.fnDraw();
+                            } else {
+                                noty({text: data['DESCRIPTION'], type: "error"});
+                            }
+                        },
+                        error: function(data) {
+                            noty({text: "{/literal}{$LANG.notyerroroccured}{literal}", type: "error"});
+                        }
+                });
+            });
+
+            function updateBackorderNumber(){
+                $.ajax({
+                    type: "POST",
+                    async: true,
+                    dataType: "json",
+                    url: "{/literal}{$modulepath}{literal}backend/call.php",
+                    data: {COMMAND : "QueryBackorderOverviewStatus"},
+                    success: function(data){
+                        var total=0;
+                        $.each(data.PROPERTY, function(i, obj) {
+                              total = total + parseInt(obj.anzahl);
+                        });
+                        $("#nb_backorders").html(total);
+                    },
+                    error: function(data){
+                        $("#nb_backorders").html("#");
+                    }
+                });
+            }
+            updateBackorderNumber();
+
+            $.ajax({
+                type: "POST",
+                async: true,
                 dataType: "json",
                 url: "{/literal}{$modulepath}{literal}backend/call.php",
                 data: {COMMAND : "QueryDeletedDomainsStats"},
@@ -75,7 +142,6 @@
                     output +='</div>';
                     output +='</a>';
                     $("#droppingdomains").append(output);
-
                 },
                 error: function(data){
                 }
@@ -117,7 +183,7 @@
 
                 $.ajax({
                     type: "POST",
-                    async: false,
+                    async: true,
                     dataType: "json",
                     url: "{/literal}{$modulepath}{literal}backend/call.php",
                     data: {
@@ -129,10 +195,12 @@
                     success: function(data) {
                         if(command=="CreateBackorder" && data["CODE"]==200){
                             button.addClass("active btn-success");
+                            updateBackorderNumber();
                             noty({text: "{/literal}{$LANG.notybackordersuccessfullycreated}{literal}"});
                         }
                         else if(command=="DeleteBackorder" && data["CODE"]==200){
                             button.removeClass("active btn-success");
+                            updateBackorderNumber();
                             noty({text: "{/literal}{$LANG.notybackordersuccessfullydeleted}{literal}"});
                         }
                         else{
@@ -147,7 +215,7 @@
 
             $.ajax({
                 type: "POST",
-                async: false,
+                async: true,
                 dataType: "json",
                 url: "{/literal}{$modulepath}{literal}backend/call.php",
                 data: {COMMAND : "QueryPriceList"},
@@ -169,7 +237,7 @@
 
 			$.ajax({
 			type: "POST",
-			async: false,
+			async: true,
 			dataType: "json",
 			url: "{/literal}{$modulepath}{literal}backend/call.php",
 			data: {COMMAND : "QueryPriceList"},
