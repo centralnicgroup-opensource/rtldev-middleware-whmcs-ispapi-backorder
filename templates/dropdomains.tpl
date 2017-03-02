@@ -224,36 +224,66 @@
                 data: {COMMAND : "QueryPriceList"},
                 success: function(data){
                     $("#pricelist").html();
+                    var count = 0;
                     $.each(data.PROPERTY, function(i, obj) {
-                          var output="";
-                          output += '<tr>';
-                          output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
-                          output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
-                          output += '</tr>';
-                          $("#pricelist").append(output);
+                        count++;
+                        if(count <= 5){
+                            var output="";
+                            output += '<tr>';
+                            output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
+                            output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
+                            output += '</tr>';
+                            $("#pricelist").append(output);
+                        }else{
+                            var output="";
+                            output += '<tr class="pricing_row hide">';
+                            output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
+                            output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
+                            output += '</tr>';
+                            $("#pricelist").append(output);
+                        }
                     });
+                    var output="";
+                    output += '<tr>';
+                    output += '<td colspan="2" align="center"><button action="show" style="margin-top:8px;" class="form-control input-sm btn-default" id="morepricing"><i class="fa fa-caret-down" aria-hidden="true"></i> {/literal}{$LANG.showmore}{literal}</button></td>';
+                    output += '</tr>';
+                    $("#pricelist").append(output);
                 },
                 error: function(data){
                 }
             });
 
+            //show/hide pricing logic
+            $(document).on('click', '#morepricing', function (e) {
+                if($(this).attr("action") == "show") {
+                    $(this).html("<i class='fa fa-caret-up' aria-hidden='true'></i> {/literal}{$LANG.hidemore}{literal}");
+                    $.each( $(".pricing_row"), function(obj) {
+                        $(this).removeClass("hide");
+                    });
+                    $(this).attr("action", "hide")
+                }else{
+                    $(this).html("<i class='fa fa-caret-down' aria-hidden='true'></i> {/literal}{$LANG.showmore}{literal}");
+                    $.each( $(".pricing_row"), function(obj) {
+                        $(this).addClass("hide");
+                    });
+                    $(this).attr("action", "show")
+                }
+            });
 
 			$.ajax({
-			type: "POST",
-			async: true,
-			dataType: "json",
-			url: "{/literal}{$modulepath}{literal}backend/call.php",
-			data: {COMMAND : "QueryPriceList"},
-			success: function(data){
-                var output="";
-				$.each(data.PROPERTY, function(i, obj) {
-					  output += '<option value="'+obj.TLD+'">'+obj.TLD+'</option>';
-				});
-                $("#tld").append(output);
-			},
-			error: function(data){
-			}
-		});
+    			type: "POST",
+    			async: true,
+    			dataType: "json",
+    			url: "{/literal}{$modulepath}{literal}backend/call.php",
+    			data: {COMMAND : "QueryPriceList"},
+    			success: function(data){
+                    var output="";
+    				$.each(data.PROPERTY, function(i, obj) {
+    					  output += '<option value="'+obj.TLD+'">'+obj.TLD+'</option>';
+    				});
+                    $("#tld").append(output);
+    			}
+		    });
 
             oTable = $('#DeletedDomainsList').dataTable({
                 scrollX: true,
@@ -301,10 +331,10 @@
 <!--############################### SIDEBAR #######################################-->
 <div class="col-md-3 pull-md-left sidebar">
 
-    <!-- ########## CREDIT VOLUME ########## -->
+    <!-- ##################### MY ACCOUNT ###################### -->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-money"></i>&nbsp;{$LANG.creditvolume}</h3>
+            <h3 class="panel-title"><i class="fa fa-user-circle-o"></i>&nbsp;{$LANG.creditvolume}</h3>
         </div>
         <div class="panel-body">
             <div id="creditvolume" class="row" style="padding:0px 10px;">
@@ -323,9 +353,9 @@
             </div>
         </div>
     </div>
-    <!-- ###################################### -->
+    <!-- ####################################################### -->
 
-    <!--############################## REFINE SEARCH ##############################-->
+    <!--############################## SEARCH ##############################-->
     <div menuitemname="Client Details" class="panel panel-default">
 
             <div class="panel-heading">
@@ -334,8 +364,9 @@
             <form id="settings">
             <div class="panel-body">
                 <div class="form-group" style="margin-bottom:5px;">
-                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindoescontain} <span style="font-weight:normal;">({$LANG.regexsupported})</span></label>
+                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindoescontain}</label>
                     <input class="form-control" name="DOMAINREGEXP" id="DOMAINREGEXP" value="">
+                    <span style="font-weight:normal;font-size:12px;">* {$LANG.regexsupported}</span>
                 </div>
 
                 <div class="form-group" style="margin-bottom:5px;">
@@ -410,12 +441,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!--<div class="row">
-                            <div class="col-lg-12">
-                                <input name="digits_no" id="digits_no" type="checkbox" checked="" /> {$LANG.nodigits}
-                                <input name="digits_only" id="digits_only" type="checkbox" /> {$LANG.digitsonly}
-                            </div>
-                        </div>-->
                     </div>
 
                     <hr style="margin:10px 0px 10px 0px;">
@@ -435,11 +460,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!--<div class="row">
-                            <div class="col-lg-12">
-                                <input name="hyphens_no" id="hyphens_no" type="checkbox" /> {$LANG.nohyphens}
-                            </div>
-                        </div>-->
                     </div>
 
                     <hr style="margin:10px 0px 10px 0px;">
@@ -474,16 +494,16 @@
         </form>
 
     </div>
-    <!--############################## END REFINE SEARCH ##############################-->
+    <!--####################################################################-->
 
-    <!-- ########## DROP DATES ########## -->
+    <!-- ########################## UPCOMING DROPS ######################### -->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-calendar"></i>&nbsp; {$LANG.upcomingdrops}</h3>
         </div>
         <div class="list-group" id="droppingdomains"></div>
     </div>
-    <!-- ###################################### -->
+    <!--####################################################################-->
 
     <!--############################### CREATE BACKORDER #######################################-->
     <div menuitemname="Client Details" class="panel panel-default">
@@ -497,9 +517,9 @@
             <input type="submit" value="{$LANG.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
         </div>
     </div>
-    <!--############################### END CREATE BACKORDER #######################################-->
+    <!--#######################################################################################-->
 
-    <!--############################### BACKORDERS PRICING #######################################-->
+    <!--############################### PRICING #######################################-->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title"><i class="fa fa-usd"></i> {$LANG.pricelist}</h3>
@@ -516,7 +536,7 @@
             </table>
         </div>
     </div>
-    <!--############################### END BACKORDERS PRICING #######################################-->
+    <!--###############################################################################-->
 
 </div>
 <!--############################### END SIDEBAR #######################################-->

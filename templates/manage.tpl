@@ -150,16 +150,49 @@
             data: {COMMAND : "QueryPriceList"},
             success: function(data){
                 $("#pricelist").html();
+                var count = 0;
                 $.each(data.PROPERTY, function(i, obj) {
-                      var output="";
-                      output += '<tr>';
-                      output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
-                      output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
-                      output += '</tr>';
-                      $("#pricelist").append(output);
+                    count++;
+                    if(count <= 5){
+                        var output="";
+                        output += '<tr>';
+                        output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
+                        output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
+                        output += '</tr>';
+                        $("#pricelist").append(output);
+                    }else{
+                        var output="";
+                        output += '<tr class="pricing_row hide">';
+                        output += '<td align="center" width="33%" ><strong>.'+obj.TLD+'</strong></td>';
+                        output += '<td align="center">'+obj.PRICEFULL_FORMATED+'</td>';
+                        output += '</tr>';
+                        $("#pricelist").append(output);
+                    }
                 });
+                var output="";
+                output += '<tr>';
+                output += '<td colspan="2" align="center"><button action="show" style="margin-top:8px;" class="form-control input-sm btn-default" id="morepricing"><i class="fa fa-caret-down" aria-hidden="true"></i> {/literal}{$LANG.showmore}{literal}</button></td>';
+                output += '</tr>';
+                $("#pricelist").append(output);
             },
             error: function(data){
+            }
+        });
+
+        //show/hide pricing logic
+        $(document).on('click', '#morepricing', function (e) {
+            if($(this).attr("action") == "show") {
+                $(this).html("<i class='fa fa-caret-up' aria-hidden='true'></i> {/literal}{$LANG.hidemore}{literal}");
+                $.each( $(".pricing_row"), function(obj) {
+                    $(this).removeClass("hide");
+                });
+                $(this).attr("action", "hide")
+            }else{
+                $(this).html("<i class='fa fa-caret-down' aria-hidden='true'></i> {/literal}{$LANG.showmore}{literal}");
+                $.each( $(".pricing_row"), function(obj) {
+                    $(this).addClass("hide");
+                });
+                $(this).attr("action", "show")
             }
         });
 
@@ -245,10 +278,10 @@
 <!--############################### SIDEBAR #######################################-->
 <div class="col-md-3 pull-md-left sidebar">
 
-    <!-- ########## CREDIT VOLUME ########## -->
+    <!-- ########################### MY ACCOUNT ######################### -->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-money"></i>&nbsp;{$LANG.creditvolume}</h3>
+            <h3 class="panel-title"><i class="fa fa-user-circle-o"></i>&nbsp;{$LANG.creditvolume}</h3>
         </div>
         <div class="panel-body">
             <div id="creditvolume" class="row" style="padding:0px 10px;">
@@ -267,12 +300,12 @@
             </div>
         </div>
     </div>
-    <!-- ###################################### -->
+    <!-- ################################################################ -->
 
     <!-- ########## BACKORDER STATUS ########## -->
     <div menuitemname="Client Details" class="panel panel-default" id="overviewbackorderstatus_box" style="display:none;">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-question-circle"></i>&nbsp;{$LANG.overviewbackorderstatus}</h3>
+            <h3 class="panel-title"><i class="fa fa-filter"></i>&nbsp;{$LANG.overviewbackorderstatus}</h3>
         </div>
         <div class="panel-body">
         	<table width="100%" id="overviewbackorderstatus"></table>
@@ -294,7 +327,7 @@
     </div>
     <!-- ###################################### -->
 
-    <!--############################### BACKORDERS PRICING #######################################-->
+    <!--###################################### PRICING ##########################################-->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title"><i class="fa fa-usd"></i> {$LANG.pricelist}</h3>
@@ -311,7 +344,7 @@
             </table>
         </div>
     </div>
-    <!--############################### END BACKORDERS PRICING #######################################-->
+    <!--#########################################################################################-->
 
 
 </div>
