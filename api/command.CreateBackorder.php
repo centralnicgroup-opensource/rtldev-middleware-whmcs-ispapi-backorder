@@ -29,7 +29,7 @@ $values = array(
 	"reference" => ""
 );
 
-if ( preg_match('/^(.*)\.(.*)$/', $command["DOMAIN"], $m) ) {
+if ( preg_match('/^([a-zA-Z\-]+)\.([a-zA-Z]+)$/', $command["DOMAIN"], $m) ) {
 	$values["domain"] = strtolower($m[1]);
 	$values["tld"] = strtolower($m[2]);
 

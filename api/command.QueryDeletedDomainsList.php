@@ -175,7 +175,7 @@ if ( isset($command["DROPDATE_TO"]) && $command["DROPDATE_TO"]!=""  ) {
 $stmt = $db->prepare("
 	SELECT SQL_CALC_FOUND_ROWS zone, domain, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits, domain_number_of_umlauts
 	FROM pending_domains
-	WHERE 1
+	WHERE drop_date > NOW()
 	$conditions
 	$orderby
 	$limit;

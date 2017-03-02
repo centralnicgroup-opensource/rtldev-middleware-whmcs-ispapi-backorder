@@ -389,13 +389,15 @@
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:10px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainchars}</label>
-                        <div class="row">
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="chars_count_min" id="chars_count_min" value="">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
@@ -408,13 +410,15 @@
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:10px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainletters}</label>
-                        <div class="row">
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="letters_count_min" id="letters_count_min" value="">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
@@ -427,13 +431,15 @@
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:10px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindigits}</label>
-                        <div class="row">
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="digits_count_min" id="digits_count_min" value="">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
@@ -446,13 +452,15 @@
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:5px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainhyphens}</label>
-                        <div class="row">
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="hyphens_count_min" id="hyphens_count_min" value="">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
