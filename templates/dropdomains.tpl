@@ -24,6 +24,7 @@
     <table id="DeletedDomainsList" class="table table-striped table-framed" cellspacing="0" width="100%">
         <thead><tr>{foreach $fields as $field}<th>{$field['fieldname']}</th>{/foreach}</tr></thead>
     </table>
+    <br>
 
     {LITERAL}
     <script>
@@ -39,10 +40,12 @@
                 $("#dropdate_from").val("");
                 $("#dropdate_to").val("");
             }else{
-                var mydate = new Date(tmpdate);
-                mydate.setDate(mydate.getDate());
-                $("#dropdate_from").val(tmpdate);
-                $("#dropdate_to").val( mydate.getFullYear()+"-"+( mydate.getMonth()+1) +"-"+mydate.getDate() );
+                var selecteddate = new Date(tmpdate);
+                var selecteddate_formated = $.datepicker.formatDate('yy-mm-dd', selecteddate);
+                //var selecteddatenextday = new Date(selecteddate.setTime( selecteddate.getTime() + 1 * 86400000 ));
+                //var selecteddatenextday_formated = $.datepicker.formatDate('yy-mm-dd', selecteddate);
+                $("#dropdate_from").val(selecteddate_formated);
+                $("#dropdate_to").val(selecteddate_formated);
             }
             $("#searchbutton").trigger( "click" );
         }
@@ -129,7 +132,7 @@
                               var output ='';
                               output +='<a onclick="setdate(\''+data.PROPERTY.DROPDAY[i]+'\');" class="list-group-item">';
                               output +='<div class="row"><div class="col-lg-8"> <i class="fa fa-circle-o"></i>&nbsp;';
-                              output +='	<span>'+data.PROPERTY.DROPDAY[i]+'</span></div>';
+                              output +='<span>'+data.PROPERTY.DROPDAY[i]+'</span></div>';
                               output +='</div>';
                               output +='</a>';
                               $("#droppingdomains").append(output);
@@ -138,7 +141,7 @@
                     var output ='';
                     output +='<a onclick="setdate(\'total\');" class="list-group-item">';
                     output +='	<div class="row"><div class="col-lg-8"><i class="fa fa-circle-o"></i>&nbsp;';
-                    output +='	<span>{/literal}{$LANG.all}{literal}</span></div>';
+                    output +='	<span><strong>{/literal}{$LANG.all}{literal}</strong></span></div>';
                     output +='</div>';
                     output +='</a>';
                     $("#droppingdomains").append(output);
@@ -331,12 +334,12 @@
             <form id="settings">
             <div class="panel-body">
                 <div class="form-group" style="margin-bottom:5px;">
-                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindoescontain}</label>
+                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindoescontain} <span style="font-weight:normal;">({$LANG.regexsupported})</span></label>
                     <input class="form-control" name="DOMAINREGEXP" id="DOMAINREGEXP" value="">
                 </div>
 
                 <div class="form-group" style="margin-bottom:5px;">
-                    <label style="margin:0px;" for="" class="control-label">TLD</label>
+                    <label style="margin:0px;" for="" class="control-label">{$LANG.domainsearchtld}</label>
                     <select class="form-control input-sm" name="tld" id="tld">
                         <option value="_all_">{$LANG.all}</option>
                     </select>
@@ -493,12 +496,6 @@
         <div class="panel-footer clearfix">
             <input type="submit" value="{$LANG.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
         </div>
-    </div>
-    <div id="dialog" title="{$LANG.createbackordersuccess}" style="display:none;">
-        <p>{$LANG.createbackordersuccesstext}</p>
-    </div>
-    <div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
-        <p>{$LANG.createbackordererrortext}</p>
     </div>
     <!--############################### END CREATE BACKORDER #######################################-->
 

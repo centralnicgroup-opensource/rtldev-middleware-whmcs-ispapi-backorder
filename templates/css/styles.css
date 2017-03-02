@@ -47,6 +47,10 @@ table.dataTable thead th {
     cursor:pointer;
 }
 
+#overviewbackorderstatus td.bold {
+    font-weight: bold;
+}
+
 #overviewlist tr:hover {
     background-color: #ddd;
     cursor:pointer;

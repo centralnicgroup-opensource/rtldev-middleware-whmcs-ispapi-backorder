@@ -37,9 +37,7 @@
             </tr>
         </thead>
     </table>
-    <!--<div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
-        <p>{$LANG.createbackordererrortext}</p>
-    </div>-->
+    <br>
 
     {LITERAL}
     <script>
@@ -116,28 +114,29 @@
                 data: {COMMAND : "QueryBackorderOverviewStatus"},
                 success: function(data){
                     $("#overviewbackorderstatus").html("");
-                    var totallite=0;
-                    var totalfull=0;
                     var total=0;
                     var output="";
-
                     $.each(data.PROPERTY, function(i, obj) {
                           total = total + parseInt(obj.anzahl);
-                          output="";
-                          output += '<tr value="'+obj.status+'" class="setValue" field="status">';
-                          output += '<td align="center" width="75%"><strong>'+obj.status+'</strong></td>';
-                          output += '<td align="center" >'+obj.anzahl +'</td>';
-                          output += '</tr>';
-                          $("#overviewbackorderstatus").append(output);
+                          //Only display status with anzahl > 0
+                          if(obj.anzahl > 0){
+                              output  = '';
+                              output += '<tr value="'+obj.status+'" class="setValue" field="status">';
+                              output += '<td class="" style="text-align:center;">'+obj.status+' ('+obj.anzahl+')</td>';
+                              output += '</tr>';
+                              $("#overviewbackorderstatus").append(output);
+                          }
                     });
-                    output="";
-                    output += '<tr value="ALL" class="setValue" field="status">';
-                    output += '<td align="center" width="75%"><strong>ALL</strong></td>';
-                    output += '<td align="center" >'+total+'</td>';
-                    output += '</tr>';
-                    $("#overviewbackorderstatus").append(output);
-                },
-                error: function(data){
+                    if(total > 0){
+                        output  = '<tr><td><hr style="margin:5px;"></td></tr>';
+                        output += '<tr value="ALL" class="setValue" field="status">';
+                        output += '<td class="bold" style="text-align:center;">{/literal}{$LANG.showall}{literal} ('+total+')</td>';
+                        output += '</tr>';
+                        $("#overviewbackorderstatus").append(output);
+                        $("#overviewbackorderstatus_box").show();
+                    }else{
+                        $("#overviewbackorderstatus_box").hide();
+                    }
                 }
             });
         }
@@ -271,18 +270,11 @@
     <!-- ###################################### -->
 
     <!-- ########## BACKORDER STATUS ########## -->
-    <div menuitemname="Client Details" class="panel panel-default">
+    <div menuitemname="Client Details" class="panel panel-default" id="overviewbackorderstatus_box" style="display:none;">
         <div class="panel-heading">
             <h3 class="panel-title"><i class="fa fa-question-circle"></i>&nbsp;{$LANG.overviewbackorderstatus}</h3>
         </div>
         <div class="panel-body">
-        	<table width="100%">
-        		<tr>
-        			<td align="center" width="75%"><b>{$LANG.tldstatus}</b></td>
-        			<td align="center" ><b>{$LANG.tldnumber}</b></td>
-        		</tr>
-        	</table>
-        	<hr style="margin:5px;">
         	<table width="100%" id="overviewbackorderstatus"></table>
         </div>
     </div>
@@ -300,12 +292,6 @@
             <input type="submit" value="{$LANG.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
         </div>
     </div>
-    <!--<div id="dialog" title="{$LANG.createbackordersuccess}" style="display:none;">
-        <p>{$LANG.createbackordersuccesstext}</p>
-    </div>
-    <div id="dialogerror" title="{$LANG.createbackordererror}" style="display:none;">
-        <p>{$LANG.createbackordererrortext}</p>
-    </div>-->
     <!-- ###################################### -->
 
     <!--############################### BACKORDERS PRICING #######################################-->
