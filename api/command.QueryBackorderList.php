@@ -29,8 +29,6 @@ if(isset($command['TYPE']) && $command['TYPE']!="")
 	$condition['type'] = $command['TYPE'];
 }
 
-
-
 $orderby = "";
 $orders = array(
 	"ID" => "id",
@@ -58,8 +56,6 @@ if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
 	if($command["ORDERBY"]=="NUMBEROFHYPHENSDESC") $sortorder = "DESC";
 }
 
-
-
 $result = select_query('backorder_domains',$fields,$condition, $order, $sortorder, $limit);
 
 while ($data = mysql_fetch_assoc($result)) {
@@ -78,7 +74,6 @@ while ($data = mysql_fetch_assoc($result)) {
 	}
 }
 
-
 if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 	foreach ( $r["PROPERTY"]["DOMAIN"] as $index => $domain ) {
 		if ( preg_match('/^(.*)\.(.*)$/', $domain, $m) ) {
@@ -92,13 +87,9 @@ if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 	}
 }
 
-
-
 $result = select_query('backorder_domains',$fields,$condition); //ADD DM 14.08.2015
 $data = mysql_fetch_assoc(mysql_query("SELECT FOUND_ROWS() AS `found_rows`;"));
 $r["PROPERTY"]["TOTAL"][] = $data['found_rows'];
-
-
 
 return $r;
 

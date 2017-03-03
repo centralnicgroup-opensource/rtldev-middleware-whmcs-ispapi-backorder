@@ -1,5 +1,4 @@
-<?php // $command, $userid - DM 30.07.2015 / MODIFIED SA 17.08.2015
-//require_once dirname(__FILE__)."/../backend/helper.php";
+<?php // $command, $userid
 
 $currencyid=NULL;
 $result = select_query('tblclients','currency',array("id" => $userid ));
@@ -8,7 +7,6 @@ $currencyid= $data["currency"];
 if($currencyid==NULL){
 	return backorder_api_response(541, "PRICELIST - USER CURRENCY ERROR");
 }
-
 
 $currency=NULL;
 $result = select_query('tblcurrencies','*',array("id" => $currencyid ));

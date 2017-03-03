@@ -1,27 +1,10 @@
 <?php // $command, $userid
+include(dirname(__FILE__)."/../../../../configuration.php");
 
 if ( !isset($command["LIMIT"]) ) $command["LIMIT"] = 100;
 if ( !isset($command["FIRST"]) ) $command["FIRST"] = 0;
 
 $limit = isset($command["LIMIT"])? $command["FIRST"].",".$command["LIMIT"] : "";
-/*
-$host = "qbk-db-slave.fs.de.hexonet.net.";
-$user = "backorderde";
-$pass = "QHvhGXGBSWv6AcjG";
-
-$options = array(
-    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-);
-
-try {
-	$db = new PDO("mysql:dbname=dvm_live;host=$host", $user, $pass, $options);
-} catch (PDOException $ex) {
-//	return backorder_api_response(549, "DB Connect failed: ".$ex->getMessage());
-	return backorder_api_response(549, "DB Connect failed");
-}
-*/
-
-include(dirname(__FILE__)."/../../../../configuration.php");
 
 $options = array(
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',

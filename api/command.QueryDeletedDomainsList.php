@@ -32,10 +32,7 @@ $orders = array(
 	"NUMBEROFDIGITSDESC" => "domain_number_of_digits DESC,domain DESC,zone DESC",
 	"NUMBEROFHYPHENS" => "domain_number_of_hyphens,domain,zone",
 	"NUMBEROFHYPHENSDESC" => "domain_number_of_hyphens DESC,domain DESC,zone DESC",
-	//"NUMBEROFUMLAUTS" => "domain_number_of_umlauts,domain,zone",
-	//"NUMBEROFUMLAUTSDESC" => "domain_number_of_umlauts DESC,domain DESC,zone DESC",
 );
-
 
 if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
 	$orderby = "ORDER BY ".$orders[$command["ORDERBY"]];
@@ -88,22 +85,14 @@ if ( isset($command["MAXNUMBEROFLETTERS"]) && preg_match('/^([0-9]+)$/', $comman
 	$conditions .= "AND (domain_number_of_characters - domain_number_of_digits - domain_number_of_hyphens) <= :MAXNUMBEROFLETTERS\n";
 	$conditions_values[":MAXNUMBEROFLETTERS"] = $command["MAXNUMBEROFLETTERS"];
 }
-
-
-
-
-
-
 if ( isset($command["DOMAINREGEXP"]) && strlen($command["DOMAINREGEXP"]) ) {
 	$conditions .= "AND domain REGEXP :DOMAINREGEXP\n";
 	$conditions_values[":DOMAINREGEXP"] = $command["DOMAINREGEXP"];
 }
-
 if ( isset($command["DOMAINNOTREGEXP"]) && strlen($command["DOMAINNOTREGEXP"]) ) {
 	$conditions .= "AND domain NOT REGEXP :DOMAINNOTREGEXP\n";
 	$conditions_values[":DOMAINNOTREGEXP"] = $command["DOMAINNOTREGEXP"];
 }
-
 if ( isset($command["CHARS_COUNT_MIN"]) && preg_match('/^([0-9]+)$/', $command["CHARS_COUNT_MIN"]) ) {
 	$conditions .= "AND (domain_number_of_characters) >= :CHARS_COUNT_MIN\n";
 	$conditions_values[":CHARS_COUNT_MIN"] = $command["CHARS_COUNT_MIN"];
@@ -112,7 +101,6 @@ if ( isset($command["CHARS_COUNT_MAX"]) && preg_match('/^([0-9]+)$/', $command["
 	$conditions .= "AND (domain_number_of_characters) <= :CHARS_COUNT_MAX\n";
 	$conditions_values[":CHARS_COUNT_MAX"] = $command["CHARS_COUNT_MAX"];
 }
-
 if ( isset($command["LETTERS_COUNT_MIN"]) && preg_match('/^([0-9]+)$/', $command["LETTERS_COUNT_MIN"]) ) {
 	$conditions .= "AND (domain_number_of_characters - domain_number_of_digits - domain_number_of_hyphens - domain_number_of_umlauts) >= :LETTERS_COUNT_MIN\n";
 	$conditions_values[":LETTERS_COUNT_MIN"] = $command["LETTERS_COUNT_MIN"];
@@ -121,7 +109,6 @@ if ( isset($command["LETTERS_COUNT_MAX"]) && preg_match('/^([0-9]+)$/', $command
 	$conditions .= "AND (domain_number_of_characters - domain_number_of_digits - domain_number_of_hyphens - domain_number_of_umlauts) <= :LETTERS_COUNT_MAX\n";
 	$conditions_values[":LETTERS_COUNT_MAX"] = $command["LETTERS_COUNT_MAX"];
 }
-
 if ( isset($command["DIGITS_COUNT_MIN"]) && preg_match('/^([0-9]+)$/', $command["DIGITS_COUNT_MIN"]) ) {
 	$conditions .= "AND (domain_number_of_digits) >= :DIGITS_COUNT_MIN\n";
 	$conditions_values[":DIGITS_COUNT_MIN"] = $command["DIGITS_COUNT_MIN"];
@@ -136,8 +123,6 @@ if ( isset($command["DIGITS_NO"]) && $command["DIGITS_NO"]=="true" ) {
 if ( isset($command["DIGITS_ONLY"]) && $command["DIGITS_ONLY"]=="true" ) {
 	$conditions .= "AND domain_number_of_digits = domain_number_of_characters\n";
 }
-
-
 if ( isset($command["HYPHENS_COUNT_MIN"]) && preg_match('/^([0-9]+)$/', $command["HYPHENS_COUNT_MIN"]) ) {
 	$conditions .= "AND (domain_number_of_hyphens) >= :HYPHENS_COUNT_MIN\n";
 	$conditions_values[":HYPHENS_COUNT_MIN"] = $command["HYPHENS_COUNT_MIN"];
@@ -149,20 +134,6 @@ if ( isset($command["HYPHENS_COUNT_MAX"]) && preg_match('/^([0-9]+)$/', $command
 if ( isset($command["HYPHENS_NO"]) && $command["HYPHENS_NO"]=="true" ) {
 	$conditions .= "AND domain_number_of_hyphens = 0\n";
 }
-/*if ( isset($command["UMLAUTE_COUNT_MIN"]) && preg_match('/^([0-9]+)$/', $command["UMLAUTE_COUNT_MIN"]) ) {
-	$conditions .= "AND (domain_number_of_umlauts) >= :UMLAUTE_COUNT_MIN\n";
-	$conditions_values[":UMLAUTE_COUNT_MIN"] = $command["UMLAUTE_COUNT_MIN"];
-}
-if ( isset($command["UMLAUTE_COUNT_MAX"]) && preg_match('/^([0-9]+)$/', $command["UMLAUTE_COUNT_MAX"]) ) {
-	$conditions .= "AND (domain_number_of_umlauts) <= :UMLAUTE_COUNT_MAX\n";
-	$conditions_values[":UMLAUTE_COUNT_MAX"] = $command["UMLAUTE_COUNT_MAX"];
-}
-if ( isset($command["UMLAUTE_NO"]) && $command["UMLAUTE_NO"]=="true" ) {
-	$conditions .= "AND domain_number_of_umlauts = 0\n";
-}
-if ( isset($command["UMLAUTE_ONLY"]) && $command["UMLAUTE_ONLY"]=="true" ) {
-	$conditions .= "AND domain_number_of_umlauts = domain_number_of_characters\n";
-}*/
 if ( isset($command["DROPDATE_FROM"]) && $command["DROPDATE_FROM"]!="" ) {
 	$conditions .= "AND DATE(drop_date) >= :DROPDATE_FROM\n";  //CONVERT_TZ(DATE_ADD(drop_date, INTERVAL 31 DAY), 'UTC', 'Europe/Berlin') >= :DROPDATE_FROM\n";
 	$conditions_values[":DROPDATE_FROM"] = $command["DROPDATE_FROM"];
@@ -182,7 +153,6 @@ $stmt = $db->prepare("
 ");
 $stmt->execute($conditions_values);
 
-
 while ( $data = $stmt->fetch() ) {
 	$r["PROPERTY"]["DOMAIN"][] = utf8_decode($data["domain"].".".$data["zone"]);
 	$r["PROPERTY"]["LABEL"][] = $data["domain"];
@@ -193,7 +163,6 @@ while ( $data = $stmt->fetch() ) {
 	$r["PROPERTY"]["NUMBEROFCHARACTERS"][] = $data["domain_number_of_characters"];
 	$r["PROPERTY"]["NUMBEROFHYPHENS"][] = $data["domain_number_of_hyphens"];
 	$r["PROPERTY"]["NUMBEROFDIGITS"][] = $data["domain_number_of_digits"];
-	//$r["PROPERTY"]["NUMBEROFUMLAUTS"][] = $data["domain_number_of_umlauts"];
 }
 
 if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {

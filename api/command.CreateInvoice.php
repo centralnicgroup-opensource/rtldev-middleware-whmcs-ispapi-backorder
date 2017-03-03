@@ -69,13 +69,11 @@ if($result["CODE"] == 200){
 		logmessage("command.CreateInvoice", "ok", $message);
 		return backorder_api_response(549, "CAN'T GET TLD PRICING");
 	}
-	
+
 }else{
 	$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed, can't get TLD pricing";
 	logmessage("command.CreateInvoice", "ok", $message);
 	return backorder_api_response(549, "CAN'T GET TLD PRICING");
 }
-
-
 
 ?>

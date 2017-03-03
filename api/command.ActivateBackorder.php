@@ -8,7 +8,6 @@ if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) )
 if ( !preg_match('/^(.*)\.(.*)$/', $command["DOMAIN"], $m) )
 	return backorder_api_response(505, "DOMAIN");
 
-
 $result = select_query('backorder_domains','*',array("userid" => $userid, "domain" => $m[1], "tld" => $m[2]));
 if (!($data = mysql_fetch_assoc($result))) {
 	return backorder_api_response(545, "DOMAIN");

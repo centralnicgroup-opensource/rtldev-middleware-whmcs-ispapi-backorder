@@ -11,8 +11,6 @@ if ( !backorder_api_check_syntax_domain($command["DOMAIN"]) )
 if ( !backorder_api_check_valid_tld($command["DOMAIN"], $userid) )
 	return backorder_api_response(541, "NOT SUPPORTED");
 
-$backordertype = "FULL";
-
 if(isset($command["DROPDATE"])){
 	$dropdate = $command["DROPDATE"];
 }else{
@@ -24,7 +22,7 @@ $values = array(
 	"createddate" => date("Y-m-d H:i:s"),
 	"updateddate" => date("Y-m-d H:i:s"),
 	"dropdate" => $dropdate,
-	"type" => $backordertype,
+	"type" => "FULL",
 	"status" => "REQUESTED",
 	"reference" => ""
 );
@@ -33,7 +31,7 @@ if ( preg_match('/^([a-zA-Z\-]+)\.([a-zA-Z]+)$/', $command["DOMAIN"], $m) ) {
 	$values["domain"] = strtolower($m[1]);
 	$values["tld"] = strtolower($m[2]);
 
-	//CHECK IF PRICING IS SET FOR THIS TLD
+	//CHECK IF PRICING EXISTING FOR THIS TLD
 	$querypricelist = array(
 			"COMMAND" => "QueryPriceList",
 			"USER" => $userid,
@@ -43,7 +41,7 @@ if ( preg_match('/^([a-zA-Z\-]+)\.([a-zA-Z]+)$/', $command["DOMAIN"], $m) ) {
 
 	if($result["CODE"] == 200){
 		$backorder_price = $result["PROPERTY"][$values["tld"]]["PRICEFULL"];
-		if(empty($backorder_price)){ //IF PRICE SET FOR THIS TLD
+		if(empty($backorder_price)){
 			return backorder_api_response(549, "TLD NOT SUPPORTED");
 		}
 	}else{
@@ -80,6 +78,5 @@ if ( preg_match('/^([a-zA-Z\-]+)\.([a-zA-Z]+)$/', $command["DOMAIN"], $m) ) {
 }else{
 	return backorder_api_response(549, "CREATE FAILED");
 }
-
 
 ?>

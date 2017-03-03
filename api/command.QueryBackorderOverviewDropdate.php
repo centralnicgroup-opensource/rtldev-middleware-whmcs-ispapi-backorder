@@ -27,7 +27,6 @@ while ($data = mysql_fetch_assoc($result)) {
 	$r["PROPERTY"][$data["dropdateday"]]["anzahl".$data["type"]] = $data["anzahl"];
 }
 
-
 return $r;
 
 ?>
