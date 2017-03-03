@@ -3,11 +3,7 @@
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/lib/DataTables/datatables.css">
 <script src="modules/addons/ispapibackorder/templates/lib/DataTables/datatables.min.js"></script>
 <script src="modules/addons/ispapibackorder/templates/lib/noty-2.4.1/js/noty/packaged/jquery.noty.packaged.min.js"></script>
-<!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-<script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="modules/addons/ispapibackorder/templates/js/jquery.noty.packaged.min.js"></script>-->
+
 <script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
@@ -401,15 +397,13 @@
                     <div class="form-group" style="margin-bottom:10px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainchars}</label>
                         <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="chars_count_min" id="chars_count_min" value="">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="chars_count_max" id="chars_count_max" value="">
@@ -422,15 +416,13 @@
                     <div class="form-group" style="margin-bottom:10px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainletters}</label>
                         <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="letters_count_min" id="letters_count_min" value="">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="letters_count_max" id="letters_count_max" value="">
@@ -443,15 +435,13 @@
                     <div class="form-group" style="margin-bottom:10px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindigits}</label>
                         <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="digits_count_min" id="digits_count_min" value="">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="digits_count_max" id="digits_count_max" value="0">
@@ -464,15 +454,13 @@
                     <div class="form-group" style="margin-bottom:5px;">
                         <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainhyphens}</label>
                         <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.min}:</span>
                                     <input class="form-control input-sm" name="hyphens_count_min" id="hyphens_count_min" value="">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row" style="margin-bottom:5px;">
-                            <div class="col-lg-6">
+                            <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
                                     <input class="form-control input-sm" name="hyphens_count_max" id="hyphens_count_max" value="">
