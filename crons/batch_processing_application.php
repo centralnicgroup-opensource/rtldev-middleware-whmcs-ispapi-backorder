@@ -87,7 +87,7 @@ while ($local = mysql_fetch_array($result)) {
 			"OWNERCONTACT0" => get_contact_details("USER", $local["userid"]),
 			"ADMINCONTACT0" => get_contact_details("USER", $local["userid"]),
 			"TECHCONTACT0" => get_contact_details("USER", $local["userid"]),
-			"BILLINGCONTACT0" => get_contact_details("USER", $local["userid"])//get_contact_details("SYSTEM")
+			"BILLINGCONTACT0" => get_contact_details("USER", $local["userid"]) //get_contact_details("SYSTEM")
 		);
 
 		$backorder = ispapi_api_call($command);

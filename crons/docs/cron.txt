@@ -2,25 +2,25 @@
 ######     CRON DOCUMENTATION      #######
 ##########################################
 
-batch_import_pendingdomainlist.php (once a day) at 00:10
+batch_import_pendingdomainlist.php (twice a day)
 Import the complete pending deleted domain list from HEXONET in WHMCS dabatabe (table: pending_domains)
 ##########################################
 
-daily_dropdate_synch.php (once a day) at 1:30
+daily_dropdate_synch.php (twice a day)
 Synchronize the dropdate of the local backorder table with the online droplist database.
 ##########################################
 
 batch_requested_active.php (every 5 minutes)
-The backorders with status "Requested" will change to "Active" if the dropdate is withing the next 3 days and if the customer has enough credit on his WHMCS account.
+The backorders with status "REQUESTED" will change to "ACTIVE" if the dropdate is withing the next 3 days and if the customer has enough credit on his WHMCS account.
 ##########################################
 
 batch_active_processing.php (every 5 minutes)
-The backorders with status "Active" will change to "Processing" if the dropdate is withing the next 2 hours.
-Backorder with status "Processing" cannot be deleted.
+The backorders with status "ACTIVE" will change to "PROCESSING" if the dropdate is withing the next 2 hours.
+Backorder with status "PROCESSING" cannot be deleted.
 ##########################################
 
 batch_processing_application.php (every 5 minutes)
-The backorders with status "Processing" will be send to the Hexonet BACKEND (AddDomainApplication).
+The backorders with status "PROCESSING" will be sent to the HEXONET BACKEND (AddDomainApplication).
 ##########################################
 
 batch_polling.php (every 5 minutes)
@@ -31,10 +31,9 @@ Domain will be imported for all paid invoices and for winning auctions.
 
 
 CRONTAB:
-
-10 0 * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_import_pendingdomainlist.php >> cron.log 2>&1
-30 1 * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/daily_dropdate_synch.php >> cron.log 2>&1
-*/5 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_requested_active.php >> cron.log 2>&1
-*/5 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_active_processing.php >> cron.log 2>&1
-*/5 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_processing_application.php >> cron.log 2>&1
-*/5 * * * * /usr/bin/php /var/www/whmcs2/whmcs/modules/addons/backorder/crons/batch_polling.php >> cron.log 2>&1
+1 0,10 * * * php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/batch_import_pendingdomainlist.php >/dev/null 2>&1
+1 1,11 * * * php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/daily_dropdate_synch.php >/dev/null 2>&1
+*/5 * * * *  php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/batch_requested_active.php >/dev/null 2>&1
+*/5 * * * * php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/batch_active_processing.php >/dev/null 2>&1
+*/5 * * * *  php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/batch_processing_application.php >/dev/null 2>&1
+*/5 * * * * php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/batch_polling.php >/dev/null 2>&1

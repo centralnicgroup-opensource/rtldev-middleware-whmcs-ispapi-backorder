@@ -151,10 +151,6 @@ function ispapibackorder_clientarea($vars) {
 		include($file_backorder);
 	}
 
-	/*if(!isset($_GET["p"])){
-		$_GET["p"] = "test1";
-	}*/
-
 	//include controller file
 	$vars = array();
 	$controller = getcwd()."/modules/addons/".$modulename."/controller/".$_GET["p"].".php";

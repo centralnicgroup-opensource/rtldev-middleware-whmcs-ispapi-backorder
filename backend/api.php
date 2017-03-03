@@ -17,11 +17,11 @@ function logmessage($cronname, $status, $message, $query){
 	));
 }
 
-//THIS FUNCTION CALLS OUR HEXONET API AND IS USED FOR CRONS OR IN THE BACKEND
+//THIS FUNCTION CALLS OUR HEXONET API AND IS USED FOR CRONS AND IN THE BACKEND
 function ispapi_api_call($command){
 	require_once(dirname(__FILE__)."/../../../../includes/registrarfunctions.php");
 
-	//Check if the ISPAPI Registrar Module is installed
+	//CHECK IF THE ISPAPI REGISTRAR MODULE IS INSTALLED
 	$error = false;
 	$message = "";
 	if(file_exists(dirname(__FILE__)."/../../../../modules/registrars/ispapi/ispapi.php")){
@@ -70,14 +70,14 @@ function ispapi_api_call($command){
 	return $response;
 }
 
-//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CUSTOMER OR FOR THE ADMIN
+//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CUSTOMER AND ADMIN
 function backorder_api_call($command) {
 	$time = microtime(true);
 	$ca = new WHMCS_ClientArea();
 
 	$userid = $ca->getUserID();
 
-	//CHECK IF ADMIN LOGGED AND AUTHORIZE PASSING USERID TO COMMAND
+	//CHECK IF ADMIN LOGGED IN AND AUTHORIZE PASSING USERID TO COMMAND
 	if(isset($_SESSION['adminid']) && $_SESSION['adminid'] > 0 && isset($command["USERID"])){
 		$userid = $command["USERID"];
 	}
@@ -109,8 +109,9 @@ function backorder_api_call($command) {
 	return $response;
 }
 
-//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CRONS LIKE BATCH_REQUESTED_ACTIVE
+//THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CRONS AND SOME OTHER COMMANDS
 //$userid WILL TAKE THE VALUE OF $command["USER"]
+//THIS COMMAND IS NOT AVAILABLE FROM OUTSIDE
 function backorder_backend_api_call($command) {
 	$time = microtime(true);
 	$ca = new WHMCS_ClientArea();
@@ -142,6 +143,7 @@ function backorder_backend_api_call($command) {
 	return $response;
 }
 
+//THIS FUNCTION IS USED FOR LISTINGS
 function backorder_api_query_list($command, $config = "") {
 	$response = backorder_api_call($command, $config);
 
@@ -200,8 +202,7 @@ function backorder_api_query_list($command, $config = "") {
 	return $list;
 }
 
-
-
+// CREATE AN API RESPONSE
 function backorder_api_response($code, $info = "") {
 	$r = array("CODE" => $code, "DESCRIPTION" => "Error", "PROPERTY" => array());
 	$codes = array(
@@ -222,7 +223,7 @@ function backorder_api_response($code, $info = "") {
 	return $r;
 }
 
-//check the domain syntax
+//CHECK THE DOMAIN SYNTAX
 function backorder_api_check_syntax_domain($domain) {
 	$IDN = new idna_convert();
 	if ( strlen($domain) > 223) return false;
@@ -230,8 +231,7 @@ function backorder_api_check_syntax_domain($domain) {
 	return true;
 }
 
-
-//check if tld in the pricelist
+//CHECK IF TLD IN THE PRICELIST
 function backorder_api_check_valid_tld($domain, $userid) {
 	$IDN = new idna_convert();
 	$currencyid=NULL;

@@ -184,8 +184,6 @@ class PendingDomainListPDO
 
 		//delete domains with drop_date in the past
 		$this->instance->exec("DELETE FROM pending_domains WHERE drop_date < NOW()");
-		//$yesterday = date('Y-m-d 23:59:59',strtotime("-1 days"));
-		//$this->instance->exec("DELETE FROM pending_domains WHERE drop_date <= '".$yesterday."'");
 	}
 
 	/**

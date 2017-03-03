@@ -75,11 +75,6 @@
                         if( row["status"] == "REQUESTED" || row["status"] == "ACTIVE" || (row["status"] == "PROCESSING" && row["reference"] == "" )){
                             links = links + '<button type="button" class="deleteBackorder" domain="' + row["domain"] + "." + row["tld"] + '" userid="' + row["userid"] + '">Delete</button>';
                         }
-
-                        /*if( row["status"] == "REQUESTED" ){
-                            links = links + '<button type="button" class="activateBackorder" domain="' + row["domain"] + "." + row["tld"] + '" userid="' + row["userid"] + '">Activate</button>';
-                        }*/
-
                         return links;
                     },
                 }

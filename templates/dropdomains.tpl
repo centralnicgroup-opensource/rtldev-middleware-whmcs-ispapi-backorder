@@ -57,7 +57,7 @@
                 type: "POST",
                 async: true,
                 dataType: "json",
-                url: "modules/addons/ispapibackorder/backend/call.php",
+                url: "{/literal}{$modulepath}{literal}backend/call.php",
                 data: {COMMAND : "GetAvailableFunds"},
                 success: function(data){
                     //console.log(data);
@@ -76,7 +76,7 @@
                         type: "POST",
                         async: true,
                         dataType: "json",
-                        url: "modules/addons/ispapibackorder/backend/call.php",
+                        url: "{/literal}{$modulepath}{literal}backend/call.php",
                         data: {
                             COMMAND: "CreateBackorder",
                             DOMAIN: $("#createnewbackorder").val(),

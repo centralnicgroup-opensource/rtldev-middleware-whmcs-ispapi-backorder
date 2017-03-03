@@ -11,7 +11,6 @@ $fields[]=array ("fieldname" => $_LANG['dropdate'], 	"apifieldname" => "DROPDATE
 $fields[]=array ("fieldname" => $_LANG['chars'], 		"apifieldname" => "NUMBEROFCHARACTERS");
 $fields[]=array ("fieldname" => $_LANG['digits'], 		"apifieldname" => "NUMBEROFDIGITS");
 $fields[]=array ("fieldname" => $_LANG['hyphens'], 		"apifieldname" => "NUMBEROFHYPHENS");
-//$fields[]=array ("fieldname" => "Umlauts", 		"apifieldname" => "NUMBEROFUMLAUTS");
 
 $vars["fields"] = $fields;
 
@@ -75,17 +74,8 @@ if(isset($_POST['COMMAND'])){
 
 }
 
-
 $vars["breadcrumb"][] = array("last" => false, "link" => "", "label" => "Backorder" );
 $vars["breadcrumb"][] = array("last" => true, "link" => "", "label" => $_LANG["domainheader"]);
 $vars["displayTitle"] = $_LANG["domainheader"];
-
-/*$vars["BackorderSidebar"] .= '<div menuitemname="Client Details" class="panel panel-default">
-<div class="panel-heading">
-<h3 class="panel-title"><i class="fa fa-calendar"></i>&nbsp; '.$_LANG['freedomains'].'</h3>
-</div>
-<div class="list-group" id="droppingdomains">
-</div>
-</div>';*/
 
 ?>

@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__)."/../../../../init.php";
 
 if(isset($_SESSION["Language"])){
@@ -16,7 +15,5 @@ if ( file_exists($file_backorder) ) {
 }else{
 	include(dirname(__FILE__)."/../lang/english.php");
 }
-
-//replaced getcwd() with dirname(__FILE__) on jan 13, 2017
 
 ?>
