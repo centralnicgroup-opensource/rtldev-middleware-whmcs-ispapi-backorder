@@ -1,8 +1,13 @@
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="modules/addons/ispapibackorder/templates/lib/jquery-ui-1.12.1/jquery-ui.min.css">
+<script src="modules/addons/ispapibackorder/templates/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="modules/addons/ispapibackorder/templates/lib/DataTables/datatables.css">
+<script src="modules/addons/ispapibackorder/templates/lib/DataTables/datatables.min.js"></script>
+<script src="modules/addons/ispapibackorder/templates/lib/noty-2.4.1/js/noty/packaged/jquery.noty.packaged.min.js"></script>
+<!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="modules/addons/ispapibackorder/templates/js/jquery.noty.packaged.min.js"></script>
+<script type="text/javascript" src="modules/addons/ispapibackorder/templates/js/jquery.noty.packaged.min.js"></script>-->
 <script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
@@ -24,7 +29,7 @@
     <table id="DeletedDomainsList" class="table table-striped table-framed" cellspacing="0" width="100%">
         <thead><tr>{foreach $fields as $field}<th>{$field['fieldname']}</th>{/foreach}</tr></thead>
     </table>
-    <br>
+    <br><br><br><br>
 
     {LITERAL}
     <script>
@@ -318,6 +323,12 @@
                     var oSettings = oTable.fnSettings();
                     $("#results").val(oSettings._iDisplayLength);
                 }
+            });
+
+            $( document ).ready(function() {
+                $("#DeletedDomainsList_processing").removeClass("panel");
+                $("#DeletedDomainsList_processing").removeClass("panel-default");
+                $("#DeletedDomainsList_processing").css("z-index", "1000");
             });
 
         });

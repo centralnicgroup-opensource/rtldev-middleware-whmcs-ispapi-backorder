@@ -1,8 +1,3 @@
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-<script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
-
 <button type="button" class="reloadlogs btn btn-info btn-sm">Reload</button>
 <br><br>
 
@@ -36,7 +31,7 @@
 </script>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover table-condensed dt-bootstrap" id="backorderlogs" style="width:99%;">
+    <table class="table table-bordered table-hover table-condensed dt-bootstrap" id="backorderlogs" style="width:100%;">
         <thead>
             <tr>
                 <th>ID</th>
