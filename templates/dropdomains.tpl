@@ -3,7 +3,6 @@
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/lib/DataTables/datatables.css">
 <script src="modules/addons/ispapibackorder/templates/lib/DataTables/datatables.min.js"></script>
 <script src="modules/addons/ispapibackorder/templates/lib/noty-2.4.1/js/noty/packaged/jquery.noty.packaged.min.js"></script>
-
 <script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
