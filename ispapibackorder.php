@@ -61,7 +61,7 @@ function ispapibackorder_activate() {
     $r = full_query("SELECT * FROM tblemailtemplates WHERE name='backorder_lowbalance_notification'");
     $exist = mysql_num_rows($r) > 0;
     if(!$exist){
-        $query = 'INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES ("general", "backorder_lowbalance_notification", "Low Balance Notification from {$company_name}", "<p>Hello {$client_name},<br /><br />unfortunately, your account has insufficient funds. You need to charge your account with the required funds, so that we can process your backorder requests.<br />If you fail to charge your account, the following backorders will be ignored:<br />{foreach from=$list item=data}<br />- <strong>{$data.domain} </strong>({$data.dropdate}){/foreach}<br /><br /><span>{$signature}</span></p>", 0, 1, 0)';
+        $query = 'INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES ("general", "backorder_lowbalance_notification", "Low Balance Notification from {$company_name}", "<p>Hello {$client_name},<br /><br />Unfortunately, you have insufficient funds in your account to process your requested backorder(s). Kindly log in to charge your account so that the following backorder(s) may be processed:<br />{foreach from=$list item=data}- <strong>{$data.domain}</strong> / {$data.dropdate}<br />{/foreach}</p><p><span>{$signature}</span></p>", 0, 1, 0)';
         $result = full_query($query);
     }
 

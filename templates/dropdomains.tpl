@@ -40,12 +40,12 @@
                 $("#dropdate_from").val("");
                 $("#dropdate_to").val("");
             }else{
-                var selecteddate = new Date(tmpdate);
-                var selecteddate_formated = $.datepicker.formatDate('yy-mm-dd', selecteddate);
+                //var selecteddate = new Date(tmpdate);
+                //var selecteddate_formated = $.datepicker.formatDate('yy-mm-dd', selecteddate);
                 //var selecteddatenextday = new Date(selecteddate.setTime( selecteddate.getTime() + 1 * 86400000 ));
                 //var selecteddatenextday_formated = $.datepicker.formatDate('yy-mm-dd', selecteddate);
-                $("#dropdate_from").val(selecteddate_formated);
-                $("#dropdate_to").val(selecteddate_formated);
+                $("#dropdate_from").val(tmpdate);
+                $("#dropdate_to").val(tmpdate);
             }
             $("#searchbutton").trigger( "click" );
         }
