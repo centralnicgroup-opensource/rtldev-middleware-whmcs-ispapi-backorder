@@ -1,13 +1,16 @@
 <?php
 
-if (!defined("WHMCS"))
-    die("This file cannot be accessed directly");
+$module_version = "1.0.0";
+
+//if (!defined("WHMCS"))
+//    die("This file cannot be accessed directly");
 
 function ispapibackorder_config() {
+    global $module_version;
     $configarray = array(
     "name" => "ISPAPI Backorder",
     "description" => "This addon allows you to provide backorders to your customers.",
-    "version" => "1.0",
+    "version" => $module_version,
     "author" => "",
     "language" => "english",
     "fields" => array("username" => array ("FriendlyName" => "Admin username", "Type" => "text", "Size" => "30", "Description" => "[REQUIRED]", "Default" => "admin"))
