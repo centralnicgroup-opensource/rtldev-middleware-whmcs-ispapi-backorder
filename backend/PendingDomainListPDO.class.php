@@ -153,7 +153,7 @@ class PendingDomainListPDO
 			while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
 				$line++;
 
-				if ( preg_match('/^(.*)\.(.*)$/', $data[0], $m) ) {
+				if ( preg_match('/^([^.]*)\.(.*)$/', $data[0], $m) ) {
 					$domain = strtolower($m[1]);
 					$zone = strtolower($m[2]);
 				}
