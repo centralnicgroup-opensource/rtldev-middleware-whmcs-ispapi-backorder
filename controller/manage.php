@@ -54,12 +54,9 @@ if(isset($_POST['COMMAND'])){
 			foreach($fields as $field){
 				if($field['apifieldname']=="BACKORDERTYPE"){
 					$tmpfield = '<div class="btn-group btn-group">';
-
-					if($item[$field['apifieldname']]=="FULL"){
-						//DISPLAY DELETE BUTTON ONLY FOR: "PENDING-PAYMENT", "AUCTION-PENDING", "PROCESSING"
-						if(!in_array($item['STATUS'], array("PENDING-PAYMENT", "AUCTION-PENDING", "PROCESSING"))){
-							$tmpfield .= '<button placeholder2="'.$item['DROPDATE'].'" placeholder="'.$cnt.'" value="'.$item['DOMAIN'].'" class="line'.$cnt.' setbackorder btn btn-default btn-sm active">'.$_LANG['deletebutton'].'</button>';
-						}
+					//DISPLAY DELETE BUTTON ONLY FOR: "PENDING-PAYMENT", "AUCTION-PENDING", "PROCESSING"
+					if(!in_array($item['STATUS'], array("PENDING-PAYMENT", "AUCTION-PENDING", "PROCESSING"))){
+						$tmpfield .= '<button placeholder2="'.$item['DROPDATE'].'" placeholder="'.$cnt.'" value="'.$item['DOMAIN'].'" class="line'.$cnt.' setbackorder btn btn-default btn-sm active">'.$_LANG['deletebutton'].'</button>';
 					}
 					$tmpfield .= '</div>';
 					$newitem[] = $tmpfield;

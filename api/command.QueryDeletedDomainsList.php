@@ -167,7 +167,7 @@ while ( $data = $stmt->fetch() ) {
 
 if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 	foreach ( $r["PROPERTY"]["DOMAIN"] as $index => $domain ) {
-		if ( preg_match('/^(.*)\.(.*)$/', $domain, $m) ) {
+		if ( preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $domain, $m) ) {
 			$result = select_query('backorder_domains','*',array("userid" => $userid, "domain" => $m[1], "tld" => $m[2] ));
 			$data = mysql_fetch_assoc($result);
 			if ( $data ) {

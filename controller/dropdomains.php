@@ -53,7 +53,7 @@ if(isset($_POST['COMMAND'])){
 			foreach($fields as $field){
 				if($field['apifieldname']=="BACKORDERTYPE"){
 					$tmpfield = '<div class="btn-group btn-group">';
-					if($item[$field['apifieldname']]=="FULL"){
+					if($item["BACKORDERTYPE"]=="FULL"){
 						$tmpfield .= '<button placeholder2="'.$item['DROPDATE'].'" placeholder="'.$cnt.'" value="'.$item['DOMAIN'].'" class="line'.$cnt.' setbackorder btn btn-success btn-sm active">BACKORDER</button>';
 					}else{
 						$tmpfield .= '<button placeholder2="'.$item['DROPDATE'].'" placeholder="'.$cnt.'" value="'.$item['DOMAIN'].'" class="line'.$cnt.' setbackorder btn btn-default btn-sm">BACKORDER</button>';
