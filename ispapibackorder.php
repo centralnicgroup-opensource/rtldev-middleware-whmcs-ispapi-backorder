@@ -140,7 +140,7 @@ function ispapibackorder_clientarea($vars) {
     }
 
 	$modulename = "ispapibackorder";
-	$modulepath = "../modules/addons/".$modulename;
+	$modulepath = "modules/addons/".$modulename;
 
 	//include language files
 	$language = $_SESSION["Language"];
