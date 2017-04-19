@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('UTC');
 $cronname = "BATCH_IMPORT_PENDINGDOMAINLIST";
 require_once dirname(__FILE__)."/../backend/PendingDomainListPDO.class.php";
 require_once dirname(__FILE__)."/../backend/api.php";

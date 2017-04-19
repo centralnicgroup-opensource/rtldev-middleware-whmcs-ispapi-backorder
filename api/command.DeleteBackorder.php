@@ -16,6 +16,8 @@ if (!($data = mysql_fetch_assoc($result))) {
 	if(in_array($data["status"], array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($data["status"]=="PROCESSING" && !empty($data["reference"]) ) ){
 		return backorder_api_response(549, "THIS BACKORDER CANNOT BE DELETED");
 	}
+	$message = "BACKORDER ".$command["DOMAIN"]." DELETED";
+	logmessage("command.DeleteBackorder", "ok", $message);
 	delete_query('backorder_domains', array('id' => $data['id']) );
 }
 
