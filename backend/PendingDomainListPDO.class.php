@@ -124,7 +124,6 @@ class PendingDomainListPDO
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //IMPORTANT in order to avoid displaying content in the browser.
 		$data = curl_exec($ch);
 		curl_close($ch);
-
 		//file_put_contents("../tmp/pending_delete_list_tmp.zip", fopen(self::PENDING_DELETE_LIST_FILE_URL, 'r'));
 		//exec("wget -O ../tmp/pending_delete_list_tmp.zip ".self::PENDING_DELETE_LIST_FILE_URL);
 	}
@@ -144,12 +143,7 @@ class PendingDomainListPDO
 			$handle = fopen($file, "r");
 		}else{
 			$this->downloadPendingDeleteList();
-
-			//$zip = new ZipArchive;
-
-
 			$handle = fopen('zip://'.$GLOBALS["downloads_dir"].'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
-			//die("ok");
 		}
 
 		$sql = 'INSERT IGNORE INTO pending_domains (domain, zone, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits) VALUES ';
