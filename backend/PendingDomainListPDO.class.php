@@ -119,9 +119,10 @@ class PendingDomainListPDO
 		$ch = curl_init(str_replace(" ","%20",self::PENDING_DELETE_LIST_FILE_URL));
 
 		curl_setopt($ch, CURLOPT_TIMEOUT, 50);
-		curl_setopt($ch, CURLOPT_FILE, $fp);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //IMPORTANT in order to avoid displaying content in the browser.
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+
 		$data = curl_exec($ch);
 		curl_close($ch);
 		//file_put_contents("../tmp/pending_delete_list_tmp.zip", fopen(self::PENDING_DELETE_LIST_FILE_URL, 'r'));
