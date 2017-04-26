@@ -87,7 +87,7 @@ if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 	}
 }
 
-$result = select_query('backorder_domains',$fields,$condition); //ADD DM 14.08.2015
+$result = select_query('backorder_domains',$fields,$condition);
 $data = mysql_fetch_assoc(mysql_query("SELECT FOUND_ROWS() AS `found_rows`;"));
 $r["PROPERTY"]["TOTAL"][] = $data['found_rows'];
 

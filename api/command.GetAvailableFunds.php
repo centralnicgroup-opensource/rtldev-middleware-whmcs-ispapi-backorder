@@ -35,7 +35,6 @@ $r["PROPERTY"]["CREDITBALANCE"]["VALUE_FORMATED"] = formatPrice($credit, $cur);
 
 //GET ALL UNPAID INVOICES
 #######################################################
-//TODO: don't count add funds invoices here
 $results = localAPI("getinvoices", array("userid" => $userid, "limitnum" => "99999999999") ,"admin");
 $unpaidamount = 0;
 
