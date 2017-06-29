@@ -1,4 +1,5 @@
 <?php // $command, $userid
+use WHMCS\Database\Capsule;
 
 if ( !$userid )	return backorder_api_response(531, "AUTHORIZATION FAILED");
 
@@ -8,17 +9,25 @@ if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) )
 if ( !preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $command["DOMAIN"], $m) )
 	return backorder_api_response(505, "DOMAIN");
 
-$result = select_query('backorder_domains','*',array("userid" => $userid, "domain" => $m[1], "tld" => $m[2]));
+$backorder = Capsule::table('backorder_domains')
+						->where('userid', $userid)
+						->where('domain', $m[1])
+						->where('tld', $m[2])
+						->first();
 
-if (!($data = mysql_fetch_assoc($result))) {
+if(empty($backorder)){
 	return backorder_api_response(545, "DOMAIN");
 }else{
-	if(in_array($data["status"], array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($data["status"]=="PROCESSING" && !empty($data["reference"]) ) ){
+
+	if(in_array($backorder->status, array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($backorder->status == "PROCESSING" && !empty($backorder->reference) ) ){
 		return backorder_api_response(549, "THIS BACKORDER CANNOT BE DELETED");
 	}
 	$message = "BACKORDER ".$command["DOMAIN"]." DELETED";
 	logmessage("command.DeleteBackorder", "ok", $message);
-	delete_query('backorder_domains', array('id' => $data['id']) );
+
+	Capsule::table('backorder_domains')
+				->where('id', '=', $backorder->id)
+				->delete();
 }
 
 return backorder_api_response(200);

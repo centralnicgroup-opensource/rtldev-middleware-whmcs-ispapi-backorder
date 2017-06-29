@@ -1,4 +1,5 @@
 <?php // $command, $userid
+use WHMCS\Database\Capsule;
 
 if ( !$userid )	return backorder_api_response(531);
 
@@ -12,8 +13,10 @@ $domain = $m[1];
 $tld = $m[2];
 
 //GET ADMIN USERNAME
-$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
-$adminuser = $r["value"];
+$adminuser = Capsule::table('tbladdonmodules')
+                        ->where('module', 'ispapibackorder')
+                        ->where('setting', 'username')
+                        ->value('value');
 if(empty($adminuser)){
 	return backorder_api_response(549, "MISSING ADMIN USERNAME IN MODULE CONFIGURATION");
 }
@@ -48,16 +51,25 @@ if($result["CODE"] == 200){
 
 		if ($invoicing["result"] == "success"){
 			//GET OLD STATUS
-			$r = select_query("backorder_domains","*",array("id" =>$command["BACKORDERID"]));
-			$d = mysql_fetch_array($r);
-			$oldstatus = $d["status"];
+			$backorderbeforeupdate = Capsule::table('backorder_domains')->where('id', $command["BACKORDERID"])->first();
+			$oldstatus = $backorderbeforeupdate->status;
 
-			if(update_query('backorder_domains', array("status" => "PENDING-PAYMENT", "invoice" => $invoicing["invoiceid"], "updateddate" => date("Y-m-d H:i:s")) , array("userid" => $userid, "id" => $command["BACKORDERID"] ))){
+			try {
+				Capsule::table('backorder_domains')
+				            ->where('userid', $userid)
+				            ->where('id', $command["BACKORDERID"])
+				            ->update(['status' => 'PENDING-PAYMENT', 'invoice' => $invoicing["invoiceid"], 'updateddate' => date("Y-m-d H:i:s")]);
+
 				$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") set from ".$oldstatus." to PENDING-PAYMENT, invoice created (".$invoicing["invoiceid"].")";
 				logmessage("command.CreateInvoice", "ok", $message);
+
+				return backorder_api_response(200);
+			}catch (\Exception $e) {
+				$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") Trying to set from ".$oldstatus." to PENDING-PAYMENT, invoice created (".$invoicing["invoiceid"].") Error: ".$e->getMessage();
+				logmessage("command.CreateInvoice", "error", $message);
+				return backorder_api_response(549, $message);
 			}
 
-			return backorder_api_response(200);
 		}else {
 			$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed";
 			logmessage("command.CreateInvoice", "ok", $message);

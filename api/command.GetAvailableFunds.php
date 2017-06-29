@@ -1,4 +1,6 @@
 <?php // $command
+use WHMCS\Database\Capsule;
+
 //RETURN THE CURRENT AVAILABLE CREDIT !
 //AVAILABLE CREDIT = CURRENT CREDIT BALANCE - UNPAID INVOICES - RESERVED AMOUNT
 //LIST OF ALL STATUS: 'REQUESTED','ACTIVE','PROCESSING','SUCCESSFUL','FAILED','CANCELLED','AUCTION-PENDING','AUCTION-WON','AUCTION-LOST','PENDING-PAYMENT'
@@ -8,19 +10,21 @@ if ( !$userid )	return backorder_api_response(531);
 $r = backorder_api_response(200);
 
 //GET THE CLIENT CURRENCY
-$result = full_query("SELECT cur.* FROM tblcurrencies cur, tblclients cli WHERE cli.currency = cur.id AND cli.id=".$userid);
-$cur = mysql_fetch_array($result);
+#######################################################
+$cur = Capsule::select('SELECT cur.* FROM tblcurrencies cur, tblclients cli WHERE cli.currency = cur.id AND cli.id=:id', ['id' => $userid]);
+$cur = get_object_vars($cur[0]);
+#######################################################
 
 //GET THE CURRENT CREDIT BALANCE
 #######################################################
-
 //GET ADMIN USERNAME
-$admin_request = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
-$adminuser = $admin_request["value"];
+$adminuser = Capsule::table('tbladdonmodules')
+                        ->where('module', 'ispapibackorder')
+                        ->where('setting', 'username')
+                        ->value('value');
 if(empty($adminuser)){
 	return backorder_api_response(549, "MISSING ADMIN USERNAME IN MODULE CONFIGURATION");
 }
-
 
 $d = localAPI("getclientsdetails", array("clientid" => $userid, "stats" => true), $adminuser);
 $credit = 0;
@@ -41,13 +45,17 @@ $unpaidamount = 0;
 foreach($results["invoices"]["invoice"] as $invoice){
 	if($invoice["status"] == "Unpaid")
 		$ignore = false;
+
 		//THE TYPE OF THE INVOICE IS NOT RETURNED BY THE WHMCS API, WE NEED TO IGNORE THE ADD FUNDS INVOICES.
-		$result = full_query("SELECT type FROM tblinvoiceitems WHERE invoiceid = ".$invoice["id"]);
-		while($data = mysql_fetch_array($result)){
-			if($data["type"] == "AddFunds"){
-				$ignore = true;
-			}
-		}
+        $invoiceitems = Capsule::table('tblinvoiceitems')
+                                    ->where('invoiceid', $invoice["id"])
+                                    ->get();
+        foreach ($invoiceitems as $item) {
+            if($item->type == "AddFunds"){
+                $ignore = true;
+            }
+        }
+
 		if(!$ignore){
 			$unpaidamount = $unpaidamount + $invoice["total"];
 		}
@@ -64,12 +72,16 @@ $r["PROPERTY"]["UNPAIDINVOICES"]["VALUE_FORMATED"] = formatPrice($unpaidamount, 
 //DON'T ADD PENDING-PAYMENT HERE BECAUSE THIS ONE WILL BE HANDLED WITH THE UNPAID INVOICES
 $reserved_amount = 0;
 $open_backorders = array();
-$result = full_query("SELECT id, tld, type FROM backorder_domains WHERE userid = $userid AND (status = 'ACTIVE' OR status = 'PROCESSING' OR status = 'AUCTION-PENDING')");
-while($data = mysql_fetch_array($result)){
-	array_push($open_backorders, array("id" => $data["id"], "tld" => $data["tld"], "type" => $data["type"]));
+$openbackorders_obj = Capsule::table('backorder_domains')
+                                ->select('id', 'tld', 'type')
+                                ->where('userid', $userid)
+                                ->whereIn('status', ['ACTIVE','PROCESSING','AUCTION-PENDING'])
+                                ->get();
+foreach($openbackorders_obj as $openbackorder){
+	array_push($open_backorders, array("id" => $openbackorder->id, "tld" => $openbackorder->tld, "type" => $openbackorder->type));
 }
 
-//if credit < = 0 there is no need to continue.
+//if credit <= 0 there is no need to continue.
 if($credit > 0){
 	foreach($open_backorders as $backorder){
 		//GET THE PRICE OF THE BACKORDER
