@@ -1,4 +1,5 @@
 <?php // $command, $userid
+use WHMCS\Database\Capsule;
 
 if ( !$userid )	return backorder_api_response(531);
 $r = backorder_api_response(200);
@@ -15,16 +16,32 @@ for($i=1; $i<=31; $i++)
 }
 
 $condition = array("userid" => $userid);
-$result = full_query("SELECT DATE(dropdate) AS dropdateday, type, COUNT( * ) AS anzahl
-					FROM  `backorder_domains`
-					WHERE DATE(dropdate) !=  '0000-00-00'
-					AND DATE(dropdate)  > '".date("Y-m-d")."'
-					AND `userid` =".$userid."
-					GROUP BY DATE(dropdate),type");
 
-while ($data = mysql_fetch_assoc($result)) {
-	$r["PROPERTY"][$data["dropdateday"]]["anzahl"] += $data["anzahl"];
-	$r["PROPERTY"][$data["dropdateday"]]["anzahl".$data["type"]] = $data["anzahl"];
+// $result = full_query("SELECT DATE(dropdate) AS dropdateday, type, COUNT( * ) AS anzahl
+// 					FROM  `backorder_domains`
+// 					WHERE DATE(dropdate) !=  '0000-00-00'
+// 					AND DATE(dropdate)  > '".date("Y-m-d")."'
+// 					AND `userid` =".$userid."
+// 					GROUP BY DATE(dropdate),type");
+
+// while ($data = mysql_fetch_assoc($result)) {
+// 	$r["PROPERTY"][$data["dropdateday"]]["anzahl"] += $data["anzahl"];
+// 	$r["PROPERTY"][$data["dropdateday"]]["anzahl".$data["type"]] = $data["anzahl"];
+// }
+
+//tulsi
+$result = Capsule::select('SELECT DATE(dropdate) AS dropdateday, type, COUNT( * ) AS anzahl
+					FROM  `backorder_domains`
+					WHERE DATE(dropdate) !=  "0000-00-00"
+					AND DATE(dropdate)  > date("Y-m-d")
+					AND `userid` = userid
+					GROUP BY DATE(dropdate),type' , ['userid' => $userid]);
+
+//Cast to an array
+$result = (array)$result;
+while($result){
+	$r["PROPERTY"][$result["dropdateday"]]["anzahl"] += $result["anzahl"];
+	$r["PROPERTY"][$result["dropdateday"]]["anzahl".$result["type"]] = $result["anzahl"];
 }
 
 return $r;

@@ -1,4 +1,5 @@
 <?php // $command, $userid
+use WHMCS\Database\Capsule;
 
 if ( !$userid )	return backorder_api_response(531);
 
@@ -15,6 +16,7 @@ if ( $userid < 0 ) {
 	$condition = array();
 	$fields = 'SQL_CALC_FOUND_ROWS backorder_domains.*,(SELECT email FROM tblclients WHERE tblclients.id=backorder_domains.userid LIMIT 1) as useremail';
 }
+
 
 if(isset($command['STATUS']) && $command['STATUS']!="")
 {
@@ -56,23 +58,62 @@ if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
 	if($command["ORDERBY"]=="NUMBEROFHYPHENSDESC") $sortorder = "DESC";
 }
 
-$result = select_query('backorder_domains',$fields,$condition, $order, $sortorder, $limit);
+// $result = select_query('backorder_domains',$fields,$condition, $order, $sortorder, $limit);
 
-while ($data = mysql_fetch_assoc($result)) {
-	$r["PROPERTY"]["ID"][] = $data["id"];
-	$r["PROPERTY"]["DOMAIN"][] = $data["domain"].".".$data["tld"];
-	$r["PROPERTY"]["LABEL"][] = $data["domain"];
-	$r["PROPERTY"]["TLD"][] = $data["tld"];
-	$r["PROPERTY"]["STATUS"][] = strtoupper($data["status"]);
-	$r["PROPERTY"]["DROPDATE"][] = strtoupper($data["dropdate"]);
-	$r["PROPERTY"]["CREATEDDATE"][] = strtoupper($data["createddate"]);
-	$r["PROPERTY"]["UPDATEDDATE"][] = strtoupper($data["updateddate"]);
+$result1 = Capsule::table('backorder_domains')->select(Capsule::raw([$fields,$condition, $order, $sortorder, $limit]));
+
+
+
+$result = (array)$result1;
+// echo "<pre>";
+// print_r($result);
+// echo "</pre>";
+//
+while($result){
+	$r["PROPERTY"]["ID"][] = $result["id"];
+	$r["PROPERTY"]["DOMAIN"][] = $result["domain"].".".$result["tld"];
+	$r["PROPERTY"]["LABEL"][] = $result["domain"];
+	$r["PROPERTY"]["TLD"][] = $result["tld"];
+	$r["PROPERTY"]["STATUS"][] = strtoupper($result["status"]);
+	$r["PROPERTY"]["DROPDATE"][] = strtoupper($result["dropdate"]);
+	$r["PROPERTY"]["CREATEDDATE"][] = strtoupper($result["createddate"]);
+	$r["PROPERTY"]["UPDATEDDATE"][] = strtoupper($result["updateddate"]);
 
 	if ( $userid < 0 ) {
-		$r["PROPERTY"]["USER"][] = $data["userid"];
-		$r["PROPERTY"]["USEREMAIL"][] = $data["useremail"];
+		$r["PROPERTY"]["USER"][] = $result["userid"];
+		$r["PROPERTY"]["USEREMAIL"][] = $result["useremail"];
 	}
+	// echo "<pre> here";
+	// print_r($result);
+	// echo "</pre> here";
 }
+//
+// echo "<pre> here";
+// print_r($result);
+// echo "</pre> here";
+
+// while ($data = mysql_fetch_assoc($result)) {
+// 	$r["PROPERTY"]["ID"][] = $data["id"];
+// 	$r["PROPERTY"]["DOMAIN"][] = $data["domain"].".".$data["tld"];
+// 	$r["PROPERTY"]["LABEL"][] = $data["domain"];
+// 	$r["PROPERTY"]["TLD"][] = $data["tld"];
+// 	$r["PROPERTY"]["STATUS"][] = strtoupper($data["status"]);
+// 	$r["PROPERTY"]["DROPDATE"][] = strtoupper($data["dropdate"]);
+// 	$r["PROPERTY"]["CREATEDDATE"][] = strtoupper($data["createddate"]);
+// 	$r["PROPERTY"]["UPDATEDDATE"][] = strtoupper($data["updateddate"]);
+//
+// 	if ( $userid < 0 ) {
+// 		$r["PROPERTY"]["USER"][] = $data["userid"];
+// 		$r["PROPERTY"]["USEREMAIL"][] = $data["useremail"];
+// 	}
+// 	echo "<pre> here";
+// 	print_r($data);
+// 	echo "</pre> here";
+// }
+
+// echo "<pre> here";
+// print_r($result);
+// echo "</pre> here";
 
 if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 	foreach ( $r["PROPERTY"]["DOMAIN"] as $index => $domain ) {
@@ -83,6 +124,8 @@ if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 				$r["PROPERTY"]["STATUS"][$index] = strtoupper($data["status"]);
 				$r["PROPERTY"]["BACKORDERTYPE"][$index] = strtoupper($data["type"]);
 			}
+
+
 		}
 	}
 }

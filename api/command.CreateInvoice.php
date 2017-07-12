@@ -10,7 +10,7 @@ if ( !preg_match('/^(.*)\.(.*)$/', $command["DOMAIN"], $m) )
 	return backorder_api_response(505, "DOMAIN");
 
 $domain = $m[1];
-$tld = $m[2];
+$tld = $m[2]; 
 
 //GET ADMIN USERNAME
 $adminuser = Capsule::table('tbladdonmodules')

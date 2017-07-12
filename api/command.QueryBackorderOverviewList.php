@@ -1,13 +1,38 @@
 <?php // $command, $userid
-
+use WHMCS\Database\Capsule;
 if ( !$userid )	return backorder_api_response(531);
 $r = backorder_api_response(200);
 
 $currencyid=NULL;
-$result = select_query('tblclients','currency',array("id" => $userid ));
+
+// $result = select_query('tblclients','currency',array("id" => $userid ));
+
+//tulsi
+$result = Capsule::table('tblclients')->select('currency')
+					->where('id', $userid)
+					->get();
+
+// $result = Capsule::table('tblclients')
+// 			->where('currency')
+// 			->where('id', $userid);
+// $result = (array)$result;
+// echo "> <pre>";
+// print_r($result);
+// echo "< </pre>";
+
 $data = mysql_fetch_assoc($result);
+echo "> data <pre>";
+print_r($data);
+echo "< </pre>";
 if ( $data ) {
 	$currencyid= $data["currency"];
+
+	echo "> currency id <pre>";
+	print_r($currencyid);
+	echo "< </pre>";
+
+
+
 }
 if ( $currencyid==NULL ) return backorder_api_response(541, "PRICELIST - USER CURRENCY ERROR");
 
