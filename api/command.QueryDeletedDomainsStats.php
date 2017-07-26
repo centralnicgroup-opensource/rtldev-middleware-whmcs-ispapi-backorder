@@ -1,4 +1,5 @@
 <?php // $command, $userid
+use WHMCS\Database\Capsule;
 include(dirname(__FILE__)."/../../../../configuration.php");
 
 if ( !isset($command["LIMIT"]) ) $command["LIMIT"] = 100;
@@ -24,10 +25,27 @@ $r["PROPERTY"]["TOTAL7DAY"] = [0];
 
 //GET LIST OF ALL EXTENSIONS AVAILABLE FOR BACKORDER TO ONLY DISPLAY THOSE ONES
 $allextensions=array();
-$result = full_query("select extension from backorder_pricing GROUP BY extension");
-while ($b = mysql_fetch_array($result)) {
-    array_push($allextensions, $b["extension"]);
+// $result = full_query("select extension from backorder_pricing GROUP BY extension");
+//
+// while ($b = mysql_fetch_array($result)) {
+//     array_push($allextensions, $b["extension"]);
+// }
+
+// T
+$result1 = Capsule::select("select extension from backorder_pricing GROUP BY extension");
+$result = array();
+foreach($result1 as $object)
+{
+    $result[] = (array)$object;
+
 }
+// echo "<pre> >"; print_r($result); echo "< </pre>";
+foreach($result as $key=>$value){
+    array_push($allextensions, $value["extension"]);
+}
+// echo "<pre> >"; print_r($allextensions); echo "< </pre>";
+
+// end T
 
 $stmt = $db->prepare("
 	SELECT count(*) as c, DATE(drop_date) as drop_day,

@@ -1,5 +1,5 @@
 <?php // $command, $userid
-
+use WHMCS\Database\Capsule;
 if ( !isset($command["LIMIT"]) ) $command["LIMIT"] = 100;
 if ( !isset($command["FIRST"]) ) $command["FIRST"] = 0;
 
@@ -51,18 +51,42 @@ if ( isset($command["TLD"]) && $command["TLD"] != "_all_" ){
 }else{
     //TLD NOT SELECTED
     //GET LIST OF ALL EXTENSIONS AVAILABLE FOR BACKORDER TO ONLY DISPLAY THOSE ONES
-    $result = full_query("select extension from backorder_pricing GROUP BY extension");
+    // $result = full_query("select extension from backorder_pricing GROUP BY extension");
+
+    //T
+    $result1 = Capsule::select("select extension from backorder_pricing GROUP BY extension");
+    $result = array();
+    foreach($result1 as $object)
+    {
+        $result[] =  (array) $object;
+    }
+    // echo "<pre>"; print_r($result); echo "</pre>";
+    //end T
+
     $i=0;
-    while ($b = mysql_fetch_array($result)) {
+    // T
+    foreach ($result as $key => $value) {
         if($i==0){
             $conditions .= "AND ( zone = :TLD$i\n";
-        	$conditions_values[":TLD$i"] = $b["extension"];
+        	$conditions_values[":TLD$i"] = $value["extension"];
         }else{
             $conditions .= "OR zone = :TLD$i\n";
-        	$conditions_values[":TLD$i"] = $b["extension"];
+        	$conditions_values[":TLD$i"] = $value["extension"];
         }
         $i++;
     }
+    // end T
+    // while ($b = mysql_fetch_array($result)) {
+    //     // echo "<pre>"; print_r($b); echo "</pre>";
+    //     if($i==0){
+    //         $conditions .= "AND ( zone = :TLD$i\n";
+    //     	$conditions_values[":TLD$i"] = $b["extension"];
+    //     }else{
+    //         $conditions .= "OR zone = :TLD$i\n";
+    //     	$conditions_values[":TLD$i"] = $b["extension"];
+    //     }
+    //     $i++;
+    // }
     //CLOSE THE PARENTHESIS
     if($i!=0){
         $conditions .= ")\n";
@@ -168,12 +192,27 @@ while ( $data = $stmt->fetch() ) {
 if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 	foreach ( $r["PROPERTY"]["DOMAIN"] as $index => $domain ) {
 		if ( preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $domain, $m) ) {
-			$result = select_query('backorder_domains','*',array("userid" => $userid, "domain" => $m[1], "tld" => $m[2] ));
-			$data = mysql_fetch_assoc($result);
-			if ( $data ) {
-				$r["PROPERTY"]["STATUS"][$index] = strtoupper($data["status"]);
-				$r["PROPERTY"]["BACKORDERTYPE"][$index] = strtoupper($data["type"]);
+			// $result = select_query('backorder_domains','*',array("userid" => $userid, "domain" => $m[1], "tld" => $m[2] ));
+
+            //T
+            $result = Capsule::table('backorder_domains')
+            						->where('userid', $userid)
+            						->where('domain', $m[1])
+            						->where('tld', $m[2])
+            						->first();
+            $result = (array)$result;
+            // echo "<pre> >"; print_r($result); echo "< </pre>";
+			if ( $result ) {
+				$r["PROPERTY"]["STATUS"][$index] = strtoupper($result["status"]);
+				$r["PROPERTY"]["BACKORDERTYPE"][$index] = strtoupper($result["type"]);
 			}
+            // end T
+
+			// $data = mysql_fetch_assoc($result);
+			// if ( $data ) {
+			// 	$r["PROPERTY"]["STATUS"][$index] = strtoupper($data["status"]);
+			// 	$r["PROPERTY"]["BACKORDERTYPE"][$index] = strtoupper($data["type"]);
+			// }
 		}
 	}
 }

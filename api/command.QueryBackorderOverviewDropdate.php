@@ -29,7 +29,7 @@ $condition = array("userid" => $userid);
 // 	$r["PROPERTY"][$data["dropdateday"]]["anzahl".$data["type"]] = $data["anzahl"];
 // }
 
-//tulsi
+//T
 $result = Capsule::select('SELECT DATE(dropdate) AS dropdateday, type, COUNT( * ) AS anzahl
 					FROM  `backorder_domains`
 					WHERE DATE(dropdate) !=  "0000-00-00"
