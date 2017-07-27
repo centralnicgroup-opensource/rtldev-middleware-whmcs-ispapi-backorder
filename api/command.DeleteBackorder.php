@@ -1,35 +1,42 @@
 <?php // $command, $userid
 use WHMCS\Database\Capsule;
 
-if ( !$userid )	return backorder_api_response(531, "AUTHORIZATION FAILED");
+try {
 
-if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) )
-	return backorder_api_response(504, "DOMAIN");
+	if ( !$userid )	return backorder_api_response(531, "AUTHORIZATION FAILED");
 
-if ( !preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $command["DOMAIN"], $m) )
-	return backorder_api_response(505, "DOMAIN");
+	if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) )
+		return backorder_api_response(504, "DOMAIN");
 
-$backorder = Capsule::table('backorder_domains')
-						->where('userid', $userid)
-						->where('domain', $m[1])
-						->where('tld', $m[2])
-						->first();
+	if ( !preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $command["DOMAIN"], $m) )
+		return backorder_api_response(505, "DOMAIN");
 
-if(empty($backorder)){
-	return backorder_api_response(545, "DOMAIN");
-}else{
+	$backorder = Capsule::table('backorder_domains')
+							->where('userid', $userid)
+							->where('domain', $m[1])
+							->where('tld', $m[2])
+							->first();
 
-	if(in_array($backorder->status, array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($backorder->status == "PROCESSING" && !empty($backorder->reference) ) ){
-		return backorder_api_response(549, "THIS BACKORDER CANNOT BE DELETED");
+	if(empty($backorder)){
+		return backorder_api_response(545, "DOMAIN");
+	}else{
+
+		if(in_array($backorder->status, array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($backorder->status == "PROCESSING" && !empty($backorder->reference) ) ){
+			return backorder_api_response(549, "THIS BACKORDER CANNOT BE DELETED");
+		}
+		$message = "BACKORDER ".$command["DOMAIN"]." DELETED";
+		logmessage("command.DeleteBackorder", "ok", $message);
+
+		Capsule::table('backorder_domains')
+					->where('id', '=', $backorder->id)
+					->delete();
 	}
-	$message = "BACKORDER ".$command["DOMAIN"]." DELETED";
-	logmessage("command.DeleteBackorder", "ok", $message);
 
-	Capsule::table('backorder_domains')
-				->where('id', '=', $backorder->id)
-				->delete();
+	return backorder_api_response(200);
+
+} catch (\Exception $e) {
+	logmessage("command.DeleteBackorder", "DB error", $e->getMessage());
+	return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
-
-return backorder_api_response(200);
 
 ?>
