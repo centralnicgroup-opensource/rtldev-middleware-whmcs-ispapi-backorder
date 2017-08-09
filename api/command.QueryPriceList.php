@@ -34,7 +34,6 @@ try {
 		$result=$pdo->prepare("SELECT * FROM backorder_pricing WHERE currency_id=? AND extension=? ");
 		$result->execute(array($params["currency_id"], $params["extension"]));
 		$data = $result->fetchAll(PDO::FETCH_ASSOC);
-		echo "<pre> data variable when extension is set "; print_r($data); echo "</pre>";
 		foreach ($data as $key => $value) {
 			if(!empty($value["fullprice"])){ //USE || $data["fullprice"]=="0" IF FREE BACKORDER ARE ALLOWED TO BE DISPLAYED
 				$r["PROPERTY"][$value["extension"]]["PRICEFULL"] = $value["fullprice"];
@@ -48,7 +47,6 @@ try {
 		$result=$pdo->prepare("SELECT * FROM backorder_pricing WHERE currency_id=?");
 		$result->execute(array($params["currency_id"]));
 		$data = $result->fetchAll(PDO::FETCH_ASSOC);
-		echo "<pre> data variable when extension is not set "; print_r($data); echo "</pre>";
 		foreach ($data as $key => $value) {
 			if(!empty($value["fullprice"])){ //USE || $data["fullprice"]=="0" IF FREE BACKORDER ARE ALLOWED TO BE DISPLAYED
 				$r["PROPERTY"][$value["extension"]]["PRICEFULL"] = $value["fullprice"];
