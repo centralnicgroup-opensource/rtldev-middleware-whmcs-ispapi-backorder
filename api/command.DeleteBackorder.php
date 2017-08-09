@@ -11,12 +11,11 @@
 	if ( !preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $command["DOMAIN"], $m) )
 		return backorder_api_response(505, "DOMAIN");
 
-	// ############################
 	$result = $pdo->prepare("SELECT * FROM backorder_domains WHERE userid=? AND domain=? AND tld=?");
 	$result->execute(array($userid, $m[1], $m[2]));
 	$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 	$rows = $rows[0];
-		// echo "<pre>"; print_r($rows); echo "</pre>";
+
 	if (!($rows)) {
 		return backorder_api_response(545, "DOMAIN");
 	}else{
@@ -28,15 +27,11 @@
 
 			$stmt = $pdo->prepare("DELETE FROM backorder_domains WHERE id=?");
     		$stmt->execute(array($rows['id']));
-    		// $affected_rows = $stmt->rowCount();
-    		// echo "Affected rows: ".$affected_rows;
-
 	}
-	// #################################
 
 	return backorder_api_response(200);
  } catch (\Exception $e) {
- 	logmessage("command.CreateBackorder", "DB error", $e->getMessage());
+ 	logmessage("command.DeleteBackorder", "DB error", $e->getMessage());
  	return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
  }
 

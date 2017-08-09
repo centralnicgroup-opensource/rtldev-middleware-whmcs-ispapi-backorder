@@ -55,7 +55,6 @@ try {
     }else{
         //TLD NOT SELECTED
         //GET LIST OF ALL EXTENSIONS AVAILABLE FOR BACKORDER TO ONLY DISPLAY THOSE ONES
-        ##########################
         $result = $pdo->prepare("SELECT extension FROM backorder_pricing GROUP BY extension");
         $result->execute();
         $b = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -71,7 +70,6 @@ try {
                 }
                 $i++;
         }
-        ###########################
         //CLOSE THE PARENTHESIS
         if($i!=0){
             $conditions .= ")\n";
@@ -173,11 +171,10 @@ try {
     	$r["PROPERTY"]["NUMBEROFHYPHENS"][] = $data["domain_number_of_hyphens"];
     	$r["PROPERTY"]["NUMBEROFDIGITS"][] = $data["domain_number_of_digits"];
     }
-	#######################################
+
 	if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
 		foreach ( $r["PROPERTY"]["DOMAIN"] as $index => $domain ) {
 			if ( preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $domain, $m) ) {
-				##################
 				$result = $pdo->prepare("SELECT * FROM backorder_domains WHERE userid=? AND domain=? AND tld=?");
 				$result->execute(array($userid, $m[1], $m[2]));
 				$data = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -187,11 +184,9 @@ try {
 				    	$r["PROPERTY"]["BACKORDERTYPE"][$index] = strtoupper($value["type"]);
 					}
 			    }
-				#################
 			}
 		}
 	}
-	#######################################
 
     $data = $db->query("SELECT FOUND_ROWS() AS `found_rows`;")->fetch();
     $r["PROPERTY"]["TOTAL"][] = $data['found_rows'];
@@ -199,7 +194,7 @@ try {
     return $r;
 
 } catch (\Exception $e) {
-   logmessage("command.CreateBackorder", "DB error", $e->getMessage());
+   logmessage("command.QueryDeletedDomainsList", "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
 

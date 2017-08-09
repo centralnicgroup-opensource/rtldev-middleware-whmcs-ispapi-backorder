@@ -12,31 +12,20 @@ use WHMCS\Database\Capsule;
 	$r = backorder_api_response(200);
 
 	//GET THE CLIENT CURRENCY
-
-	//GET THE CURRENT CREDIT BALANCE
-	#######################################################
-
-	//###############################
 	$result = $pdo->prepare("SELECT cur.* FROM tblcurrencies cur, tblclients cli WHERE cli.currency=cur.id AND cli.id=?");
 	$result->execute(array($userid));
 	$cur = $result->fetchAll(PDO::FETCH_ASSOC);
 	$cur = $cur[0];
 
-	//##############################
+    //GET THE CURRENT CREDIT BALANCE
+    #######################################################
 
 	//GET ADMIN USERNAME
-
-	//################################
 	$admin_request= $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module=? AND setting=?");
 	$admin_request->execute(array('ispapibackorder', 'username'));
 	$rows = $admin_request->fetchAll(PDO::FETCH_ASSOC);
 	$rows = $rows[0];
-	// echo "<pre> rows "; print_r($cur); echo "</pre>";
 	$adminuser = $rows["value"];
-	// echo "<pre> admin user "; print_r($adminuser); echo "</pre>";
-
-	//##############################
-
 
 	$d = localAPI("getclientsdetails", array("clientid" => $userid, "stats" => true), $adminuser);
 	$credit = 0;
@@ -63,13 +52,11 @@ use WHMCS\Database\Capsule;
 			$result->execute(array($invoice["id"]));
 			$data = $admin_request->fetchAll(PDO::FETCH_ASSOC);
 			$data = $data[0];
-			// echo "<pre> data 1"; print_r($data); echo "</pre>";
 			while($data){
 				if($data["type"] == "AddFunds"){
 					$ignore = true;
 				}
 			}
-			//##############################
 			if(!$ignore){
 				$unpaidamount = $unpaidamount + $invoice["total"];
 			}
@@ -86,8 +73,6 @@ use WHMCS\Database\Capsule;
 	//DON'T ADD PENDING-PAYMENT HERE BECAUSE THIS ONE WILL BE HANDLED WITH THE UNPAID INVOICES
 	$reserved_amount = 0;
 	$open_backorders = array();
-
-	//####################################
 	$result=$pdo->prepare("SELECT id, tld, type FROM backorder_domains WHERE userid=? AND (status=? OR status=? OR status=?)");
 	$result->execute(array($userid, 'ACTIVE', 'PROCESSING', 'AUCTION-PENDING'));
 	$data = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -95,7 +80,6 @@ use WHMCS\Database\Capsule;
 	foreach ($data as $key => $value) {
 		array_push($open_backorders, array("id" => $value["id"], "tld" => $value["tld"], "type" => $value["type"]));
 	}
-	//####################################
 
 	//if credit < = 0 there is no need to continue.
 	if($credit > 0){
@@ -123,7 +107,6 @@ use WHMCS\Database\Capsule;
 	//echo "<br>";
 	#######################################################
 
-
 	$available_credit = $credit - $unpaidamount - $reserved_amount;
 	if($available_credit <= 0){
 		$available_credit = 0;
@@ -134,7 +117,7 @@ use WHMCS\Database\Capsule;
 
 	return $r;
  } catch (\Exception $e) {
- 	logmessage("command.CreateBackorder", "DB error", $e->getMessage());
+ 	logmessage("command.GetAvailableFunds", "DB error", $e->getMessage());
  	return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
  }
 

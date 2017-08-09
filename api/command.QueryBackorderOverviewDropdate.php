@@ -20,7 +20,6 @@ try {
 
 	$condition = array("userid" => $userid);
 
-	//#########################################
 	$result=$pdo->prepare("SELECT DATE(dropdate) AS dropdateday, type, COUNT( * ) AS anzahl
 	 					FROM  backorder_domains
 	 					WHERE DATE(dropdate)!=?
@@ -33,12 +32,11 @@ try {
 		$r["PROPERTY"][$value["dropdateday"]]["anzahl"] += $value["anzahl"];
 		$r["PROPERTY"][$value["dropdateday"]]["anzahl".$value["type"]] = $value["anzahl"];
 	}
-	//##########################################
 
 	return $r;
 
 } catch (\Exception $e) {
-   logmessage("command.CreateBackorder", "DB error", $e->getMessage());
+   logmessage("command.QueryBackorderOverviewDropdate", "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
 

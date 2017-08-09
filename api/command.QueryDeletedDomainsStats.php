@@ -29,7 +29,6 @@ try {
 
     //GET LIST OF ALL EXTENSIONS AVAILABLE FOR BACKORDER TO ONLY DISPLAY THOSE ONES
     $allextensions=array();
-    ############################
     $result = $pdo->prepare("select extension from backorder_pricing GROUP BY extension");
     $result->execute();
     $b = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -37,7 +36,6 @@ try {
     foreach ($b as $key => $value) {
          array_push($allextensions, $value["extension"]);
     }
-    #############################
 
     $stmt = $db->prepare("
     	SELECT count(*) as c, DATE(drop_date) as drop_day,
@@ -63,7 +61,7 @@ try {
     return $r;
 
 } catch (\Exception $e) {
-   logmessage("command.CreateBackorder", "DB error", $e->getMessage());
+   logmessage("command.QueryDeletedDomainsStats", "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
 

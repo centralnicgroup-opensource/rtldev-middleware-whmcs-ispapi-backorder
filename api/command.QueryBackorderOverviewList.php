@@ -9,12 +9,10 @@ try {
 
 	$currencyid=NULL;
 
-	//##################
 	$result=$pdo->prepare("SELECT currency FROM tblclients WHERE id=?");
 	$result->execute(array($userid));
 	$data = $result->fetchAll(PDO::FETCH_ASSOC);
 	$data = $data[0];
-	//###############
 
 	if ( $data ) {
 		$currencyid= $data["currency"];
@@ -24,12 +22,10 @@ try {
 
 	$currency=NULL;
 
-	//####################################
 	$result = $pdo->prepare("SELECT * FROM tblcurrencies WHERE id=?");
 	$result->execute(array($userid));
 	$data = $result->fetchAll(PDO::FETCH_ASSOC);
 	$data = $data[0];
-	//###################################
 	if ( $data ) {
 		$currency=$data;
 	}
@@ -42,7 +38,6 @@ try {
 	$result = $pdo->prepare("SELECT * FROM backorder_pricing WHERE currency_id=?");
 	$result->execute(array($currencyid));
 	$data = $result->fetchAll(PDO::FETCH_ASSOC);
-	// echo "<pre> data 2 \n"; print_r($data); echo "</pre>";
 	foreach ($data as $key => $value) {
 			$r["PROPERTY"][$value["extension"]]["tld"] = $value["extension"];
 			$r["PROPERTY"][$value["extension"]]["LITE"] = 0;
@@ -51,7 +46,6 @@ try {
 	}
 
 	$condition = array("userid" => $userid);
-	############################
 	$result = $pdo->prepare("SELECT count(*) as anzahl, tld, type FROM backorder_domains WHERE userid=? GROUP BY tld, type");
 	$result->execute(array($userid));
 	$data = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -59,13 +53,11 @@ try {
 			$r["PROPERTY"][ $value["tld"] ][ $value["type"] ] = $value["anzahl"];
 			$r["PROPERTY"][ $value["tld"] ]["total"] += $value["anzahl"];
 	}
-	############################
-
 
 	return $r;
 
 } catch (\Exception $e) {
-   logmessage("command.CreateBackorder", "DB error", $e->getMessage());
+   logmessage("command.QueryBackorderOverviewList", "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
 
