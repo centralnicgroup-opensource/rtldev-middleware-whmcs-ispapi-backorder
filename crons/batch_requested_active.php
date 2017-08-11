@@ -1,4 +1,5 @@
 <?php
+
 date_default_timezone_set('UTC');
 $cronname = "BATCH_REQUESTED_ACTIVE";
 require_once dirname(__FILE__)."/../../../../init.php";
@@ -6,33 +7,33 @@ require_once dirname(__FILE__)."/../backend/api.php";
 
 use WHMCS\Database\Capsule;
 try{
-	//GET PDO CONNECTION
 	$pdo = Capsule::connection()->getPdo();
 
 	$could_not_be_set_to_active = array();
 	$list = array();
 
-	$result=$pdo->prepare("SELECT * FROM backorder_domains WHERE status=? ");
+	$result=$pdo->prepare("SELECT * FROM backorder_domains WHERE status=?");
 	$result->execute(array("REQUESTED"));
-	$local = $result->fetchAll(PDO::FETCH_ASSOC);
-	foreach ($local as $key => $value) {
+	$locals = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($locals as $local) {
 		$today = new DateTime(date("Y-m-d H:i:s"));
-		$dropdate = new DateTime($value["dropdate"]);
+		$dropdate = new DateTime($local["dropdate"]);
 
 		$diff_timestamp = $dropdate->getTimestamp() - $today->getTimestamp();
-		$diff_timestamp =259200;
+
 		//CHECK IF TIMESTAMP >=0 AND <= 259200 (3 DAYS) AND ADD TO THE LIST
 		if($diff_timestamp >=0 && $diff_timestamp <= 259200){
-			if(!isset($list[$value["userid"]])){
-				$list[$value["userid"]]["backorders"] = array();
+			if(!isset($list[$local["userid"]])){
+				$list[$local["userid"]]["backorders"] = array();
 			}
-			$list[$value["userid"]]["backorders"][] = array("id" => $value["id"],
-															"tld" => $value["tld"],
-															"type" => $value["type"],
-															"domain" => $value["domain"].".".$value["tld"],
-															"dropdate" => $value["dropdate"],
-															"status" => $value["status"],
-															"lowbalance_notification" => $value["lowbalance_notification"] );
+			$list[$local["userid"]]["backorders"][] = array("id" => $local["id"],
+															"tld" => $local["tld"],
+															"type" => $local["type"],
+															"domain" => $local["domain"].".".$local["tld"],
+															"dropdate" => $local["dropdate"],
+															"status" => $local["status"],
+															"lowbalance_notification" => $local["lowbalance_notification"] );
 		}
 	}
 
@@ -81,18 +82,16 @@ try{
 					//SET BACKORDER STATUS TO ACTIVE
 					$res=$pdo->prepare("SELECT id, status, domain, tld FROM backorder_domains WHERE id=? ");
 					$res->execute(array($backorder["id"]));
-					$data = $res->fetchAll(PDO::FETCH_ASSOC);
-					foreach ($data as $ky => $value) {
-						//SET STATUS TO ACTIVE IF NOT ALREADY ACTIVE
-						if($value["status"] == "REQUESTED"){
-							$oldstatus = $value["status"];
-							$update=$pdo->prepare("UPDATE backorder_domains SET status=?, updateddate=? WHERE id=?");
-							$update->execute(array("ACTIVE", date("Y-m-d H:i:s"), $value["id"]));
-							$affected_rows = $update->rowCount();
-							if($affected_rows != 0){
-								$message = "BACKORDER ".$value["domain"].".".$value["tld"]." (backorderid=".$value["id"].", userid=".$key.") set from ".$oldstatus." to ACTIVE";
-								logmessage($cronname, "ok", $message);
-							}
+					$data = $res->fetch(PDO::FETCH_ASSOC);
+					//SET STATUS TO ACTIVE IF NOT ALREADY ACTIVE
+					if($data["status"] == "REQUESTED"){
+						$oldstatus = $data["status"];
+						$update=$pdo->prepare("UPDATE backorder_domains SET status=?, updateddate=? WHERE id=?");
+						$update->execute(array("ACTIVE", date("Y-m-d H:i:s"), $data["id"]));
+						$affected_rows = $update->rowCount();
+						if($affected_rows != 0){
+							$message = "BACKORDER ".$data["domain"].".".$data["tld"]." (backorderid=".$data["id"].", userid=".$key.") set from ".$oldstatus." to ACTIVE";
+							logmessage($cronname, "ok", $message);
 						}
 					}
 				}else  {
@@ -111,8 +110,8 @@ try{
 	}
 
 	//GET ADMIN USERNAME
-	$rquery=$pdo->prepare("SELECT value FROM tbladdonmodules WHERE module=? AND  setting=? ");
-	$rquery->execute(array("ispapibackorder", "username"));
+	$rquery=$pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND  setting='username'");
+	$rquery->execute();
 	$r = $rquery->fetch(PDO::FETCH_ASSOC);
 	$adminuser = $r["value"];
 	if(empty($adminuser)){
@@ -132,20 +131,18 @@ try{
 			foreach($backorders as $backorder){
 				$update = $pdo->prepare("UPDATE backorder_domains SET updateddate=?, lowbalance_notification=? WHERE id=?");
 				$update->execute(array(date("Y-m-d H:i:s"), 1, $backorder["id"]));
-				$affected_rows = $update->rowCount();
-				if($affected_rows != 0){
+				if($update->rowCount() != 0){
 					$message = "BACKORDER ".$backorder["domain"]." (backorderid=".$backorder["id"].", userid=".$key.") insufficient funds - low balance notification sent";
 					logmessage($cronname, "error", $message);
 				}
 			}
 	}
 
-	//logmessage($cronname, "ok", "BATCH_REQUESTED_ACTIVE done");
-	echo date("Y-m-d H:i:s")." BATCH_REQUESTED_ACTIVE done.\n";
+	//logmessage($cronname, "ok", "$cronname done");
+	echo date("Y-m-d H:i:s")." $cronname done.\n";
 } catch (\Exception $e) {
-   logmessage("batch_requested_active", "DB error", $e->getMessage());
+   logmessage($cronname, "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
-
 
 ?>
