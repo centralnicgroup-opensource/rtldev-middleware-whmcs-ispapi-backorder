@@ -8,13 +8,12 @@ require_once dirname(__FILE__)."/../backend/api.php";
 use WHMCS\Database\Capsule;
 try{
 	$pdo = Capsule::connection()->getPdo();
-
 	$could_not_be_set_to_active = array();
 	$list = array();
 
-	$result=$pdo->prepare("SELECT * FROM backorder_domains WHERE status=?");
-	$result->execute(array("REQUESTED"));
-	$locals = $result->fetchAll(PDO::FETCH_ASSOC);
+	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status=?");
+	$stmt->execute(array("REQUESTED"));
+	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	foreach ($locals as $local) {
 		$today = new DateTime(date("Y-m-d H:i:s"));
@@ -80,16 +79,16 @@ try{
 
 				if(($current_credit - $backorder_price) >= 0){
 					//SET BACKORDER STATUS TO ACTIVE
-					$res=$pdo->prepare("SELECT id, status, domain, tld FROM backorder_domains WHERE id=? ");
-					$res->execute(array($backorder["id"]));
-					$data = $res->fetch(PDO::FETCH_ASSOC);
+					$stmt = $pdo->prepare("SELECT id, status, domain, tld FROM backorder_domains WHERE id=?");
+					$stmt->execute(array($backorder["id"]));
+					$data = $stmt->fetch(PDO::FETCH_ASSOC);
+
 					//SET STATUS TO ACTIVE IF NOT ALREADY ACTIVE
 					if($data["status"] == "REQUESTED"){
 						$oldstatus = $data["status"];
-						$update=$pdo->prepare("UPDATE backorder_domains SET status=?, updateddate=? WHERE id=?");
-						$update->execute(array("ACTIVE", date("Y-m-d H:i:s"), $data["id"]));
-						$affected_rows = $update->rowCount();
-						if($affected_rows != 0){
+						$stmt = $pdo->prepare("UPDATE backorder_domains SET status=?, updateddate=? WHERE id=?");
+						$stmt->execute(array("ACTIVE", date("Y-m-d H:i:s"), $data["id"]));
+						if($stmt->rowCount() != 0){
 							$message = "BACKORDER ".$data["domain"].".".$data["tld"]." (backorderid=".$data["id"].", userid=".$key.") set from ".$oldstatus." to ACTIVE";
 							logmessage($cronname, "ok", $message);
 						}
@@ -110,9 +109,9 @@ try{
 	}
 
 	//GET ADMIN USERNAME
-	$rquery=$pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND  setting='username'");
-	$rquery->execute();
-	$r = $rquery->fetch(PDO::FETCH_ASSOC);
+	$stmt = $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND  setting='username'");
+	$stmt->execute();
+	$r = $stmt->fetch(PDO::FETCH_ASSOC);
 	$adminuser = $r["value"];
 	if(empty($adminuser)){
 		$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
@@ -129,9 +128,9 @@ try{
 
 			#SET THE LOWBALANCENOTIFICATION FLAG TO 1
 			foreach($backorders as $backorder){
-				$update = $pdo->prepare("UPDATE backorder_domains SET updateddate=?, lowbalance_notification=? WHERE id=?");
-				$update->execute(array(date("Y-m-d H:i:s"), 1, $backorder["id"]));
-				if($update->rowCount() != 0){
+				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET updateddate=?, lowbalance_notification=? WHERE id=?");
+				$update_stmt->execute(array(date("Y-m-d H:i:s"), 1, $backorder["id"]));
+				if($update_stmt->rowCount() != 0){
 					$message = "BACKORDER ".$backorder["domain"]." (backorderid=".$backorder["id"].", userid=".$key.") insufficient funds - low balance notification sent";
 					logmessage($cronname, "error", $message);
 				}
