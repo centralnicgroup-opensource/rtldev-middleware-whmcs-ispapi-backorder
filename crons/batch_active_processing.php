@@ -20,8 +20,8 @@ try{
 		//CHECK IF TIMESTAMP >=0 AND <= 7200 (2 HOURS)
 		if($diff_timestamp >=0 && $diff_timestamp <=  7200){
 			//CHANGE STATUS FROM ACTIVE TO PROCESSING
-			$stmt = $pdo->prepare("UPDATE backorder_domains SET status=?, updateddate=? WHERE id=?");
-			$stmt->execute(array("PROCESSING", date("Y-m-d H:i:s"), $local["id"]));
+			$stmt = $pdo->prepare("UPDATE backorder_domains SET status='PROCESSING', updateddate=NOW() WHERE id=?");
+			$stmt->execute(array($local["id"]));
 
 			if($stmt->rowCount() != 0){
 				$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ACTIVE to PROCESSING";

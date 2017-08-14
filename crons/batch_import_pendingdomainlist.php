@@ -12,7 +12,7 @@ $pd->createTable();
 $pd->import();
 //$pd->import(array(), dirname(__FILE__)."/../tmp/pending_delete_domain_list.csv");
 
-logmessage($cronname, "ok", "BATCH_IMPORT_PENDINGDOMAINLIST done");
-echo date("Y-m-d H:i:s")." BATCH_IMPORT_PENDINGDOMAINLIST done.\n";
+logmessage($cronname, "ok", "$cronname done");
+echo date("Y-m-d H:i:s")." $cronname done.\n";
 
 ?>

@@ -11,8 +11,8 @@ try{
 	$could_not_be_set_to_active = array();
 	$list = array();
 
-	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status=?");
-	$stmt->execute(array("REQUESTED"));
+	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status='REQUESTED'");
+	$stmt->execute();
 	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	foreach ($locals as $local) {
@@ -86,8 +86,8 @@ try{
 					//SET STATUS TO ACTIVE IF NOT ALREADY ACTIVE
 					if($data["status"] == "REQUESTED"){
 						$oldstatus = $data["status"];
-						$stmt = $pdo->prepare("UPDATE backorder_domains SET status=?, updateddate=? WHERE id=?");
-						$stmt->execute(array("ACTIVE", date("Y-m-d H:i:s"), $data["id"]));
+						$stmt = $pdo->prepare("UPDATE backorder_domains SET status='ACTIVE', updateddate=NOW() WHERE id=?");
+						$stmt->execute(array($data["id"]));
 						if($stmt->rowCount() != 0){
 							$message = "BACKORDER ".$data["domain"].".".$data["tld"]." (backorderid=".$data["id"].", userid=".$key.") set from ".$oldstatus." to ACTIVE";
 							logmessage($cronname, "ok", $message);
@@ -111,8 +111,8 @@ try{
 	//GET ADMIN USERNAME
 	$stmt = $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND  setting='username'");
 	$stmt->execute();
-	$r = $stmt->fetch(PDO::FETCH_ASSOC);
-	$adminuser = $r["value"];
+	$data = $stmt->fetch(PDO::FETCH_ASSOC);
+	$adminuser = $data["value"];
 	if(empty($adminuser)){
 		$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
 		logmessage($cronname, "error", $message);
@@ -128,8 +128,8 @@ try{
 
 			#SET THE LOWBALANCENOTIFICATION FLAG TO 1
 			foreach($backorders as $backorder){
-				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET updateddate=?, lowbalance_notification=? WHERE id=?");
-				$update_stmt->execute(array(date("Y-m-d H:i:s"), 1, $backorder["id"]));
+				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET updateddate=NOW(), lowbalance_notification='1' WHERE id=?");
+				$update_stmt->execute(array($backorder["id"]));
 				if($update_stmt->rowCount() != 0){
 					$message = "BACKORDER ".$backorder["domain"]." (backorderid=".$backorder["id"].", userid=".$key.") insufficient funds - low balance notification sent";
 					logmessage($cronname, "error", $message);

@@ -283,11 +283,10 @@ try{
 		}
 	}
 
-	//logmessage($cronname, "ok", "BATCH_POLLING done");
-	echo date("Y-m-d H:i:s")." BATCH_POLLING done.\n";
+	echo date("Y-m-d H:i:s")." $cronname done.\n";
 
 } catch (\Exception $e) {
-   logmessage("batch_polling", "DB error", $e->getMessage());
+   logmessage($cronname, "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
 

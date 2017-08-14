@@ -21,8 +21,8 @@ try{
 			$old_dropdate = $local["dropdate"];
 			$new_dropdate = $online["drop_date"];
 
-			$update_stmt = $pdo->prepare("UPDATE backorder_domains SET dropdate=?, updateddate=? WHERE domain=? AND tld=?");
-			$update_stmt->execute(array($online["drop_date"], date("Y-m-d H:i:s"), $local["domain"], $local["tld"]));
+			$update_stmt = $pdo->prepare("UPDATE backorder_domains SET dropdate=?, updateddate=NOW() WHERE domain=? AND tld=?");
+			$update_stmt->execute(array($online["drop_date"], $local["domain"], $local["tld"]));
 			if($update_stmt->rowCount() != 0){
 				$message = "DROPDATE OF BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") SYNCHRONIZED ($old_dropdate => $new_dropdate)";
 				logmessage($cronname, "ok", $message);

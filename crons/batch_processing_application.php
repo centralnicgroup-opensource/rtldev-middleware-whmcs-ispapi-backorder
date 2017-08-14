@@ -14,8 +14,8 @@ try{
 		//GET ADMIN USERNAME
 		$stmt = $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND setting='username'");
 		$stmt->execute();
-		$r = $stmt->fetch(PDO::FETCH_ASSOC);
-		$adminuser = $r["value"];
+		$data = $stmt->fetch(PDO::FETCH_ASSOC);
+		$adminuser = $data["value"];
 
 		if($type == "USER"){
 			$command = "getclientsdetails";
@@ -77,8 +77,8 @@ try{
 		return $values;
 	}
 
-	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status=?");
-	$stmt->execute(array("PROCESSING"));
+	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status='PROCESSING'");
+	$stmt->execute();
 	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	foreach ($locals as $local) {
@@ -98,8 +98,8 @@ try{
 			$backorder = ispapi_api_call($command);
 
 			if($backorder["CODE"] == 200){
-				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET reference=?, updateddate=? WHERE id=?");
-				$update_stmt->execute(array($backorder["PROPERTY"]["APPLICATION"][0], date("Y-m-d H:i:s"), $local["id"]));
+				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET reference=?, updateddate=NOW() WHERE id=?");
+				$update_stmt->execute(array($backorder["PROPERTY"]["APPLICATION"][0], $local["id"]));
 
 				if($update_stmt->rowCount() != 0){
 					$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." SENT TO HEXONET (reference=".$backorder["PROPERTY"]["APPLICATION"][0].")";
