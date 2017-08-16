@@ -30,7 +30,7 @@ try{
  		}
 	}
 
-	logmessage($cronname, "ok", "$cronname done");
+	//logmessage($cronname, "ok", "$cronname done");
 	echo date("Y-m-d H:i:s")." $cronname done.\n";
 } catch (\Exception $e) {
    logmessage($cronname, "DB error", $e->getMessage());
