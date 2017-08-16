@@ -1,18 +1,13 @@
-<?php // $command, $userid
+<?php
  use WHMCS\Database\Capsule;
  try {
-	 //GET DPO CONNECTION
 	$pdo = Capsule::connection()->getPdo();
 
 	if ( !$userid )	return backorder_api_response(531);
+	if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) ) return backorder_api_response(504, "DOMAIN");
+	if ( !backorder_api_check_syntax_domain($command["DOMAIN"]) ) return backorder_api_response(505, "DOMAIN");
+	if ( !backorder_api_check_valid_tld($command["DOMAIN"], $userid) ) return backorder_api_response(541, "NOT SUPPORTED");
 
-	if ( !isset($command["DOMAIN"]) || !strlen($command["DOMAIN"]) )
-		return backorder_api_response(504, "DOMAIN");
-
-	if ( !backorder_api_check_syntax_domain($command["DOMAIN"]) )
-		return backorder_api_response(505, "DOMAIN");
-	if ( !backorder_api_check_valid_tld($command["DOMAIN"], $userid) )
-		return backorder_api_response(541, "NOT SUPPORTED");
 	if(isset($command["DROPDATE"])){
 		$dropdate = $command["DROPDATE"];
 	}else{
@@ -51,18 +46,17 @@
 		}
 		//------------------------------------------------------
 
-		// //CHECK IF THERE IS A DROPDATE EXISTING IN THE DROPLIST
-		$r1  = $pdo->prepare("SELECT * FROM pending_domains WHERE domain=? AND zone=?");
-		$r1->execute(array($values["domain"], $values["tld"]));
-		$d1 = $r1->fetch(PDO::FETCH_ASSOC);
-
+		//CHECK IF THERE IS A DROPDATE EXISTING IN THE DROPLIST
+		$stmt = $pdo->prepare("SELECT * FROM pending_domains WHERE domain=? AND zone=?");
+		$stmt->execute(array($values["domain"], $values["tld"]));
+		$d1 = $stmt->fetch(PDO::FETCH_ASSOC);
 		if(!empty($d1)){
 			$values["dropdate"] = $d1["drop_date"];
 		}
 
-		$result =$pdo->prepare("SELECT * FROM backorder_domains WHERE userid=? AND domain=? AND tld=?");
-    	$result->execute(array($userid, $values["domain"], $values["tld"]));
-    	$data = $result->fetch(PDO::FETCH_ASSOC);
+		$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE userid=? AND domain=? AND tld=?");
+    	$stmt->execute(array($userid, $values["domain"], $values["tld"]));
+    	$data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if($data){
 			if (in_array($data["status"], array("REQUESTED", "ACTIVE", "FAILED", "SUCCESSFUL", "AUCTION-LOST", "AUCTION-WON"))){
@@ -72,13 +66,13 @@
 			}
 			//IF NOT EXISTING, INSERT IT
 		}else{
-			$insert=$pdo->prepare("INSERT INTO backorder_domains ( userid, createddate, updateddate, dropdate, type, status, reference, domain, tld ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )");
-			$insert->execute(array($values["userid"], $values["createddate"], $values["updateddate"], $values["dropdate"], $values["type"], $values["status"], $values["reference"], $values["domain"], $values["tld"]));
-			$affected_rows = $insert->rowCount();
-			if($affected_rows == 0){
+			$insert_stmt = $pdo->prepare("INSERT INTO backorder_domains ( userid, createddate, updateddate, dropdate, type, status, reference, domain, tld ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+			$insert_stmt->execute(array($values["userid"], $values["createddate"], $values["updateddate"], $values["dropdate"], $values["type"], $values["status"], $values["reference"], $values["domain"], $values["tld"]));
+			if($insert_stmt->rowCount() == 0){
 				return backorder_api_response(549, "CREATE FAILED");
 			}
 		}
+        
 		$message = "BACKORDER ".$command["DOMAIN"]." set to REQUESTED";
 		logmessage("command.CreateBackorder", "ok", $message);
 		return backorder_api_response(200);
