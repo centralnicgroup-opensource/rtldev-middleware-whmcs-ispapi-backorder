@@ -1,90 +1,81 @@
 <?php
+require_once dirname(__FILE__).'/../../../../init.php';
+use WHMCS\Database\Capsule;
+
 //INSERT ALL MISSING PRICES - NEEDED WHEN RESELLER ADDS NEW CURRENCIES
 ###############################################################################
-//GET TOTAL NUMBER OF CURRENCIES
 
-require_once dirname(__FILE__).'/../../../../init.php'; // i added this
-// https://forum.whmcs.com/showthread.php?112839-issue-with-custom-module
-
-use WHMCS\Database\Capsule;
 try {
-	//GET DPO CONNECTION
    $pdo = Capsule::connection()->getPdo();
 
+   //GET TOTAL NUMBER OF CURRENCIES
    $currencies = array();
    $nb_currencies = 0;
+   $stmt = $pdo->prepare("SELECT * FROM tblcurrencies");
+   $stmt->execute();
+   $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-   $r0=$pdo->prepare("SELECT * FROM tblcurrencies");
-   $r0->execute();
-   $d0 = $r0->fetchAll(PDO::FETCH_ASSOC);
-
-   foreach ($d0 as $key => $value) {
-       array_push($currencies, $value);
+   foreach ($data as $row) {
+       array_push($currencies, $row);
        $nb_currencies++;
    }
 
-   //GO THROUGH ALL EXTENSIONS
-   $r=$pdo->prepare("SELECT distinct(extension) FROM backorder_pricing");
-   $r->execute();
-   $d = $r->fetchAll(PDO::FETCH_ASSOC);
-   foreach ($d as $key => $value) {
-       $extension =$value["extension"];
-       $r1=$pdo->prepare("SELECT count(*) as nb_prices FROM backorder_pricing WHERE extension=?");
-       $r1->execute(array($extension));
-       $d1=$r1->fetch(PDO::FETCH_ASSOC);
+   //GO THROUGH ALL EXTENSIONS AND ADD MISSING PRICES (WHEN YOU ADD A NEW CURRENCY, IT WILL ADD THE PRICES FOR THIS CURRENCY)
+   ###############################################################################
+   $stmt = $pdo->prepare("SELECT distinct(extension) FROM backorder_pricing");
+   $stmt->execute();
+   $d = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   foreach ($d as $value) {
+       $extension = $value["extension"];
+       $stmt = $pdo->prepare("SELECT count(*) as nb_prices FROM backorder_pricing WHERE extension=?");
+       $stmt->execute(array($extension));
+       $d1 = $stmt->fetch(PDO::FETCH_ASSOC);
        $nb_prices = $d1["nb_prices"];
        if($nb_prices < $nb_currencies){
            foreach($currencies as $currency){
-               $r2=$pdo->prepare("SELECT * FROM backorder_pricing WHERE extension=? AND currency_id=?");
-               $r2->execute(array($extension, $currency["id"]));
-               $d2 = $r2->fetchAll(PDO::FETCH_ASSOC);
+               $stmt = $pdo->prepare("SELECT * FROM backorder_pricing WHERE extension=? AND currency_id=?");
+               $stmt->execute(array($extension, $currency["id"]));
+               $d2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
                if(empty($d2)){
-                   $insert=$pdo->prepare("INSERT INTO backorder_pricing(extension, currency_id, fullprice) VALUES(:extension, :currency_id, :fullprice)");
-                   $insert->execute(array(':extension' => $extension, ':currency_id' => $currency["id"] , ':fullprice' => "NULL"));
-                   $affected_rows = $insert->rowCount();
+                   $insert_stmt = $pdo->prepare("INSERT INTO backorder_pricing(extension, currency_id, fullprice) VALUES(:extension, :currency_id, :fullprice)");
+                   $insert_stmt->execute(array(':extension' => $extension, ':currency_id' => $currency["id"], ':fullprice' => "NULL"));
+                   //$affected_rows = $insert_stmt->rowCount();
                }
            }
        }
    }
-
-
    ###############################################################################
 
    //CLEAN ALL NON EXISTING CURRENCIES
    ###############################################################################
    $cur_string = "";
    foreach($currencies as $currency){
-       $cur_string .= $currency["id"].",";
+       $cur_string .= $pdo->quote($currency["id"]).",";
    }
    $cur_string .= "-1";
-   $r0 = $pdo->prepare("DELETE FROM backorder_pricing WHERE currency_id NOT IN (?)");
-   $r0->execute(array($cur_string));
+   $stmt = $pdo->prepare("DELETE FROM backorder_pricing WHERE currency_id NOT IN ($cur_string)");
+   $stmt->execute();
    ###############################################################################
 
-   //Delete pricing
+   //DELETE PRICING
    ###############################################################################
    if(isset($_REQUEST["deletepricing"])){
-       $delete=$pdo->prepare("DELETE FROM backorder_pricing WHERE extension=?");
-       $delete->execute(array(mysql_real_escape_string($_REQUEST["deletepricing"])));
+       $delete_stmt = $pdo->prepare("DELETE FROM backorder_pricing WHERE extension=?");
+       $delete_stmt->execute(array($_REQUEST["deletepricing"]));
        echo '<div class="infobox"><strong><span class="title">Deletion Successfully!</span></strong><br>Your backorder pricing has been deleted.</div>';
    }
    ###############################################################################
 
-   //Save pricing
+   //SAVE PRICING
    ###############################################################################
    if(isset($_REQUEST["savepricing"])){
-       /*echo "<pre>";
-       print_r($_POST["EXT"]);
-       echo "</pre>";*/
        foreach($_POST["EXT"] as $id => $extension){
            $price = $extension["PRICE"];
            if(empty($price) && !is_numeric($price)){ //IF PRICE EMPTY OR PRICE NOT INTEGER
                $price = "NULL";
            }
-
-           $update = $pdo->prepare("UPDATE backorder_pricing SET fullprice=? WHERE id=?");
-           $update->execute(array($price, $id));
-
+           $update_stmt = $pdo->prepare("UPDATE backorder_pricing SET fullprice=? WHERE id=?");
+           $update_stmt->execute(array($price, $id));
        }
        if( isset($_POST["ADD"]["EXTENSION"]) && !empty($_POST["ADD"]["EXTENSION"]) ){
            $name = strtolower($_POST["ADD"]["EXTENSION"]);
@@ -95,48 +86,44 @@ try {
                if(empty($price) && !is_numeric($price)){ //IF PRICE EMPTY OR PRICE NOT INTEGER
                    $price = "NULL";
                }
-               $insert = $pdo->prepare("INSERT INTO backorder_pricing(extension, currency_id, fullprice) VALUES(:extension, :currency_id, :fullprice)");
-               $insert->execute(array(':extension' => $name, ':currency_id' => $currency_id , ':fullprice' => $price));
+               $insert_stmt = $pdo->prepare("INSERT INTO backorder_pricing(extension, currency_id, fullprice) VALUES(:extension, :currency_id, :fullprice)");
+               $insert_stmt->execute(array(':extension' => $name, ':currency_id' => $currency_id , ':fullprice' => $price));
            }
        }
        echo '<div class="infobox"><strong><span class="title">Changes Saved Successfully!</span></strong><br>Your changes have been saved.</div>';
    }
    ###############################################################################
 
-   //Get all pricing
+   //GET ALL PRICING TO DISPLAY
    ###############################################################################
    $extensions = array();
-   $result=$pdo->prepare("SELECT distinct(extension) FROM backorder_pricing");
-   $result->execute();
-   $data = $result->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($data as $key => $value) {
+   $stmt = $pdo->prepare("SELECT distinct(extension) FROM backorder_pricing");
+   $stmt->execute();
+   $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($data as $value) {
         $item = array("extension" => $value["extension"] );
-        $r=$pdo->prepare("SELECT BP.id as extension_id, BP.currency_id as currency_id, BP.extension, BP.fullprice, CUR.code FROM backorder_pricing BP, tblcurrencies CUR WHERE BP.extension=? AND BP.currency_id=CUR.id");
-        $r->execute(array($value["extension"]));
-        $d = $r->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($d as $ky => $val) {
+        $stmt = $pdo->prepare("SELECT BP.id as extension_id, BP.currency_id as currency_id, BP.extension, BP.fullprice, CUR.code FROM backorder_pricing BP, tblcurrencies CUR WHERE BP.extension=? AND BP.currency_id=CUR.id");
+        $stmt->execute(array($value["extension"]));
+        $d = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($d as $val) {
             $item["pricing"][$val["code"]] = array("extension_id" => $val["extension_id"], "currency_id" => $val["currency_id"], "fullprice" => $val["fullprice"]);
         }
         array_push($extensions, $item);
     }
-   //echo "<pre>";
-   //print_r($extensions);
    ###############################################################################
 
-   //Get all currencies
+   //GET ALL CURRENCIES
    ###############################################################################
    $currency_collumns = "";
    $currencies = array();
-   $result=$pdo->prepare('SELECT * FROM tblcurrencies');
-   $result->execute();
-   $data= $result->fetchAll(PDO::FETCH_ASSOC);
-   foreach ($data as $key => $value) {
+   $stmt = $pdo->prepare('SELECT * FROM tblcurrencies');
+   $stmt->execute();
+   $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   foreach ($data as $value) {
        array_push($currencies, $value);
        $currency_collumns .= "<th>".$value["code"]."</th>";
    }
    ###############################################################################
-
-
 
    echo '<form action="'.$modulelink.'" method="post">';
    echo '<div class="tablebg" align="center">';
@@ -161,9 +148,6 @@ try {
        }
        echo '<td></td>';
    echo '</tr>';
-
-
-
    echo '</tbody>';
    echo '</table>';
    echo '</div>';
@@ -171,8 +155,7 @@ try {
    echo '</form>';
 
 } catch (\Exception $e) {
-   logmessage("backend.pricing", "DB error", $e->getMessage());
-   return backorder_api_response(599, "FAILED. Please contact Support.");
+   die($e->getMessage());
 }
 
 
