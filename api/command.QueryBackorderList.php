@@ -1,13 +1,13 @@
 <?php
 
 use WHMCS\Database\Capsule;
-try {
+try{
 
     $pdo = Capsule::connection()->getPdo();
 
-    if (!$userid )	return backorder_api_response(531);
-    if (!isset($command["LIMIT"]) || !is_numeric($command["LIMIT"])) $command["LIMIT"] = 100;
-    if (!isset($command["FIRST"]) || !is_numeric($command["FIRST"])) $command["FIRST"] = 0;
+    if(!$userid) return backorder_api_response(531);
+    if(!isset($command["LIMIT"]) || !is_numeric($command["LIMIT"])) $command["LIMIT"] = 100;
+    if(!isset($command["FIRST"]) || !is_numeric($command["FIRST"])) $command["FIRST"] = 0;
     $limit = "LIMIT ".$command["FIRST"].",".$command["LIMIT"];
 
     $r = backorder_api_response(200);
@@ -28,7 +28,7 @@ try {
     	"STATUSDESC" => "status DESC",
     );
 
-    if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
+    if(isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]])){
     	$order = $orders[$command["ORDERBY"]];
     }else{
         $order = "id";
@@ -38,7 +38,6 @@ try {
     $sth = $pdo->prepare("SELECT * FROM backorder_domains $where $orderby $limit");
     $sth->execute();
     $rows = $sth->fetchAll(PDO::FETCH_ASSOC);
-
 
     foreach($rows as $data){
     	$r["PROPERTY"]["ID"][] = $data["id"];
@@ -51,9 +50,9 @@ try {
     	$r["PROPERTY"]["UPDATEDDATE"][] = strtoupper($data["updateddate"]);
     }
 
-    if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
-    	foreach ( $r["PROPERTY"]["DOMAIN"] as $index => $domain ) {
-    		if ( preg_match('/^(.*)\.(.*)$/', $domain, $m) ) {
+    if(isset($r["PROPERTY"]["DOMAIN"]) && $userid){
+    	foreach($r["PROPERTY"]["DOMAIN"] as $index => $domain){
+    		if(preg_match('/^(.*)\.(.*)$/', $domain, $m)){
                 $sth = $pdo->prepare("SELECT status, type FROM backorder_domains WHERE userid=? AND domain=? AND tld=?");
                 $sth->execute(array($userid,$m[1],$m[2]));
                 $data = $sth->fetch(PDO::FETCH_ASSOC);
@@ -73,7 +72,7 @@ try {
 
     return $r;
 
-} catch (\Exception $e) {
+}catch(\Exception $e){
 	logmessage("command.QueryBackorderList", "DB error", $e->getMessage());
 	return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
