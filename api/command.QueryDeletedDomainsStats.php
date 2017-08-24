@@ -17,7 +17,7 @@ try{
     $r["PROPERTY"]["TOTAL7DAY"] = [0];
 
     //GET LIST OF ALL EXTENSIONS AVAILABLE FOR BACKORDER TO ONLY DISPLAY THOSE ONES
-    $allextensions=array();
+    $allextensions = array();
     $stmt = $pdo->prepare("select extension from backorder_pricing GROUP BY extension");
     $stmt->execute();
     $extensions = $stmt->fetchAll(PDO::FETCH_ASSOC);
