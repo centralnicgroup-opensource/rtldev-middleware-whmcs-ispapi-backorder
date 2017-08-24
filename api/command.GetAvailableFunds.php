@@ -24,6 +24,10 @@ try{
 	$stmt->execute();
 	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 	$adminuser = $row["value"];
+    if(empty($adminuser)){
+        return backorder_api_response(549, "MISSING ADMIN USERNAME IN MODULE CONFIGURATION");
+    }
+
 
 	$d = localAPI("getclientsdetails", array("clientid" => $userid, "stats" => true), $adminuser);
 	$credit = 0;
@@ -32,16 +36,18 @@ try{
 	}
 	$r["PROPERTY"]["CREDITBALANCE"]["VALUE"] = $credit;
 	$r["PROPERTY"]["CREDITBALANCE"]["VALUE_FORMATED"] = formatPrice($credit, $cur);
+
 	//echo "CREDIT BALANCE: ".$credit;
 	//echo "<br>";
 	#######################################################
 
 	//GET ALL UNPAID INVOICES
 	#######################################################
-	$results = localAPI("getinvoices", array("userid" => $userid, "limitnum" => "99999999999") ,"admin");
+	$results = localAPI("getinvoices", array("userid" => $userid, "limitnum" => "99999999999") ,$adminuser);
 	$unpaidamount = 0;
 
 	foreach($results["invoices"]["invoice"] as $invoice){
+
 		if($invoice["status"] == "Unpaid"){
             $ignore = false;
 			//THE TYPE OF THE INVOICE IS NOT RETURNED BY THE WHMCS API, WE NEED TO IGNORE THE ADD FUNDS INVOICES.
@@ -71,8 +77,8 @@ try{
 	//DON'T ADD PENDING-PAYMENT HERE BECAUSE THIS ONE WILL BE HANDLED WITH THE UNPAID INVOICES
 	$reserved_amount = 0;
 	$open_backorders = array();
-	$stmt = $pdo->prepare("SELECT id, tld, type FROM backorder_domains WHERE userid=? AND (status=? OR status=? OR status=?)");
-	$stmt->execute(array($userid, 'ACTIVE', 'PROCESSING', 'AUCTION-PENDING'));
+	$stmt = $pdo->prepare("SELECT id, tld, type FROM backorder_domains WHERE userid=? AND (status='ACTIVE' OR status='PROCESSING' OR status='AUCTION-PENDING')");
+	$stmt->execute(array($userid));
 	$backorders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	foreach($backorders as $backorder){

@@ -13,10 +13,10 @@ try{
 		global $pdo;
 		$stmt = $pdo->prepare("SELECT p.msetupfee FROM tblpricing p, tbldomainpricing dp, tblclients c WHERE dp.id=p.relid AND c.currency=p.currency AND c.id=? AND dp.extension=? AND p.type='domainrenew'");
 		$stmt->execute(array($userid, ".".$tld));
-		$renewprice = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$renewprice = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		if(isset($renewprice[0]["msetupfee"])){
-			return $renewprice[0]["msetupfee"];
+		if(isset($renewprice["msetupfee"])){
+			return $renewprice["msetupfee"];
 		}else{
 			return 0;
 		}
@@ -34,6 +34,7 @@ try{
 			"APPLICATION" => $local["reference"]
 		);
 		$backorder = ispapi_api_call($command);
+		echo "<pre>"; print_r($backorder) ; echo "</pre>";
 
 		if($backorder["CODE"] == 200){
 
@@ -255,7 +256,7 @@ try{
 					$update_stmt->execute(array($local["id"]));
 
 					if($update_stmt->rowCount() != 0){
-						$message = "BACKORDER APPLICATION ".$backorder["domain"].".".$backorder["tld"]." (backorderid=".$backorder["id"].") set from PENDING-PAYMENT to CANCELLED (invoice set to cancelled)";
+						$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from PENDING-PAYMENT to CANCELLED (invoice set to cancelled)";
 						logmessage($cronname, "ok", $message);
 					}
 				}

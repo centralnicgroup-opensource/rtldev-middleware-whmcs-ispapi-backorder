@@ -57,8 +57,10 @@ try{
                 $update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='PENDING-PAYMENT', invoice=?, updateddate=NOW() WHERE userid=? AND id=?");
                 $update_stmt->execute(array($invoicing["invoiceid"], $userid, $command["BACKORDERID"]));
                 if($update_stmt->rowCount() != 0){
-                    return backorder_api_response(200);
+                    $message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") set from ".$oldstatus." to PENDING-PAYMENT, invoice created (".$invoicing["invoiceid"].")";
+				    logmessage("command.CreateInvoice", "ok", $message);
                 }
+                return backorder_api_response(200);
     		}else{
     			$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed";
     			logmessage("command.CreateInvoice", "ok", $message);

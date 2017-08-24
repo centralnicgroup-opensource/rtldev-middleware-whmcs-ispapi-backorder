@@ -19,7 +19,7 @@ try{
 
 	$condition = array("userid" => $userid);
 
-	$stmt = $pdo->prepare("SELECT DATE(dropdate) AS dropdateday, type, COUNT( * ) AS anzahlFROM  backorder_domains
+	$stmt = $pdo->prepare("SELECT DATE(dropdate) AS dropdateday, type, COUNT( * ) AS anzahl FROM  backorder_domains
 		 				   WHERE DATE(dropdate)!='0000-00-00' AND DATE(dropdate)>NOW() AND userid=?
 						   GROUP BY DATE(dropdate),type");
 	$stmt->execute(array($userid));

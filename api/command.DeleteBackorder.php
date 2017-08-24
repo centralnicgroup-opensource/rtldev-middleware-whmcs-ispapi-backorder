@@ -15,7 +15,7 @@ try{
     if(!$rows){
         return backorder_api_response(545, "DOMAIN");
     }else{
-        if(in_array($rows["status"], array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($data["status"]=="PROCESSING" && !empty($data["reference"]))){
+        if(in_array($rows["status"], array("PENDING-PAYMENT", "AUCTION-PENDING")) || ($rows["status"]=="PROCESSING" && !empty($rows["reference"]))){
             return backorder_api_response(549, "THIS BACKORDER CANNOT BE DELETED");
         }
         $message = "BACKORDER ".$command["DOMAIN"]." DELETED";

@@ -41,7 +41,6 @@ try{
 		$r["PROPERTY"][$pricing["extension"]]["total"] = 0;
 	}
 
-	$condition = array("userid" => $userid);
 	$stmt = $pdo->prepare("SELECT count(*) as anzahl, tld, type FROM backorder_domains WHERE userid=? GROUP BY tld, type");
 	$stmt->execute(array($userid));
 	$backorders = $stmt->fetchAll(PDO::FETCH_ASSOC);
