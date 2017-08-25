@@ -181,8 +181,7 @@ try{
 				//SET BACKORDER TO CANCELLED IF THE DROPDATE IS 4 HOURS IN THE PAST (timing issues)
 				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='CANCELLED', updateddate=NOW()
 											  WHERE  id=?
-                							  AND dropdate < DATE_ADD(now(), INTERVAL 4 HOUR)
- 										  	 ");
+                							  AND dropdate < DATE_ADD(now(), INTERVAL 4 HOUR)");
 				$update_stmt->execute(array($local["id"]));
 
 				if($update_stmt->rowCount() != 0){
@@ -193,25 +192,13 @@ try{
 		}
 	}
 
-
-	//GET ADMIN USERNAME
-	$stmt = $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND setting='username'");
-	$stmt->execute();
-	$data = $stmt->fetch(PDO::FETCH_ASSOC);
-	$adminuser = $data["value"];
-
-	if(empty($adminuser)){
-		$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
-		logmessage($cronname, "error", $message);
-	}
-
 	//ITERATE OVER PENDING-PAYMENT APPLICATIONS
 	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status='PENDING-PAYMENT'");
 	$stmt->execute();
 	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	foreach ($locals as $local) {
-		$invoice = localAPI("getinvoice", array("invoiceid" => $local["invoice"]), $adminuser);
+		$invoice = localAPI("getinvoice", array("invoiceid" => $local["invoice"]));
 		if($invoice["status"] == "error"){
 			//INVOICE NOT FOUND = INVOICE DELETED BY THE ADMIN
 			$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='CANCELLED', updateddate=NOW() WHERE id=?");
