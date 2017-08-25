@@ -9,12 +9,10 @@ use WHMCS\Database\Capsule;
 try{
 	$pdo = Capsule::connection()->getPdo();
 
-	function getRenewPrice($userid, $tld){
-		global $pdo;
+	function getRenewPrice($pdo, $userid, $tld){
 		$stmt = $pdo->prepare("SELECT p.msetupfee FROM tblpricing p, tbldomainpricing dp, tblclients c WHERE dp.id=p.relid AND c.currency=p.currency AND c.id=? AND dp.extension=? AND p.type='domainrenew'");
 		$stmt->execute(array($userid, ".".$tld));
 		$renewprice = $stmt->fetch(PDO::FETCH_ASSOC);
-
 		if(isset($renewprice["msetupfee"])){
 			return $renewprice["msetupfee"];
 		}else{
@@ -23,7 +21,7 @@ try{
 	}
 
 	//ITERATE OVER PROCESSING AND AUCTION-PENDING APPLICATIONS
-	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status='PROCESSING' OR status='AUCTION-PENDING' AND reference!=''");
+	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status IN ('PROCESSING', 'AUCTION-PENDING') AND reference != ''");
    	$stmt->execute();
    	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -34,7 +32,7 @@ try{
 			"APPLICATION" => $local["reference"]
 		);
 		$backorder = ispapi_api_call($command);
-		echo "<pre>"; print_r($backorder) ; echo "</pre>";
+		//echo "<pre>"; print_r($backorder) ; echo "</pre>";
 
 		if($backorder["CODE"] == 200){
 
@@ -116,7 +114,7 @@ try{
 						$nextduedate = $tmpdate->format('Y-m-d');
 
 						//GET RENEW PRICE OF TLD
-						$renewprice = getRenewPrice($local["userid"], $local["tld"]);
+						$renewprice = getRenewPrice($pdo, $local["userid"], $local["tld"]);
 
 						//IMPORT DOMAIN IN WHMCS
 						$insert_stmt = $pdo->prepare("INSERT INTO tbldomains (userid, domain, registrar, registrationdate, expirydate, nextduedate, nextinvoicedate, dnsmanagement, emailforwarding, status, donotrenew, recurringamount) VALUES(:userid, :domain, :registrar, :registrationdate, :expirydate, :nextduedate, :nextinvoicedate, :dnsmanagement, :emailforwarding, :status, :donotrenew, :recurringamount)");
@@ -172,18 +170,23 @@ try{
 
 			//IF APPLICATION NOT FOUND (545), THEN SET THE BACKORDER TO CANCELLED. (MEANS THE BACKORDER HAS BEEN DELETED BY THE ADMIN)
 			if($backorder["CODE"] == 545){
+
 				//GET OLD STATUS
-				$check_status_stmt = $pdo->prepare("SELECT status FROM backorder_domains WHERE id=?");
+				$check_status_stmt = $pdo->prepare("SELECT status, reference FROM backorder_domains WHERE id=?");
 				$check_status_stmt->execute(array($local["id"]));
 				$data = $check_status_stmt->fetch(PDO::FETCH_ASSOC);
 				$oldstatus = $data["status"];
+				$reference = $data["reference"];
 
-				//SET BACKORDER TO CANCELLED
-				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='CANCELLED', updateddate=NOW() WHERE id=?");
+				//SET BACKORDER TO CANCELLED IF THE DROPDATE IS 4 HOURS IN THE PAST (timing issues)
+				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='CANCELLED', updateddate=NOW()
+											  WHERE  id=?
+                							  AND dropdate < DATE_ADD(now(), INTERVAL 4 HOUR)
+ 										  	 ");
 				$update_stmt->execute(array($local["id"]));
 
 				if($update_stmt->rowCount() != 0){
-					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$oldstatus." to CANCELLED (backorder application deleted by admin)";
+					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].", reference=".$reference.") set from ".$oldstatus." to CANCELLED (backorder application deleted by admin)";
 					logmessage($cronname, "ok", $message);
 				}
 			}
@@ -236,7 +239,7 @@ try{
 
 				if($invoice["status"] == "Paid"){
 					//GET RENEW PRICE OF TLD
-					$renewprice = getRenewPrice($local["userid"], $local["tld"]);
+					$renewprice = getRenewPrice($pdo, $local["userid"], $local["tld"]);
 
 					//IMPORT DOMAIN IN WHMCS
 					$insert_stmt = $pdo->prepare("INSERT INTO tbldomains (userid, domain, registrar, registrationdate, expirydate, nextduedate, nextinvoicedate, dnsmanagement, emailforwarding, status, donotrenew, recurringamount) VALUES(:userid, :domain, :registrar, :registrationdate, :expirydate, :nextduedate, :nextinvoicedate, :dnsmanagement, :emailforwarding, :status, :donotrenew, :recurringamount)");
@@ -286,7 +289,7 @@ try{
 
 	echo date("Y-m-d H:i:s")." $cronname done.\n";
 
-} catch (\Exception $e) {
+}catch(\Exception $e){
    logmessage($cronname, "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
