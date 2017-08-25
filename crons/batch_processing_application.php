@@ -9,18 +9,11 @@ use WHMCS\Database\Capsule;
 try{
 	$pdo = Capsule::connection()->getPdo();
 
-	function get_contact_details($type="USER", $userid = NULL){
-		global $pdo;
-		//GET ADMIN USERNAME
-		$stmt = $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND setting='username'");
-		$stmt->execute();
-		$data = $stmt->fetch(PDO::FETCH_ASSOC);
-		$adminuser = $data["value"];
-
+	function get_contact_details($pdo, $type="USER", $userid = NULL){
 		if($type == "USER"){
 			$command = "getclientsdetails";
 			$params["clientid"] = $userid;
-			$results = localAPI($command, $params, $adminuser);
+			$results = localAPI($command, $params);
 
 			$values["FIRSTNAME"] = $results["firstname"];
 			$values["LASTNAME"] = $results["lastname"];
@@ -90,10 +83,10 @@ try{
 				//"INCOMPLETE" => 1,
 				"CLASS" => "BACKORDER", //strtoupper($local["tld"])."_BACKORDER",
 				"DOMAIN" => $local["domain"].".".$local["tld"],
-				"OWNERCONTACT0" => get_contact_details("USER", $local["userid"]),
-				"ADMINCONTACT0" => get_contact_details("USER", $local["userid"]),
-				"TECHCONTACT0" => get_contact_details("USER", $local["userid"]),
-				"BILLINGCONTACT0" => get_contact_details("USER", $local["userid"]) //get_contact_details("SYSTEM")
+				"OWNERCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
+				"ADMINCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
+				"TECHCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
+				"BILLINGCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]) //get_contact_details($pdo, "SYSTEM")
 			);
 			$backorder = ispapi_api_call($command);
 

@@ -108,15 +108,6 @@ try{
 		}
 	}
 
-	//GET ADMIN USERNAME
-	$stmt = $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' AND  setting='username'");
-	$stmt->execute();
-	$data = $stmt->fetch(PDO::FETCH_ASSOC);
-	$adminuser = $data["value"];
-	if(empty($adminuser)){
-		$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
-		logmessage($cronname, "error", $message);
-	}
 	//HANDLE ALL LOW BALANCE NOTIFICATIONS
 	foreach($could_not_be_set_to_active as $key => $backorders){
 			#SEND LOW BALANCE NOTIFICATION TO THE CUSTOMER
@@ -124,7 +115,7 @@ try{
 			$values["messagename"] = "backorder_lowbalance_notification";
 			$values["id"] = $key;
 			$values["customvars"] = array("list"=> $backorders);
-			$results = localAPI($command, $values, $adminuser);
+			$results = localAPI($command, $values);
 
 			#SET THE LOWBALANCENOTIFICATION FLAG TO 1
 			foreach($backorders as $backorder){
@@ -139,7 +130,7 @@ try{
 
 	//logmessage($cronname, "ok", "$cronname done");
 	echo date("Y-m-d H:i:s")." $cronname done.\n";
-} catch (\Exception $e) {
+}catch(\Exception $e){
    logmessage($cronname, "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }

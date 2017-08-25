@@ -11,15 +11,6 @@ try{
     $domain = $m[1];
     $tld = $m[2];
 
-    //GET ADMIN USERNAME
-    $stmt = $pdo->prepare("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'");
-    $stmt->execute();
-    $r = $stmt->fetch(PDO::FETCH_ASSOC);
-    $adminuser = $r["value"];
-    if(empty($adminuser)){
-    	return backorder_api_response(549, "MISSING ADMIN USERNAME IN MODULE CONFIGURATION");
-    }
-
     //GET TLD PRICING
     $querypricelist = array(
     		"COMMAND" => "QueryPriceList",
@@ -46,7 +37,7 @@ try{
     				"itemdescription1" => $command["TYPE"]." BACKORDER: ".$command["DOMAIN"],
     				"itemamount1" => $backorder_price,
     				"itemtaxed1" => 0
-    		), $adminuser);
+    		));
 
     		if($invoicing["result"] == "success"){
                 $stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE id=?");

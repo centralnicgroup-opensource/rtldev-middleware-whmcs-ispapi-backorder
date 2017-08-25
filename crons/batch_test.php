@@ -14,8 +14,3 @@ require_once dirname(__FILE__)."/../backend/api.php";
 
 echo date("Y-m-d H:i:s")." $cronname done.\n";
 ?>
-
-<!-- "COMMAND" => "CreateInvoice",
-"DOMAIN" => "bigorganicnetwork.org",
-"TYPE" => "FULL",
-"BACKORDERID" => 1, -->
