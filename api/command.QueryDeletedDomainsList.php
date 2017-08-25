@@ -1,30 +1,16 @@
-<?php // $command, $userid
+<?php
+
 use WHMCS\Database\Capsule;
-try {
-    //GET DPO CONNECTION
+
+try{
 	$pdo = Capsule::connection()->getPdo();
 
-    if ( !isset($command["LIMIT"]) ) $command["LIMIT"] = 100;
-    if ( !isset($command["FIRST"]) ) $command["FIRST"] = 0;
-
-    $limit = isset($command["LIMIT"])? $command["FIRST"].",".$command["LIMIT"] : "";
-
-    include(dirname(__FILE__)."/../../../../configuration.php");
-
-    $options = array(
-        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-    );
-
-    try {
-    	$db = new PDO("mysql:dbname=".$db_name.";host=".$db_host, $db_username, $db_password, $options);
-    } catch (PDOException $ex) {
-    	return backorder_api_response(549, "DB Connect failed");
-    }
+    if (!isset($command["LIMIT"]) && !is_numeric($command["LIMIT"])) $command["LIMIT"] = 100;
+    if (!isset($command["FIRST"]) && !is_numeric($command["FIRST"])) $command["FIRST"] = 0;
 
     $r = backorder_api_response(200);
 
     $orderby = "";
-
     $orders = array(
     	"DOMAIN" => "domain,zone",
     	"DOMAINDESC" => "domain DESC,zone DESC",
@@ -38,11 +24,12 @@ try {
     	"NUMBEROFHYPHENSDESC" => "domain_number_of_hyphens DESC,domain DESC,zone DESC",
     );
 
-    if ( isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]]) ) {
+    if(isset($command["ORDERBY"]) && isset($orders[$command["ORDERBY"]])){
     	$orderby = "ORDER BY ".$orders[$command["ORDERBY"]];
     }
 
     $limit = isset($command["LIMIT"])? "LIMIT ".$command["FIRST"].",".$command["LIMIT"] : "";
+
 
     $conditions = "";
     $conditions_values = array();
@@ -55,18 +42,17 @@ try {
     }else{
         //TLD NOT SELECTED
         //GET LIST OF ALL EXTENSIONS AVAILABLE FOR BACKORDER TO ONLY DISPLAY THOSE ONES
-        $result = $pdo->prepare("SELECT extension FROM backorder_pricing GROUP BY extension");
-        $result->execute();
-        $b = $result->fetchAll(PDO::FETCH_ASSOC);
-
+        $stmt = $pdo->prepare("SELECT extension FROM backorder_pricing GROUP BY extension");
+        $stmt->execute();
+        $extensions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $i=0;
-        foreach ($b as $key => $value) {
+        foreach ($extensions as $extension) {
             if($i==0){
                 $conditions .= "AND ( zone = :TLD$i\n";
-                $conditions_values[":TLD$i"] = $value["extension"];
+                $conditions_values[":TLD$i"] = $extension["extension"];
                 }else{
                     $conditions .= "OR zone = :TLD$i\n";
-                	$conditions_values[":TLD$i"] = $value["extension"];
+                	$conditions_values[":TLD$i"] = $extension["extension"];
                 }
                 $i++;
         }
@@ -150,7 +136,7 @@ try {
     	$conditions_values[":DROPDATE_TO"] = $command["DROPDATE_TO"];
     }
 
-    $stmt = $db->prepare("
+    $stmt = $pdo->prepare("
     	SELECT SQL_CALC_FOUND_ROWS zone, domain, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits, domain_number_of_umlauts
     	FROM pending_domains
     	WHERE drop_date > NOW()
@@ -160,7 +146,7 @@ try {
     ");
     $stmt->execute($conditions_values);
 
-    while ( $data = $stmt->fetch() ) {
+    while($data = $stmt->fetch()){
     	$r["PROPERTY"]["DOMAIN"][] = utf8_decode($data["domain"].".".$data["zone"]);
     	$r["PROPERTY"]["LABEL"][] = $data["domain"];
     	$r["PROPERTY"]["TLD"][] = $data["zone"];
@@ -172,28 +158,27 @@ try {
     	$r["PROPERTY"]["NUMBEROFDIGITS"][] = $data["domain_number_of_digits"];
     }
 
-	if ( isset($r["PROPERTY"]["DOMAIN"]) && $userid ) {
-		foreach ( $r["PROPERTY"]["DOMAIN"] as $index => $domain ) {
-			if ( preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $domain, $m) ) {
-				$result = $pdo->prepare("SELECT * FROM backorder_domains WHERE userid=? AND domain=? AND tld=?");
-				$result->execute(array($userid, $m[1], $m[2]));
-				$data = $result->fetchAll(PDO::FETCH_ASSOC);
-				if ( $data ) {
-					foreach ($data as $key => $value) {
-						$r["PROPERTY"]["STATUS"][$index] = strtoupper($value["status"]);
-				    	$r["PROPERTY"]["BACKORDERTYPE"][$index] = strtoupper($value["type"]);
-					}
-			    }
+	//GET THE TOTAL NUMBER OF RECORDS
+	$total = $pdo->query("SELECT FOUND_ROWS() AS found_rows")->fetch();
+    $r["PROPERTY"]["TOTAL"][] = $total['found_rows'];
+
+	//SET STATUS AND BACKORDERTYPE FOR BACKORDERED DOMAINS
+	if(isset($r["PROPERTY"]["DOMAIN"]) && $userid){
+		foreach($r["PROPERTY"]["DOMAIN"] as $index => $domain){
+			if(preg_match('/^([^\.^ ]{0,61})\.([a-zA-Z\.]+)$/', $domain, $m)){
+				$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE userid=? AND domain=? AND tld=?");
+				$stmt->execute(array($userid, $m[1], $m[2]));
+				$backorders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				foreach ($backorders as $backorder) {
+					$r["PROPERTY"]["STATUS"][$index] = strtoupper($backorder["status"]);
+				    $r["PROPERTY"]["BACKORDERTYPE"][$index] = strtoupper($backorder["type"]);
+				}
 			}
 		}
 	}
 
-    $data = $db->query("SELECT FOUND_ROWS() AS `found_rows`;")->fetch();
-    $r["PROPERTY"]["TOTAL"][] = $data['found_rows'];
-
     return $r;
-
-} catch (\Exception $e) {
+}catch(\Exception $e){
    logmessage("command.QueryDeletedDomainsList", "DB error", $e->getMessage());
    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
