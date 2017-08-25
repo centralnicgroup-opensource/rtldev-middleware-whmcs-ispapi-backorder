@@ -49,7 +49,7 @@ try{
         //------------------------------------------------------
 
         //CHECK IF THERE IS A DROPDATE EXISTING IN THE DROPLIST
-        $stmt = $pdo->prepare("SELECT * FROM pending_domains WHERE domain=? AND zone=?");
+        $stmt = $pdo->prepare("SELECT * FROM backorder_pending_domains WHERE domain=? AND zone=?");
         $stmt->execute(array($values["domain"], $values["tld"]));
         $d1 = $stmt->fetch(PDO::FETCH_ASSOC);
         if(!empty($d1)){

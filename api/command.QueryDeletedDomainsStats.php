@@ -29,7 +29,7 @@ try{
     	SELECT count(*) as c, DATE(drop_date) as drop_day,
     		(DATE(drop_date) <= DATE(DATE_ADD(NOW(), INTERVAL 1 DAY))) as drop_1day,
     		(DATE(drop_date) <= DATE(DATE_ADD(NOW(), INTERVAL 6 DAY))) as drop_7day
-    	FROM pending_domains
+    	FROM backorder_pending_domains
     	WHERE zone IN ('".join("','", $allextensions)."')
     	GROUP BY drop_day
     	ORDER BY drop_day

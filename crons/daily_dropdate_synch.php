@@ -13,7 +13,7 @@ try{
 	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	foreach ($locals as $local) {
-		$stmt = $pdo->prepare("SELECT domain, zone, drop_date FROM pending_domains WHERE domain=? and zone=? limit 1");
+		$stmt = $pdo->prepare("SELECT domain, zone, drop_date FROM backorder_pending_domains WHERE domain=? and zone=? limit 1");
    		$stmt->execute(array($local["domain"],$local["tld"]));
    		$online = $stmt->fetch(PDO::FETCH_ASSOC);
 

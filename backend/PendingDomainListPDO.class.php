@@ -34,7 +34,7 @@ class PendingDomainListPDO
 		$this->instance = $this->connect($dsn, $user, $pw);
 		$this->driver = $this->instance->getAttribute(PDO::ATTR_DRIVER_NAME);
 		$this->limit = 20;
-		$this->request = "SELECT * FROM pending_domains #WHERE# #ORDERBY# #LIMIT#";
+		$this->request = "SELECT * FROM backorder_pending_domains #WHERE# #ORDERBY# #LIMIT#";
 	}
 
 	/**
@@ -61,9 +61,9 @@ class PendingDomainListPDO
 	 */
 	public function createTable(){
 		try {
-			$this->instance->query("SELECT 1 FROM pending_domains LIMIT 1");
+			$this->instance->query("SELECT 1 FROM backorder_pending_domains LIMIT 1");
 		} catch (Exception $e) {
-			$this->instance->exec('CREATE TABLE pending_domains (
+			$this->instance->exec('CREATE TABLE backorder_pending_domains (
 					domain_index int(11) NOT NULL AUTO_INCREMENT,
 					zone varchar(7) NOT NULL,
 					domain varchar(63) NOT NULL,
@@ -88,7 +88,7 @@ class PendingDomainListPDO
 	 */
 	public function dropTable(){
 		try {
-			$this->instance->exec('DROP TABLE pending_domains');
+			$this->instance->exec('DROP TABLE backorder_pending_domains');
 		} catch (Exception $e) {
 			die($e->getMessage());
 		}
@@ -99,7 +99,7 @@ class PendingDomainListPDO
 	 */
 	public function clearTable(){
 		try {
-			$this->instance->exec('DELETE FROM pending_domains');
+			$this->instance->exec('DELETE FROM backorder_pending_domains');
 		} catch (Exception $e) {
 			die($e->getMessage());
 		}
@@ -147,7 +147,7 @@ class PendingDomainListPDO
 			$handle = fopen('zip://'.$GLOBALS["downloads_dir"].'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
 		}
 
-		$sql = 'INSERT IGNORE INTO pending_domains (domain, zone, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits) VALUES ';
+		$sql = 'INSERT IGNORE INTO backorder_pending_domains (domain, zone, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits) VALUES ';
 
 		if ($handle !== FALSE) {
 			$this->instance->beginTransaction();
@@ -184,7 +184,7 @@ class PendingDomainListPDO
 		}
 
 		//delete domains with drop_date in the past
-		$this->instance->exec("DELETE FROM pending_domains WHERE drop_date < NOW()");
+		$this->instance->exec("DELETE FROM backorder_pending_domains WHERE drop_date < NOW()");
 	}
 
 	/**
@@ -265,7 +265,7 @@ class PendingDomainListPDO
 	 */
 	public function getList($page){
 		try {
-			$this->instance->query("SELECT 1 FROM pending_domains LIMIT 1");
+			$this->instance->query("SELECT 1 FROM backorder_pending_domains LIMIT 1");
 		} catch (Exception $e) {
 			die($e->getMessage());
 		}
@@ -287,7 +287,7 @@ class PendingDomainListPDO
 	 */
 	public function getListByFirst($first){
 		try {
-			$this->instance->query("SELECT 1 FROM pending_domains LIMIT 1");
+			$this->instance->query("SELECT 1 FROM backorder_pending_domains LIMIT 1");
 		} catch (Exception $e) {
 			die($e->getMessage());
 		}
