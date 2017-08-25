@@ -59,8 +59,9 @@ try{
                 if($update_stmt->rowCount() != 0){
                     $message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") set from ".$oldstatus." to PENDING-PAYMENT, invoice created (".$invoicing["invoiceid"].")";
 				    logmessage("command.CreateInvoice", "ok", $message);
+                    return backorder_api_response(200);
                 }
-                return backorder_api_response(200);
+                return backorder_api_response(549, "INVOICING PROBLEM, COULD NOT WRITE IN THE DATABASE");
     		}else{
     			$message = "BACKORDER ".$domain.".".$tld." (backorderid=".$command["BACKORDERID"].") invoicing failed";
     			logmessage("command.CreateInvoice", "ok", $message);
