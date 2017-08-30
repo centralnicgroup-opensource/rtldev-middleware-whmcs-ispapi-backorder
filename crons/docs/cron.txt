@@ -38,6 +38,6 @@ This script calls all backorder required scripts in the right order:
 ##########################################
 
 CRONTAB:
-1 0,10 * * * php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/batch_import_pendingdomainlist.php >/dev/null 2>&1
+1 0,10 * * * php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/daily_import_pendingdomainlist.php >/dev/null 2>&1
 1 1,11 * * * php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/daily_dropdate_synch.php >/dev/null 2>&1
 */5 * * * *  php -q #PATH_TO_WHMCS#/whmcs/modules/addons/ispapibackorder/crons/batch.php >/dev/null 2>&1
