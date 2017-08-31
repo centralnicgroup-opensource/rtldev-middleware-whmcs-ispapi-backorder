@@ -106,7 +106,7 @@ try {
         $stmt->execute(array($value["extension"]));
         $d = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($d as $val) {
-            $item["pricing"][$val["code"]] = array("extension_id" => $val["extension_id"], "currency_id" => $val["currency_id"], "fullprice" => $val["fullprice"]);
+            $item["pricing"][$val["code"]] = array("extension_id" => $val["extension_id"], "currency_id" => $val["currency_id"], "fullprice" => number_format($val["fullprice"], 2, '.', ''));
         }
         array_push($extensions, $item);
     }
@@ -127,7 +127,7 @@ try {
 
    echo '<form action="'.$modulelink.'" method="post">';
    echo '<div class="tablebg" align="center">';
-   echo '<table id="domainpricing" class="table table-bordered table-hover table-condensed dt-bootstrap" cellspacing="1" cellpadding="3" border="0">';
+   echo '<table id="domainpricing" class="table table-bordered table-hover table-condensed dt-bootstrap datatable" cellspacing="1" cellpadding="3" border="0">';
    echo '<thead><th>Extension</th>'.$currency_collumns.'<th></th></thead>';
    echo '<tbody>';
    //DISPLAY CURRENT EXTENSIONS
@@ -137,7 +137,7 @@ try {
            foreach($currencies as $currency){
                echo '<td style="width:100px;"><input name="EXT['.$extension["pricing"][$currency["code"]]["extension_id"].'][PRICE]" type="text" value="'.$extension["pricing"][$currency["code"]]["fullprice"].'" style="width:100px;"/></td>';
            }
-           echo '<td width="20"><button name="deletepricing" value="'.$extension["extension"].'">Delete</button></td></tr>';
+           echo '<td width="20"><button name="deletepricing" class="btn btn-danger btn-sm" value="'.$extension["extension"].'">Delete</button></td></tr>';
        echo '</tr>';
    }
    //ADD NEW EXTENSION
