@@ -28,15 +28,16 @@ try{
 					logmessage($cronname, "ok", $message);
 				}
 			}
-		}else{
-			$old_dropdate = $local["dropdate"];
-			$update_stmt = $pdo->prepare("UPDATE backorder_domains SET dropdate='0000-00-00 00:00:00', updateddate=NOW() WHERE domain=? AND tld=? AND dropdate!='0000-00-00 00:00:00'");
-			$update_stmt->execute(array($local["domain"], $local["tld"]));
-			if($update_stmt->rowCount() != 0){
-				$message = "DROPDATE OF BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") SYNCHRONIZED ($old_dropdate => '0000-00-00 00:00:00') DOMAIN NO LONGER IN RGP";
-				logmessage($cronname, "ok", $message);
-			}
 		}
+		// else{
+		// 	$old_dropdate = $local["dropdate"];
+		// 	$update_stmt = $pdo->prepare("UPDATE backorder_domains SET dropdate='0000-00-00 00:00:00', updateddate=NOW() WHERE domain=? AND tld=? AND dropdate!='0000-00-00 00:00:00'");
+		// 	$update_stmt->execute(array($local["domain"], $local["tld"]));
+		// 	if($update_stmt->rowCount() != 0){
+		// 		$message = "DROPDATE OF BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") SYNCHRONIZED ($old_dropdate => '0000-00-00 00:00:00') DOMAIN NO LONGER IN RGP";
+		// 		logmessage($cronname, "ok", $message);
+		// 	}
+		// }
 	}
 
 	logmessage($cronname, "ok", "$cronname done");
