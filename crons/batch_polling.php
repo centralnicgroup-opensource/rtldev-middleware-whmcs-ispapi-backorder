@@ -4,269 +4,281 @@ $cronname = "BATCH_POLLING";
 require_once dirname(__FILE__)."/../../../../init.php";
 require_once dirname(__FILE__)."/../backend/api.php";
 
-function getRenewPrice($userid, $tld){
-	$pricereq = full_query("SELECT p.msetupfee FROM tblpricing p, tbldomainpricing dp, tblclients c
-							WHERE dp.id=p.relid
-							AND c.currency=p.currency
-							AND c.id=".$userid."
-							AND dp.extension='.".$tld."'
-							AND p.type='domainrenew'");
-	$renewprice = mysql_fetch_array($pricereq);
-	if(isset($renewprice["msetupfee"])){
-		$renewprice = $renewprice["msetupfee"];
-	}else{
-		$renewprice = 0;
-	}
-	return $renewprice;
-}
+use WHMCS\Database\Capsule;
 
-//logmessage($cronname, "ok", "BATCH_POLLING started");
+try{
+	$pdo = Capsule::connection()->getPdo();
 
-//ITERATE OVER PROCESSING APPLICATIONS
-$result = full_query("SELECT * FROM backorder_domains WHERE (status = 'PROCESSING' OR status = 'AUCTION-PENDING') AND  reference != '' ");
-while ($local = mysql_fetch_array($result)) {
-
-	//CHECK STATUSDOMAINAPPLICATION
-	$command =  array(
-		"COMMAND" => "StatusDomainApplication",
-		"APPLICATION" => $local["reference"]
-	);
-	$backorder = ispapi_api_call($command);
-
-	if($backorder["CODE"] == 200){
-
-		//AUCTION-PENDING
-		if(in_array($backorder["PROPERTY"]["STATUS"][0], array("AUCTION-PENDING"))){
-			//CHECK IF BACKORDER STATUS ALREADY SET TO AUCTION-PENDING IN WHMCS
-			$check = select_query("backorder_domains","*",array("id" => $local["id"], "status" => "AUCTION-PENDING"));
-			$data = mysql_fetch_array($check);
-			if(!$data){
-				$oldstatus = $data["status"];
-				//SET BACKORDER STATUS TO AUCTION-PENDING
-				if(update_query('backorder_domains', array("status" => "AUCTION-PENDING", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ".$oldstatus." to AUCTION-PENDING";
-					logmessage($cronname, "ok", $message);
-				}
-			}
-
-		//FAILED - AUCTION-LOST
-		}elseif(in_array($backorder["PROPERTY"]["STATUS"][0], array("FAILED", "AUCTION-LOST"))){
-			$oldstatus = $local["status"];
-
-			//CHECK IF BACKORDER STATUS ALREADY SET TO FAILED OR AUCTION-LOST IN WHMCS
-			$check = full_query("SELECT * FROM backorder_domains WHERE id = ".$local["id"]." (status = 'FAILED' OR status = 'AUCTION-LOST')");
-			$data = mysql_fetch_array($check);
-			if(!$data){
-				//GET OLD STATUS
-				$r = select_query("backorder_domains","*",array("id" => $local["id"]));
-				$d = mysql_fetch_array($r);
-				$oldstatus = $d["status"];
-
-				//SET BACKORDER STATUS TO AUCTION-FAILED
-				if(update_query('backorder_domains', array("status" => $backorder["PROPERTY"]["STATUS"][0], "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ".$oldstatus." to ".$backorder["PROPERTY"]["STATUS"][0];
-					logmessage($cronname, "ok", $message);
-				}
-			}
-
-		//AUCTION-WON
-		}elseif(in_array($backorder["PROPERTY"]["STATUS"][0], array("AUCTION-WON"))){
-
-			//CHECK IF BACKORDER STATUS ALREADY SET TO AUCTION-WON IN WHMCS
-			$check = select_query("backorder_domains","*",array("id" => $local["id"], "status" => "AUCTION-WON"));
-			$data = mysql_fetch_array($check);
-			if(!$data){
-				$oldstatus = $data["status"];
-
-				//STATUSDOMAIN TO GET THE CREATED DATE
-				$command = array(
-						"COMMAND" => "StatusDomain",
-						"DOMAIN" => $local["domain"].".".$local["tld"]
-				);
-				$status = ispapi_api_call($command);
-
-				$createddate = "";
-				if($status["CODE"] == 200){
-					$createddate = substr($status["PROPERTY"]["CREATEDDATE"][0], 0, -9);
-					$expirationdate = substr($status["PROPERTY"]["EXPIRATIONDATE"][0], 0, -9);
-
-					$tmpdate = new DateTime($expirationdate);
-					$tmpdate->modify('-15 days');
-					$nextduedate = $tmpdate->format('Y-m-d');
-
-					//GET RENEW PRICE OF TLD
-					$renewprice = getRenewPrice($local["userid"], $local["tld"]);
-
-					//IMPORT DOMAIN IN WHMCS
-					if(insert_query("tbldomains",array(
-							"userid" => $local["userid"],
-							"domain" => $local["domain"].".".$local["tld"],
-							"registrar" => "ispapi",
-							"registrationdate" => $createddate,
-							"expirydate" => $expirationdate,
-							"nextduedate" => $nextduedate,
-							"nextinvoicedate" => $nextduedate,
-							"dnsmanagement" => 1,
-							"emailforwarding" => 1,
-							"status" => "Active",
-							//"donotrenew" => 1, //THIS ATTRIBUT IS REQUIRED TO BLOCK THE SENDING OF A SECOND PAYMENT CONFIRMATION OF 0€
-							"donotrenew" => 0,
-							"recurringamount" => $renewprice
-					))){
-						if(update_query('backorder_domains', array("status" => "AUCTION-WON", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-							$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$oldstatus." to AUCTION-WON, domain imported in user account";
-							logmessage($cronname, "ok", $message);
-						}
-					}
-
-				}else{
-					$message = "StatusDomain for ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") currently not possible (Please wait)";
-					logmessage($cronname, "error", $message);
-				}
-
-			}
-
-		//SUCCESSFUL
-		}elseif(in_array($backorder["PROPERTY"]["STATUS"][0], array("SUCCESSFUL"))){
-
-			//CHECK IF BACKORDER STATUS ALREADY SET TO SUCCESSFUL IN WHMCS
-			$check = select_query("backorder_domains","*",array("id" => $local["id"], "status" => "SUCCESSFUL"));
-			$data = mysql_fetch_array($check);
-			if(!$data){
-				$oldstatus = $data["status"];
-
-				//SEND INVOICE
-				$createinvoice = array(
-						"COMMAND" => "CreateInvoice",
-						"USER" => $local["userid"],
-						"DOMAIN" => $local["domain"].".".$local["tld"],
-						"TYPE" => $local["type"],
-						"BACKORDERID" => $local["id"]
-				);
-				$r = backorder_backend_api_call($createinvoice);
-				if($r["CODE"] != 200){
-					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") - invoice creation error";
-					logmessage($cronname, "error", $message);
-				}
-
-			}
-
+	function getRenewPrice($pdo, $userid, $tld){
+		$stmt = $pdo->prepare("SELECT p.msetupfee FROM tblpricing p, tbldomainpricing dp, tblclients c WHERE dp.id=p.relid AND c.currency=p.currency AND c.id=? AND dp.extension=? AND p.type='domainrenew'");
+		$stmt->execute(array($userid, ".".$tld));
+		$renewprice = $stmt->fetch(PDO::FETCH_ASSOC);
+		if(isset($renewprice["msetupfee"])){
+			return $renewprice["msetupfee"];
+		}else{
+			return 0;
 		}
-	}else{
-		$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") NOT FOUND (".$backorder["CODE"].", ".$backorder["DESCRIPTION"].")";
-		logmessage($cronname, "error", $message);
-
-		//IF APPLICATION NOT FOUND (545), THEN SET THE BACKORDER TO CANCELLED. (MEANS THE BACKORDER HAS BEEN DELETED BY THE ADMIN)
-		if($backorder["CODE"] == 545){
-			//GET OLD STATUS
-			$r = select_query("backorder_domains","*",array("id" => $local["id"]));
-			$d = mysql_fetch_array($r);
-			$oldstatus = $d["status"];
-
-			//SET BACKORDER TO CANCELLED
-			if(update_query('backorder_domains', array("status" => "CANCELLED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-				$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$oldstatus." to CANCELLED (backorder application deleted by admin)";
-				logmessage($cronname, "ok", $message);
-			}
-		}
-
 	}
 
-}
+	//ITERATE OVER PROCESSING AND AUCTION-PENDING APPLICATIONS
+	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status IN ('PROCESSING', 'AUCTION-PENDING') AND reference != ''");
+   	$stmt->execute();
+   	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//GET ADMIN USERNAME
-$r = mysql_fetch_array(full_query("SELECT value FROM tbladdonmodules WHERE module='ispapibackorder' and setting='username'"));
-$adminuser = $r["value"];
-if(empty($adminuser)){
-	$message = "MISSING ADMIN USERNAME IN MODULE CONFIGURATION";
-	logmessage($cronname, "error", $message);
-}
-
-//ITERATE OVER PENDING-PAYMENT APPLICATIONS
-$result = select_query("backorder_domains", "*", array("status" => "PENDING-PAYMENT"));
-while ($backorder = mysql_fetch_array($result)) {
-
-	$invoice = localAPI("getinvoice", array("invoiceid" => $backorder["invoice"]), $adminuser);
-	if($invoice["status"] == "error"){
-		//INVOICE NOT FOUND = INVOICE DELETED BY THE ADMIN
-		if(update_query('backorder_domains', array("status" => "CANCELLED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $backorder["id"]))){
-			$message = "BACKORDER APPLICATION ".$backorder["domain"].".".$backorder["tld"]." (backorderid=".$backorder["id"].") set from PENDING-PAYMENT to CANCELLED (invoice deleted by admin)";
-			logmessage($cronname, "ok", $message);
-		}
-	}else{
-
-		//STATUSDOMAIN TO GET THE CREATED DATE
-		$command = array(
-				"COMMAND" => "StatusDomain",
-				"DOMAIN" => $backorder["domain"].".".$backorder["tld"]
+	foreach($locals as $local){
+		//CHECK STATUSDOMAINAPPLICATION
+		$command =  array(
+			"COMMAND" => "StatusDomainApplication",
+			"APPLICATION" => $local["reference"]
 		);
-		$status = ispapi_api_call($command);
+		$backorder = ispapi_api_call($command);
+		//echo "<pre>"; print_r($backorder) ; echo "</pre>";
 
-		$createddate = "";
-		if($status["CODE"] == 200){
-			$createddate = substr($status["PROPERTY"]["CREATEDDATE"][0], 0, -9);
-			$expirationdate = substr($status["PROPERTY"]["EXPIRATIONDATE"][0], 0, -9);
+		if($backorder["CODE"] == 200){
 
-			$tmpdate = new DateTime($expirationdate);
-			$tmpdate->modify('-15 days');
-			$nextduedate = $tmpdate->format('Y-m-d');
+			//###############################################
+			//### AUCTION-PENDING
+			//###############################################
+			if(in_array($backorder["PROPERTY"]["STATUS"][0], array("AUCTION-PENDING"))){
 
+				//CHECK IF BACKORDER STATUS ALREADY SET TO AUCTION-PENDING IN WHMCS
+				$check_status_stmt = $pdo->prepare("SELECT status FROM backorder_domains WHERE id=?");
+				$check_status_stmt->execute(array($local["id"]));
+				$data = $check_status_stmt->fetch(PDO::FETCH_ASSOC);
 
-			if($invoice["status"] == "Paid"){
-				//GET RENEW PRICE OF TLD
-				$renewprice = getRenewPrice($backorder["userid"], $backorder["tld"]);
+				if(!in_array($data["status"], array("AUCTION-PENDING"))){
+					//GET OLD STATUS
+					$oldstatus = $data["status"];
 
-				//IMPORT DOMAIN IN WHMCS
-				if(insert_query("tbldomains",array(
-						"userid" => $backorder["userid"],
-						"domain" => $backorder["domain"].".".$backorder["tld"],
-						"registrar" => "ispapi",
-						"registrationdate" => $createddate,
-						"expirydate" => $expirationdate,
-						"nextduedate" => $nextduedate,
-						"nextinvoicedate" => $nextduedate,
-						"dnsmanagement" => 1,
-						"emailforwarding" => 1,
-						"status" => "Active",
-						//"donotrenew" => 1, //THIS ATTRIBUT IS REQUIRED TO BLOCK THE SENDING OF A SECOND PAYMENT CONFIRMATION OF 0€
-						"donotrenew" => 0,
-						"recurringamount" => $renewprice
-				))){
-					if(update_query('backorder_domains', array("status" => "SUCCESSFUL" , "updateddate" => date("Y-m-d H:i:s")) , array("id" => $backorder["id"]))){
-						$message = "BACKORDER APPLICATION ".$backorder["domain"].".".$backorder["tld"]." (backorderid=".$backorder["id"].", userid=".$backorder["userid"].") set from PENDING-PAYMENT to SUCCESSFUL, invoice paid, domain imported in user account";
+					//SET BACKORDER STATUS TO AUCTION-PENDING
+					$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='AUCTION-PENDING', updateddate=NOW() WHERE id=?");
+					$update_stmt->execute(array($local["id"]));
+					if($update_stmt->rowCount() != 0){
+						$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ".$oldstatus." to AUCTION-PENDING";
 						logmessage($cronname, "ok", $message);
 					}
 				}
 
-			}else if($invoice["status"] == "Cancelled"){
-				if(update_query('backorder_domains', array("status" => "CANCELLED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $backorder["id"]))){
-					$message = "BACKORDER APPLICATION ".$backorder["domain"].".".$backorder["tld"]." (backorderid=".$backorder["id"].") set from PENDING-PAYMENT to CANCELLED (invoice set to cancelled)";
+			//###############################################
+			//### FAILED - AUCTION-LOST
+			//###############################################
+			}elseif(in_array($backorder["PROPERTY"]["STATUS"][0], array("FAILED", "AUCTION-LOST"))){
+
+				//CHECK IF BACKORDER STATUS ALREADY SET TO FAILED OR AUCTION-LOST IN WHMCS
+				$check_status_stmt = $pdo->prepare("SELECT status FROM backorder_domains WHERE id=?");
+				$check_status_stmt->execute(array($local["id"]));
+				$data = $check_status_stmt->fetch(PDO::FETCH_ASSOC);
+
+				if(!in_array($data["status"], array("FAILED", "AUCTION-LOST"))){
+					//GET OLD STATUS
+					$oldstatus = $data["status"];
+
+					//SET BACKORDER STATUS TO AUCTION-FAILED
+					$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status=?, updateddate=NOW() WHERE id=?");
+					$update_stmt->execute(array($backorder["PROPERTY"]["STATUS"][0], $local["id"]));
+
+					if($update_stmt->rowCount() != 0){
+						$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from ".$oldstatus." to ".$backorder["PROPERTY"]["STATUS"][0];
+						logmessage($cronname, "ok", $message);
+					}
+
+				}
+
+			//###############################################
+			//### AUCTION-WON
+			//###############################################
+			}elseif(in_array($backorder["PROPERTY"]["STATUS"][0], array("AUCTION-WON"))){
+
+				//CHECK IF BACKORDER STATUS ALREADY SET TO AUCTION-WON IN WHMCS
+				$check_status_stmt = $pdo->prepare("SELECT status FROM backorder_domains WHERE id=?");
+				$check_status_stmt->execute(array($local["id"]));
+				$data = $check_status_stmt->fetch(PDO::FETCH_ASSOC);
+
+				if(!in_array($data["status"], array("AUCTION-WON"))){
+					//GET OLD STATUS
+					$oldstatus = $data["status"];
+
+					//STATUSDOMAIN TO GET THE CREATED DATE
+					$command = array(
+							"COMMAND" => "StatusDomain",
+							"DOMAIN" => $local["domain"].".".$local["tld"]
+					);
+					$statusdomain = ispapi_api_call($command);
+
+					if($statusdomain["CODE"] == 200){
+						$createddate = substr($statusdomain["PROPERTY"]["CREATEDDATE"][0], 0, -9);
+						$expirationdate = substr($statusdomain["PROPERTY"]["EXPIRATIONDATE"][0], 0, -9);
+
+						$tmpdate = new DateTime($expirationdate);
+						$tmpdate->modify('-15 days');
+						$nextduedate = $tmpdate->format('Y-m-d');
+
+						//GET RENEW PRICE OF TLD
+						$renewprice = getRenewPrice($pdo, $local["userid"], $local["tld"]);
+
+						//IMPORT DOMAIN IN WHMCS
+						$insert_stmt = $pdo->prepare("INSERT INTO tbldomains (userid, domain, registrar, registrationdate, expirydate, nextduedate, nextinvoicedate, dnsmanagement, emailforwarding, status, donotrenew, recurringamount) VALUES(:userid, :domain, :registrar, :registrationdate, :expirydate, :nextduedate, :nextinvoicedate, :dnsmanagement, :emailforwarding, :status, :donotrenew, :recurringamount)");
+						$insert_stmt->execute(array(':userid' => $local["userid"], ':domain' => $local["domain"].".".$local["tld"], ':registrar' => "ispapi", ':registrationdate' => $createddate, ':expirydate' => $expirationdate, ':nextduedate' => $nextduedate, ':nextinvoicedate' => $nextduedate, ':dnsmanagement' => 1, ':emailforwarding' => 1, ':status' => "Active", ':donotrenew' => 0, ':recurringamount' => $renewprice));
+
+						if($insert_stmt->rowCount() != 0){
+							$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='AUCTION-WON', updateddate=NOW() WHERE id=?");
+							$update_stmt->execute(array($local["id"]));
+
+							if($update_stmt->rowCount() != 0){
+								$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$oldstatus." to AUCTION-WON, domain imported in user account";
+								logmessage($cronname, "ok", $message);
+							}
+						}
+					}else{
+						$message = "StatusDomain for ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") currently not possible (Please wait)";
+						logmessage($cronname, "error", $message);
+					}
+				}
+
+			//###############################################
+			//### SUCCESSFUL
+			//###############################################
+			}elseif(in_array($backorder["PROPERTY"]["STATUS"][0], array("SUCCESSFUL"))){
+
+				//CHECK IF BACKORDER STATUS ALREADY SET TO SUCCESSFUL IN WHMCS
+				$check_status_stmt = $pdo->prepare("SELECT status FROM backorder_domains WHERE id=?");
+				$check_status_stmt->execute(array($local["id"]));
+				$data = $check_status_stmt->fetch(PDO::FETCH_ASSOC);
+
+				if(!in_array($data["status"], array("SUCCESSFUL"))){
+					//GET OLD STATUS
+					$oldstatus = $data["status"];
+
+					//SEND INVOICE
+					$createinvoice = array(
+							"COMMAND" => "CreateInvoice",
+							"USER" => $local["userid"],
+							"DOMAIN" => $local["domain"].".".$local["tld"],
+							"TYPE" => $local["type"],
+							"BACKORDERID" => $local["id"]
+					);
+					$r = backorder_backend_api_call($createinvoice);
+					if($r["CODE"] != 200){
+						$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") - invoice creation error";
+						logmessage($cronname, "error", $message);
+					}
+				}
+			}
+		}else{
+			$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") NOT FOUND (".$backorder["CODE"].", ".$backorder["DESCRIPTION"].")";
+			logmessage($cronname, "error", $message);
+
+			//IF APPLICATION NOT FOUND (545), THEN SET THE BACKORDER TO CANCELLED. (MEANS THE BACKORDER HAS BEEN DELETED BY THE ADMIN)
+			if($backorder["CODE"] == 545){
+
+				//GET OLD STATUS
+				$check_status_stmt = $pdo->prepare("SELECT status, reference FROM backorder_domains WHERE id=?");
+				$check_status_stmt->execute(array($local["id"]));
+				$data = $check_status_stmt->fetch(PDO::FETCH_ASSOC);
+				$oldstatus = $data["status"];
+				$reference = $data["reference"];
+
+				//SET BACKORDER TO CANCELLED IF THE DROPDATE IS 4 HOURS IN THE PAST (timing issues)
+				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='CANCELLED', updateddate=NOW()
+											  WHERE  id=?
+                							  AND dropdate < DATE_ADD(now(), INTERVAL 4 HOUR)");
+				$update_stmt->execute(array($local["id"]));
+
+				if($update_stmt->rowCount() != 0){
+					$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].", reference=".$reference.") set from ".$oldstatus." to CANCELLED (backorder application deleted by admin)";
 					logmessage($cronname, "ok", $message);
 				}
 			}
-
-
-
-		}else{
-			$message = "StatusDomain for ".$backorder["domain"].".".$backorder["tld"]." (backorderid=".$backorder["id"].") currently not possible (Please wait)";
-			logmessage($cronname, "error", $message);
 		}
-
-
 	}
 
-}
+	//ITERATE OVER PENDING-PAYMENT APPLICATIONS
+	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status='PENDING-PAYMENT'");
+	$stmt->execute();
+	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//ITERATE OVER REQUESTED AND ACTIVE APPLICATIONS WITH DROPDATE > 2 DAYS IN THE PAST
-$result = full_query("SELECT * FROM backorder_domains WHERE (status = 'REQUESTED' OR status = 'ACTIVE') AND dropdate != '0000-00-00 00:00:00' AND dropdate < DATE_SUB(NOW(), INTERVAL 2 DAY)");
-while ($local = mysql_fetch_array($result)) {
-	//SET BACKORDER TO FAILED
-	if(update_query('backorder_domains', array("status" => "FAILED", "updateddate" => date("Y-m-d H:i:s")) , array("id" => $local["id"]))){
-		$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$local["status"]." to FAILED";
-		logmessage($cronname, "ok", $message);
+	foreach ($locals as $local) {
+		$invoice = localAPI("getinvoice", array("invoiceid" => $local["invoice"]));
+		if($invoice["status"] == "error"){
+			//INVOICE NOT FOUND = INVOICE DELETED BY THE ADMIN
+			$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='CANCELLED', updateddate=NOW() WHERE id=?");
+			$update_stmt->execute(array($local["id"]));
+
+			if($update_stmt->rowCount() != 0){
+				$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from PENDING-PAYMENT to CANCELLED (invoice deleted by admin)";
+				logmessage($cronname, "ok", $message);
+			}
+		}else{
+			//STATUSDOMAIN TO GET THE CREATED DATE
+			$command = array(
+				 "COMMAND" => "StatusDomain",
+				 "DOMAIN" => $local["domain"].".".$local["tld"]
+			);
+			$statusdomain = ispapi_api_call($command);
+
+			if($statusdomain["CODE"] == 200){
+				$createddate = substr($statusdomain["PROPERTY"]["CREATEDDATE"][0], 0, -9);
+				$expirationdate = substr($statusdomain["PROPERTY"]["EXPIRATIONDATE"][0], 0, -9);
+
+				$tmpdate = new DateTime($expirationdate);
+				$tmpdate->modify('-15 days');
+				$nextduedate = $tmpdate->format('Y-m-d');
+
+				if($invoice["status"] == "Paid"){
+					//GET RENEW PRICE OF TLD
+					$renewprice = getRenewPrice($pdo, $local["userid"], $local["tld"]);
+
+					//IMPORT DOMAIN IN WHMCS
+					$insert_stmt = $pdo->prepare("INSERT INTO tbldomains (userid, domain, registrar, registrationdate, expirydate, nextduedate, nextinvoicedate, dnsmanagement, emailforwarding, status, donotrenew, recurringamount) VALUES(:userid, :domain, :registrar, :registrationdate, :expirydate, :nextduedate, :nextinvoicedate, :dnsmanagement, :emailforwarding, :status, :donotrenew, :recurringamount)");
+					$insert_stmt->execute(array(':userid' => $local["userid"], ':domain' => $local["domain"].".".$local["tld"], ':registrar' => "ispapi", ':registrationdate' => $createddate, ':expirydate' => $expirationdate, ':nextduedate' => $nextduedate, ':nextinvoicedate' => $nextduedate, ':dnsmanagement' => 1, ':emailforwarding' => 1, ':status' => "Active", ':donotrenew' => 0, ':recurringamount' => $renewprice));
+
+					if($insert_stmt->rowCount() != 0){
+						$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='SUCCESSFUL', updateddate=NOW() WHERE id=?");
+						$update_stmt->execute(array($local["id"]));
+
+						if($update_stmt->rowCount() != 0){
+							$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from PENDING-PAYMENT to SUCCESSFUL, invoice paid, domain imported in user account";
+							logmessage($cronname, "ok", $message);
+						}
+					}
+				}elseif($invoice["status"] == "Cancelled"){
+					$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='CANCELLED', updateddate=NOW() WHERE id=?");
+					$update_stmt->execute(array($local["id"]));
+
+					if($update_stmt->rowCount() != 0){
+						$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") set from PENDING-PAYMENT to CANCELLED (invoice set to cancelled)";
+						logmessage($cronname, "ok", $message);
+					}
+				}
+
+			}else{
+				$message = "StatusDomain for ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].") currently not possible (Please wait)";
+				logmessage($cronname, "error", $message);
+			}
+		}
+	 }
+
+	//ITERATE OVER REQUESTED AND ACTIVE APPLICATIONS WITH DROPDATE > 2 DAYS IN THE PAST
+	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE (status = 'REQUESTED' OR status = 'ACTIVE') AND dropdate != '0000-00-00 00:00:00' AND dropdate < DATE_SUB(NOW(), INTERVAL 2 DAY)");
+	$stmt->execute();
+	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($locals as $local) {
+		//SET BACKORDER TO FAILED
+		$update_stmt = $pdo->prepare("UPDATE backorder_domains SET status='FAILED', updateddate=NOW() WHERE id=?");
+		$update_stmt->execute(array($local["id"]));
+
+		if($update_stmt->rowCount() != 0){
+			$message = "BACKORDER ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") set from ".$local["status"]." to FAILED";
+			logmessage($cronname, "ok", $message);
+		}
 	}
+
+	echo date("Y-m-d H:i:s")." $cronname done.\n";
+
+}catch(\Exception $e){
+   logmessage($cronname, "DB error", $e->getMessage());
+   return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
 
-//logmessage($cronname, "ok", "BATCH_POLLING done");
-echo date("Y-m-d H:i:s")." BATCH_POLLING done.\n";
 ?>

@@ -1,4 +1,4 @@
-<button type="button" class="reload btn btn-info btn-sm">Reload</button>
+<button type="button" class="reload btn btn-secondary btn-sm">Reload</button>
 <br><br>
 
 <script>
@@ -68,7 +68,7 @@
                     "render": function ( data, type, row ) {
                         var links="";
                         if( row["status"] == "REQUESTED" || row["status"] == "ACTIVE" || (row["status"] == "PROCESSING" && row["reference"] == "" )){
-                            links = links + '<button type="button" class="deleteBackorder" domain="' + row["domain"] + "." + row["tld"] + '" userid="' + row["userid"] + '">Delete</button>';
+                            links = links + '<button type="button" class="deleteBackorder btn btn-danger btn-sm" domain="' + row["domain"] + "." + row["tld"] + '" userid="' + row["userid"] + '">Delete</button>';
                         }
                         return links;
                     },
@@ -152,7 +152,7 @@
 </div>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover table-condensed dt-bootstrap" id="backorderlist" style="width:100%;">
+    <table class="table table-bordered table-hover table-condensed dt-bootstrap datatable" id="backorderlist" style="width:100%;">
         <thead>
             <tr>
                 <th>ID</th>

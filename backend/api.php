@@ -3,24 +3,25 @@ date_default_timezone_set('UTC');
 require_once dirname(__FILE__).'/../../../../init.php';
 require_once dirname(__FILE__).'/idna_convert.class.php';
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
+use WHMCS\Database\Capsule;
 
 //############################
 //HELPER FUNCTIONS
 //############################
-
 function logmessage($cronname, $status, $message, $query){
-	insert_query("backorder_logs",array(
-			"cron" => $cronname,
-			"date" => date("Y-m-d H:i:s"),
-			"status" => $status,
-			"message" => $message,
-			"query" => $query,
-	));
+    try {
+        $pdo = Capsule::connection()->getPdo();
+        $insert_stmt = $pdo->prepare("INSERT INTO backorder_logs(cron, date, status, message, query) VALUES(:cron, :date, :status, :message, :query)");
+        $insert_stmt->execute(array(':cron' => $cronname, ':date' => date("Y-m-d H:i:s") , ':status' => $status, ':message' => $message, ':query' => $query));
+    } catch (\Exception $e) {
+        die($e->getMessage());
+    }
 }
 
-//THIS FUNCTION CALLS OUR HEXONET API AND IS USED FOR CRONS AND IN THE BACKEND
+//THIS FUNCTION CALLS OUR HEXONET API AND IS USED FOR CRONS AND IN THE WHMCS ADMIN AREA
 function ispapi_api_call($command){
-	require_once(dirname(__FILE__)."/../../../../includes/registrarfunctions.php");
+    require_once(dirname(__FILE__)."/../../../../includes/registrarfunctions.php");
+    $higher_version_required_message = "The ISPAPI DomainCheck Module requires ISPAPI Registrar Module v1.0.15 or higher!";
 
 	//CHECK IF THE ISPAPI REGISTRAR MODULE IS INSTALLED
 	$error = false;
@@ -30,7 +31,6 @@ function ispapi_api_call($command){
 		require_once(dirname(__FILE__)."/../../../../modules/registrars/".$file."/".$file.".php");
 		$funcname = $file.'_GetISPAPIModuleVersion';
 		if(function_exists($file.'_GetISPAPIModuleVersion')){
-
 			$version = call_user_func($file.'_GetISPAPIModuleVersion');
 			//check if version = 1.0.15 or higher
 			if( version_compare($version, '1.0.15') >= 0 ){
@@ -43,22 +43,21 @@ function ispapi_api_call($command){
 						"password" => $ispapi_config["password"],
 				);
 				$checkAuthentication = ispapi_call($checkAuthenticationCommand, $ispapi_config);
-
 				if($checkAuthentication["CODE"] != "200"){
 					$error = true;
 					$message = "The \"".$file."\" registrar authentication failed! Please verify your registrar credentials and try again.";
 				}
 			}else{
 				$error = true;
-				$message = "The ISPAPI DomainCheck Module requires ISPAPI Registrar Module v1.0.15 or higher!";
+				$message = $higher_version_required_message;
 			}
 		}else{
 			$error = true;
-			$message = "The ISPAPI DomainCheck Module requires ISPAPI Registrar Module v1.0.15 or higher!";
+			$message = $higher_version_required_message;
 		}
 	}else{
 		$error = true;
-		$message = "The ISPAPI DomainCheck Module requires ISPAPI Registrar Module v1.0.15 or higher!";
+		$message = $higher_version_required_message;
 	}
 
 	$response = array();
@@ -234,23 +233,31 @@ function backorder_api_check_syntax_domain($domain) {
 
 //CHECK IF TLD IN THE PRICELIST
 function backorder_api_check_valid_tld($domain, $userid) {
-	$IDN = new idna_convert();
-	$currencyid=NULL;
-	$result = select_query('tblclients','currency',array("id" => $userid ));
-	$data = mysql_fetch_assoc($result);
-	if ( $data ) {
-		$currencyid= $data["currency"];
-	}
+    try {
+        $pdo = Capsule::connection()->getPdo();
+        $IDN = new idna_convert();
+        $currencyid = NULL;
 
-	$tlds = "";
-	$result = select_query('backorder_pricing','extension',array("currency_id" => $currencyid ));
-	while ($data = mysql_fetch_array($result)) {
-		$tlds .= "|.".$data["extension"];
-	}
-	$tld_list = substr($tlds, 1);
-
-	if ( !preg_match('/^([a-z0-9](\-*[a-z0-9])*)\\'.$tld_list.'$/i', $IDN->encode($domain)) ) return false;
-	return true;
+        $stmt = $pdo->prepare("SELECT currency FROM tblclients WHERE id=?");
+        $stmt->execute(array($userid));
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ( $data ) {
+           $currencyid = $data["currency"];
+        }
+        $tlds = "";
+        $stmt = $pdo->prepare("SELECT extension FROM backorder_pricing WHERE currency_id=?");
+        $stmt->execute(array($currencyid));
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($data as $value) {
+           $tlds .= "|.".$value["extension"];
+        }
+        $tld_list = substr($tlds, 1);
+        if ( !preg_match('/^([a-z0-9](\-*[a-z0-9])*)\\'.$tld_list.'$/i', $IDN->encode($domain)) )
+            return false;
+        return true;
+    } catch (\Exception $e) {
+        die($e->getMessage());
+    }
 }
 
 ?>

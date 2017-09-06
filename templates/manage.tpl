@@ -39,7 +39,7 @@
     </table>
     <br>
 
-    {LITERAL}
+    {literal}
     <script>
     var oTable;
     $(document).ready(function() {
@@ -272,7 +272,7 @@
 
     });
     </script>
-    {/LITERAL}
+    {/literal}
 </div>
 <!--###############################################################################-->
 

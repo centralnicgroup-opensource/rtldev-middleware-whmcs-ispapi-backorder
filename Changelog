@@ -4,6 +4,12 @@ ______________________________________________________________________________
 Changelog
 ______________________________________________________________________________
 
+v 1.1.0 - 2017-08-25
+ - migrate deprecated functions to new framework
+ - minor bug fixes
+ - reduced number of cron jobs
+ - minor template changes
+
 v 1.0.0 - 2017-04-21
  - first release
 

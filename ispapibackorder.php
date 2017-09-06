@@ -1,9 +1,13 @@
 <?php
 
-$module_version = "1.0.0";
+$module_version = "1.1.0";
 
 //if (!defined("WHMCS"))
 //    die("This file cannot be accessed directly");
+
+require_once dirname(__FILE__).'/../../../init.php';
+
+use WHMCS\Database\Capsule;
 
 function ispapibackorder_config() {
     global $module_version;
@@ -12,92 +16,92 @@ function ispapibackorder_config() {
     "description" => "This addon allows you to provide backorders to your customers.",
     "version" => $module_version,
     "author" => "",
-    "language" => "english",
-    "fields" => array("username" => array ("FriendlyName" => "Admin username", "Type" => "text", "Size" => "30", "Description" => "[REQUIRED]", "Default" => "admin"))
+    "language" => "english"
     );
     return $configarray;
 }
 
+
+
 function ispapibackorder_activate() {
+    try{
+        $pdo = Capsule::connection()->getPdo();
 
-    //CREATE backorder_domains TABLE IF NOT EXISTING
-    $r = full_query("SHOW TABLES LIKE 'backorder_domains'");
-    $exist = mysql_num_rows($r) > 0;
-    if(!$exist){
-        //Create backorder_domains table
-    	$query = "CREATE TABLE backorder_domains (
-                    	id int(11) NOT NULL AUTO_INCREMENT,
-                    	userid int(11) NOT NULL,
-                    	domain varchar(255) NOT NULL,
-                    	tld varchar(32) NOT NULL,
-                    	type enum('FULL','LITE') CHARACTER SET ascii NOT NULL,
-                    	status enum('REQUESTED','ACTIVE','PROCESSING','SUCCESSFUL','FAILED','CANCELLED','AUCTION-PENDING','AUCTION-WON','AUCTION-LOST','PENDING-PAYMENT') CHARACTER SET ascii NOT NULL,
-                    	createddate datetime NOT NULL,
-                    	updateddate datetime NOT NULL,
-                    	dropdate datetime NOT NULL,
-                    	reference varchar(255) NOT NULL,
-                    	invoice varchar(255) NOT NULL,
-                        lowbalance_notification INT(11) NOT NULL,
-                    	PRIMARY KEY (id),
-                    	UNIQUE KEY userid (userid,domain,tld)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-        $result = full_query($query);
+        //CREATE backorder_domains TABLE IF NOT EXISTING
+        $r=$pdo->prepare("SHOW TABLES LIKE 'backorder_domains'");
+        $r->execute();
+        if(!$r->rowCount()){
+            $query = $pdo->prepare("CREATE TABLE backorder_domains (
+                        	id int(11) NOT NULL AUTO_INCREMENT,
+                        	userid int(11) NOT NULL,
+                        	domain varchar(255) NOT NULL,
+                        	tld varchar(32) NOT NULL,
+                        	type enum('FULL','LITE') CHARACTER SET ascii NOT NULL,
+                        	status enum('REQUESTED','ACTIVE','PROCESSING','SUCCESSFUL','FAILED','CANCELLED','AUCTION-PENDING','AUCTION-WON','AUCTION-LOST','PENDING-PAYMENT') CHARACTER SET ascii NOT NULL,
+                        	createddate datetime NOT NULL,
+                        	updateddate datetime NOT NULL,
+                        	dropdate datetime NOT NULL,
+                        	reference varchar(255) NOT NULL,
+                        	invoice varchar(255) NOT NULL,
+                            lowbalance_notification INT(11) NOT NULL,
+                        	PRIMARY KEY (id),
+                        	UNIQUE KEY userid (userid,domain,tld)
+                    )ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+            $query->execute();
+        }
+
+        //CREATE backorder_logs TABLE IF NOT EXISTING
+        $r=$pdo->prepare("SHOW TABLES LIKE 'backorder_logs'");
+        $r->execute();
+        if(!$r->rowCount()){
+            $query= $pdo->prepare("CREATE TABLE backorder_logs ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron` varchar(255) NOT NULL, `date` datetime, `status` varchar(20) NOT NULL, `message` text, `query` text, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+            $query->execute();
+        }
+
+        //CREATE backorder_pricing TABLE IF NOT EXISTING
+        $r=$pdo->prepare("SHOW TABLES LIKE 'backorder_pricing'");
+        $r->execute();
+        if(!$r->rowCount()){
+            $query= $pdo->prepare("CREATE TABLE backorder_pricing ( `id` int(11) NOT NULL AUTO_INCREMENT, `extension` varchar(20) NOT NULL, `currency_id` int(11) NOT NULL, `fullprice` float, `liteprice` float, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+            $query->execute();
+        }
+
+        //ADD backorder_lowbalance_notification TEMPLATE IF NOT EXISTING
+        $r=$pdo->prepare("SELECT * FROM tblemailtemplates WHERE name=?");
+        $r->execute(array("backorder_lowbalance_notification"));
+        if(!$r->rowCount()){
+            $query= $pdo->prepare('INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES ("general", "backorder_lowbalance_notification", "Low Balance Notification from {$company_name}", "<p>Hello {$client_name},<br /><br />Unfortunately, you have insufficient funds in your account to process your requested backorder(s). Kindly log in to charge your account so that the following backorder(s) may be processed:<br />{foreach from=$list item=data}- <strong>{$data.domain}</strong> / {$data.dropdate}<br />{/foreach}</p><p><span>{$signature}</span></p>", 0, 1, 0)');
+            $query->execute();
+        }
+
+        return array('status'=>'success','description'=>'Installed');
+
+    }catch(\Exception $e){
+        return array('status'=>'error','description'=> $e->getMessage());
     }
-
-    //CREATE backorder_logs TABLE IF NOT EXISTING
-    $r = full_query("SHOW TABLES LIKE 'backorder_logs'");
-    $exist = mysql_num_rows($r) > 0;
-    if(!$exist){
-        $query = "CREATE TABLE `backorder_logs` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron` varchar(255) NOT NULL, `date` datetime, `status` varchar(20) NOT NULL, `message` text, `query` text, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-        $result = full_query($query);
-    }
-
-    //CREATE backorder_pricing TABLE IF NOT EXISTING
-    $r = full_query("SHOW TABLES LIKE 'backorder_pricing'");
-    $exist = mysql_num_rows($r) > 0;
-    if(!$exist){
-        $query = "CREATE TABLE `backorder_pricing` ( `id` int(11) NOT NULL AUTO_INCREMENT, `extension` varchar(20) NOT NULL, `currency_id` int(11) NOT NULL, `fullprice` float, `liteprice` float, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-        $result = full_query($query);
-    }
-
-    //ADD backorder_lowbalance_notification TEMPLATE IF NOT EXISTING
-    $r = full_query("SELECT * FROM tblemailtemplates WHERE name='backorder_lowbalance_notification'");
-    $exist = mysql_num_rows($r) > 0;
-    if(!$exist){
-        $query = 'INSERT INTO tblemailtemplates (type, name, subject, message, disabled, custom, plaintext) VALUES ("general", "backorder_lowbalance_notification", "Low Balance Notification from {$company_name}", "<p>Hello {$client_name},<br /><br />Unfortunately, you have insufficient funds in your account to process your requested backorder(s). Kindly log in to charge your account so that the following backorder(s) may be processed:<br />{foreach from=$list item=data}- <strong>{$data.domain}</strong> / {$data.dropdate}<br />{/foreach}</p><p><span>{$signature}</span></p>", 0, 1, 0)';
-        $result = full_query($query);
-    }
-
-    return array('status'=>'success','description'=>'Installed');
-
 }
+
 
 function ispapibackorder_deactivate() {
     //DO NOT DELETE TABLES WHEN DEACTIVATING DOMAINS - DEVELOPPER HAS TO DO IT MANUALLY IF WANTED
     //full_query("DROP TABLE backorder_domains");
     //full_query("DROP TABLE backorder_pricing");
     //full_query("DROP TABLE backorder_logs");
-    //full_query("DROP TABLE pending_domains");
+    //full_query("DROP TABLE backorder_pending_domains");
     //full_query("DELETE FROM tblemailtemplates WHERE name='backorder_lowbalance_notification'");
-    return array('status'=>'success','description'=>'Uninstalled');
+    return array("status"=>"success","description"=>"Uninstalled (All database tables starting with 'backorder_' have to be deleted manually)");
 }
 
 function ispapibackorder_upgrade($vars) {
     $version = $vars['version'];
-
     # Run SQL Updates for V1.0 to V1.1
     /*if ($version < 1.1) {
         $query = "CREATE TABLE `mylogs4` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron` varchar(255) NOT NULL, `date` datetime, `status` varchar(20) NOT NULL, `message` text, `query` text, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
         $result = mysql_query($query);
     }*/
-
 }
 
 function ispapibackorder_output($vars) {
-    if(empty($vars["username"])){
-        echo '<div class="errorbox"><strong><span class="title">Missing field!</span></strong><br>MISSING ADMIN USERNAME IN MODULE CONFIGURATION</div>';
-    }
-
 	if(!isset($_GET["tab"])){
 		$_GET["tab"] = 0;
 	}
@@ -135,10 +139,6 @@ function ispapibackorder_logs_content($modulelink){
 
 
 function ispapibackorder_clientarea($vars) {
-    if(empty($vars["username"])){
-        die("USERNAME MISSING IN MODULE CONFIGURATION");
-    }
-
 	$modulename = "ispapibackorder";
 	$modulepath = "modules/addons/".$modulename;
 

@@ -1,4 +1,4 @@
-<button type="button" class="reloadlogs btn btn-info btn-sm">Reload</button>
+<button type="button" class="reloadlogs btn btn-secondary btn-sm">Reload</button>
 <br><br>
 
 <script>
@@ -31,7 +31,7 @@
 </script>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover table-condensed dt-bootstrap" id="backorderlogs" style="width:100%;">
+    <table class="table table-bordered table-hover table-condensed dt-bootstrap datatable" id="backorderlogs" style="width:100%;">
         <thead>
             <tr>
                 <th>ID</th>

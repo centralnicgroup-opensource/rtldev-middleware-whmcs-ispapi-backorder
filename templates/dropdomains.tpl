@@ -26,7 +26,7 @@
     </table>
     <br><br><br><br>
 
-    {LITERAL}
+    {literal}
     <script>
 
         function setdate(tmpdate)
@@ -328,7 +328,7 @@
 
         });
     </script>
-    {/LITERAL}
+    {/literal}
 
 </div>
 <!--###############################################################################-->
@@ -443,7 +443,7 @@
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
                                     <span class="input-group-addon">{$LANG.max}:</span>
-                                    <input class="form-control input-sm" name="digits_count_max" id="digits_count_max" value="0">
+                                    <input class="form-control input-sm" name="digits_count_max" id="digits_count_max" value="">
                                 </div>
                             </div>
                         </div>

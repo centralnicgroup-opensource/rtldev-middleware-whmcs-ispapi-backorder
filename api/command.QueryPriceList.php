@@ -1,36 +1,64 @@
-<?php // $command, $userid
+<?php
 
-$currencyid=NULL;
-$result = select_query('tblclients','currency',array("id" => $userid ));
-$data = mysql_fetch_assoc($result);
-$currencyid= $data["currency"];
-if($currencyid==NULL){
-	return backorder_api_response(541, "PRICELIST - USER CURRENCY ERROR");
-}
+use WHMCS\Database\Capsule;
+try{
+	$pdo = Capsule::connection()->getPdo();
 
-$currency=NULL;
-$result = select_query('tblcurrencies','*',array("id" => $currencyid ));
-$currency = mysql_fetch_assoc($result);
-if ($currency==NULL){
-	return backorder_api_response(541, "PRICELIST - CURRENCY ERROR");
-}
-
-$r = backorder_api_response(200);
-$params = array("currency_id" => $currencyid);
-
-if(isset($command["TLD"])){
-	$params["extension"] = $command["TLD"];
-}
-
-$result = select_query('backorder_pricing','*',$params);
-while ( $data = mysql_fetch_assoc($result) ) {
-	if(!empty($data["fullprice"])){ //USE || $data["fullprice"]=="0" IF FREE BACKORDER ARE ALLOWED TO BE DISPLAYED
-		$r["PROPERTY"][$data["extension"]]["PRICEFULL"] = $data["fullprice"];
-		$r["PROPERTY"][$data["extension"]]["PRICEFULL_FORMATED"] = formatPrice($data["fullprice"], $currency);
-		$r["PROPERTY"][$data["extension"]]["CURRENCYSUFFIX"] = $currency["suffix"];
-		$r["PROPERTY"][$data["extension"]]["CURRENCY"] = $currency["code"];
-		$r["PROPERTY"][$data["extension"]]["TLD"] = $data["extension"];
+	$currencyid=NULL;
+	$stmt = $pdo->prepare("SELECT currency FROM tblclients WHERE id=?");
+	$stmt->execute(array($userid));
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+	$currencyid = $data["currency"];
+	if($currencyid==NULL){
+		return backorder_api_response(541, "PRICELIST - USER CURRENCY ERROR");
 	}
+
+	$currency=NULL;
+	$stmt = $pdo->prepare("SELECT * FROM tblcurrencies WHERE id=?");
+	$stmt->execute(array($currencyid));
+    $currency = $stmt->fetch(PDO::FETCH_ASSOC);
+	if ($currency==NULL){
+		return backorder_api_response(541, "PRICELIST - CURRENCY ERROR");
+	}
+
+	$r = backorder_api_response(200);
+	$params = array("currency_id" => $currencyid);
+	if(isset($command["TLD"])){
+		$params["extension"] = $command["TLD"];
+	}
+
+	if($params["extension"]){
+		$stmt = $pdo->prepare("SELECT * FROM backorder_pricing WHERE currency_id=? AND extension=?");
+		$stmt->execute(array($params["currency_id"], $params["extension"]));
+		$pricings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($pricings as $pricing) {
+			if(!empty($pricing["fullprice"])){ //USE || $data["fullprice"]=="0" IF FREE BACKORDER ARE ALLOWED TO BE DISPLAYED
+				$r["PROPERTY"][$pricing["extension"]]["PRICEFULL"] = $pricing["fullprice"];
+				$r["PROPERTY"][$pricing["extension"]]["PRICEFULL_FORMATED"] = formatPrice($pricing["fullprice"], $currency);
+				$r["PROPERTY"][$pricing["extension"]]["CURRENCYSUFFIX"] = $currency["suffix"];
+				$r["PROPERTY"][$pricing["extension"]]["CURRENCY"] = $currency["code"];
+				$r["PROPERTY"][$pricing["extension"]]["TLD"] = $pricing["extension"];
+			}
+		}
+	}else{
+		$stmt = $pdo->prepare("SELECT * FROM backorder_pricing WHERE currency_id=?");
+		$stmt->execute(array($params["currency_id"]));
+		$pricings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($pricings as $pricing) {
+			if(!empty($pricing["fullprice"])){ //USE || $data["fullprice"]=="0" IF FREE BACKORDER ARE ALLOWED TO BE DISPLAYED
+				$r["PROPERTY"][$pricing["extension"]]["PRICEFULL"] = $pricing["fullprice"];
+				$r["PROPERTY"][$pricing["extension"]]["PRICEFULL_FORMATED"] = formatPrice($pricing["fullprice"], $currency);
+				$r["PROPERTY"][$pricing["extension"]]["CURRENCYSUFFIX"] = $currency["suffix"];
+				$r["PROPERTY"][$pricing["extension"]]["CURRENCY"] = $currency["code"];
+				$r["PROPERTY"][$pricing["extension"]]["TLD"] = $pricing["extension"];
+			}
+		}
+	}
+
+	return $r;
+}catch(\Exception $e){
+   logmessage("command.QueryLogList", "DB error", $e->getMessage());
+   return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
-return $r;
+
 ?>
