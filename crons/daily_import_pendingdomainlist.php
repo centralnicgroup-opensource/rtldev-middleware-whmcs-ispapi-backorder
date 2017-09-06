@@ -1,11 +1,11 @@
 <?php
 date_default_timezone_set('UTC');
-$cronname = "BATCH_IMPORT_PENDINGDOMAINLIST";
+$cronname = "DAILY_IMPORT_PENDINGDOMAINLIST";
 require_once dirname(__FILE__)."/../backend/PendingDomainListPDO.class.php";
 require_once dirname(__FILE__)."/../backend/api.php";
 include(dirname(__FILE__)."/../../../../configuration.php");
 
-logmessage($cronname, "ok", "BATCH_IMPORT_PENDINGDOMAINLIST started");
+logmessage($cronname, "ok", "DAILY_IMPORT_PENDINGDOMAINLIST started");
 
 $pd = new PendingDomainListPDO('mysql:host='.$db_host.';dbname='.$db_name, $db_username, $db_password);
 $pd->createTable();
