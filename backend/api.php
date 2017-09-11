@@ -4,6 +4,7 @@ require_once dirname(__FILE__).'/../../../../init.php';
 require_once dirname(__FILE__).'/idna_convert.class.php';
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
 use WHMCS\Database\Capsule;
+use ISPAPI\IDN;
 
 //############################
 //HELPER FUNCTIONS
@@ -225,7 +226,7 @@ function backorder_api_response($code, $info = "") {
 
 //CHECK THE DOMAIN SYNTAX
 function backorder_api_check_syntax_domain($domain) {
-	$IDN = new idna_convert();
+	$IDN = new ISPAPI\IDN\idna_convert();
 	if ( strlen($domain) > 223) return false;
 	if ( !preg_match('/^([a-z0-9](\-*[a-z0-9])*)(\.([a-z0-9](\-*[a-z0-9]+)*))+$/i', $IDN->encode($domain)) ) return false;
 	return true;
@@ -235,7 +236,7 @@ function backorder_api_check_syntax_domain($domain) {
 function backorder_api_check_valid_tld($domain, $userid) {
     try {
         $pdo = Capsule::connection()->getPdo();
-        $IDN = new idna_convert();
+        $IDN = new ISPAPI\IDN\idna_convert();
         $currencyid = NULL;
 
         $stmt = $pdo->prepare("SELECT currency FROM tblclients WHERE id=?");
