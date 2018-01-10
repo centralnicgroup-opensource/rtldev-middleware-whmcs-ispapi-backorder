@@ -4,6 +4,9 @@ ______________________________________________________________________________
 Changelog
 ______________________________________________________________________________
 
+v 1.1.1 - 2018-01-11
+ - fix for special characters in user password
+
 v 1.1.0 - 2017-09-06
  - migrated deprecated functions to new framework
  - reduced number of cron jobs

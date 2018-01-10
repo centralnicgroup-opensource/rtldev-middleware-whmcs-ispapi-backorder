@@ -39,8 +39,6 @@ function ispapi_api_call($command){
 				$ispapi_config = ispapi_config($registrarconfigoptions);
 				$checkAuthenticationCommand = array(
 						"command" => "CheckAuthentication",
-						"subuser" => $ispapi_config["login"],
-						"password" => $ispapi_config["password"],
 				);
 				$checkAuthentication = ispapi_call($checkAuthenticationCommand, $ispapi_config);
 				if($checkAuthentication["CODE"] != "200"){
