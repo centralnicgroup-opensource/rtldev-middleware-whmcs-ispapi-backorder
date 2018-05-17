@@ -8,7 +8,7 @@ use WHMCS\Database\Capsule;
 //############################
 //HELPER FUNCTIONS
 //############################
-function logmessage($cronname, $status, $message, $query){
+function logmessage($cronname, $status, $message, $query = NULL){
     try {
         $pdo = Capsule::connection()->getPdo();
         $insert_stmt = $pdo->prepare("INSERT INTO backorder_logs(cron, date, status, message, query) VALUES(:cron, :date, :status, :message, :query)");
