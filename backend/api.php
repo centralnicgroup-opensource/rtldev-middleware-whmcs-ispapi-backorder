@@ -1,7 +1,10 @@
 <?php
 date_default_timezone_set('UTC');
 require_once dirname(__FILE__).'/../../../../init.php';
-require_once dirname(__FILE__).'/idna_convert.class.php';
+//idna_convert class name commonly used class name. The following is to avoid issues when it included in any other module 
+if (!class_exists('idna_convert')) {
+    require_once dirname(__FILE__).'/idna_convert.class.php';
+}
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
 use WHMCS\Database\Capsule;
 
