@@ -145,6 +145,13 @@ class PendingDomainListPDO
 		}else{
 			$this->downloadPendingDeleteList();
 			$handle = fopen('zip://'.$GLOBALS["downloads_dir"].'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
+
+			//throw an error message when the zip extension is missing
+			if(empty($handle)){
+				
+				die("Failed to import the drop list. Could it be that ZIP extension is not installed?");
+			}
+
 		}
 
 		$sql = 'INSERT IGNORE INTO backorder_pending_domains (domain, zone, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits) VALUES ';
@@ -152,6 +159,7 @@ class PendingDomainListPDO
 		if ($handle !== FALSE) {
 			$this->instance->beginTransaction();
 			while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+
 				$line++;
 
 				if ( preg_match('/^([^.]*)\.(.*)$/', $data[0], $m) ) {
