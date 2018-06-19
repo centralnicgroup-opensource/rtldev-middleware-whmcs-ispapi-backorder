@@ -148,8 +148,8 @@ class PendingDomainListPDO
 
 			//throw an error message when the zip extension is missing
 			if(empty($handle)){
-				echo "Failed to import the drop list. Could it be that ZIP extension is not installed? \n";
-				die;
+				
+				die("Failed to import the drop list. Could it be that ZIP extension is not installed?");
 			}
 
 		}
