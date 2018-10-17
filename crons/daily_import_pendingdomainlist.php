@@ -7,12 +7,10 @@ include(dirname(__FILE__)."/../../../../configuration.php");
 
 logmessage($cronname, "ok", "DAILY_IMPORT_PENDINGDOMAINLIST started");
 
-$pd = new PendingDomainListPDO('mysql:host='.$db_host.';dbname='.$db_name, $db_username, $db_password);
+$pd = new \HEXONET\PendingDomainListPDO('mysql:host='.$db_host.';dbname='.$db_name, $db_username, $db_password);
 $pd->createTable();
 $pd->import();
 //$pd->import(array(), dirname(__FILE__)."/../tmp/pending_delete_domain_list.csv");
 
 logmessage($cronname, "ok", "$cronname done");
 echo date("Y-m-d H:i:s")." $cronname done.\n";
-
-?>

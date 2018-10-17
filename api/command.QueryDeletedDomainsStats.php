@@ -2,11 +2,15 @@
 
 use WHMCS\Database\Capsule;
 
-try{
-	$pdo = Capsule::connection()->getPdo();
+try {
+    $pdo = Capsule::connection()->getPdo();
 
-    if (!isset($command["LIMIT"])) $command["LIMIT"] = 100;
-    if (!isset($command["FIRST"])) $command["FIRST"] = 0;
+    if (!isset($command["LIMIT"])) {
+        $command["LIMIT"] = 100;
+    }
+    if (!isset($command["FIRST"])) {
+        $command["FIRST"] = 0;
+    }
 
     $limit = isset($command["LIMIT"])? $command["FIRST"].",".$command["LIMIT"] : "";
 
@@ -36,20 +40,19 @@ try{
     ");
     $stmt->execute($conditions_values);
 
-    while($data = $stmt->fetch()){
-    	$r["PROPERTY"]["TOTAL"][0] += $data["c"];
-    	if ( $data["drop_1day"] )
-    		$r["PROPERTY"]["TOTAL1DAY"][0] += $data["c"];
-    	if ( $data["drop_7day"] )
-    		$r["PROPERTY"]["TOTAL7DAY"][0] += $data["c"];
-    	$r["PROPERTY"]["DROPDAY"][] = $data["drop_day"];
-    	$r["PROPERTY"]["DROPCOUNT"][] = $data["c"];
+    while ($data = $stmt->fetch()) {
+        $r["PROPERTY"]["TOTAL"][0] += $data["c"];
+        if ($data["drop_1day"]) {
+            $r["PROPERTY"]["TOTAL1DAY"][0] += $data["c"];
+        }
+        if ($data["drop_7day"]) {
+            $r["PROPERTY"]["TOTAL7DAY"][0] += $data["c"];
+        }
+        $r["PROPERTY"]["DROPDAY"][] = $data["drop_day"];
+        $r["PROPERTY"]["DROPCOUNT"][] = $data["c"];
     }
     return $r;
-
-}catch(\Exception $e){
-   logmessage("command.QueryDeletedDomainsStats", "DB error", $e->getMessage());
-   return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
+} catch (\Exception $e) {
+    logmessage("command.QueryDeletedDomainsStats", "DB error", $e->getMessage());
+    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
-
-?>
