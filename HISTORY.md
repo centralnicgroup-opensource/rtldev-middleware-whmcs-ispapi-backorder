@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.2...v2.0.3) (2018-10-18)
+
+
+### Bug Fixes
+
+* **IDNAConvert:** just add the vendor folder partially ([bd01cbb](https://github.com/hexonet/whmcs-ispapi-backorder/commit/bd01cbb))
+
 ## [2.0.2](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.1...v2.0.2) (2018-10-18)
 
 
