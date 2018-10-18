@@ -2,12 +2,9 @@
 date_default_timezone_set('UTC');
 require_once dirname(__FILE__).'/../../../../init.php';
 require_once dirname(__FILE__).'/../vendor/autoload.php';
-//idna_convert class name commonly used class name. The following is to avoid issues when it included in any other module
-/*if (!class_exists('idna_convert')) {
-    require_once dirname(__FILE__).'/../vendor/idna_convert.class.php';
-}*/
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
 use WHMCS\Database\Capsule;
+use Mso\IdnaConvert\IdnaConvert;
 
 //############################
 //HELPER FUNCTIONS
@@ -233,7 +230,7 @@ function backorder_api_response($code, $info = "")
 //CHECK THE DOMAIN SYNTAX
 function backorder_api_check_syntax_domain($domain)
 {
-    $IDN = new idna_convert();
+    $IDN = new IdnaConvert();
     if (strlen($domain) > 223) {
         return false;
     }
@@ -248,7 +245,7 @@ function backorder_api_check_valid_tld($domain, $userid)
 {
     try {
         $pdo = Capsule::connection()->getPdo();
-        $IDN = new idna_convert();
+        $IDN = new IdnaConvert();
         $currencyid = null;
 
         $stmt = $pdo->prepare("SELECT currency FROM tblclients WHERE id=?");
