@@ -8,7 +8,9 @@ buildsources:
 	mkdir -p $(FOLDER)/install/modules/addons/ispapibackorder
 	cp *.md HISTORY.old LICENSE *.pdf $(FOLDER)
 	cp *.php $(FOLDER)/install/modules/addons/ispapibackorder
-	cp -a api backend controller crons lang templates vendor $(FOLDER)/install/modules/addons/ispapibackorder
+	cp -a api backend controller crons lang templates $(FOLDER)/install/modules/addons/ispapibackorder
+	mkdir $(FOLDER)/install/modules/addons/ispapibackorder/vendor
+	cp -a vendor/mso $(FOLDER)/install/modules/addons/ispapibackorder/vendor
 	find $(FOLDER)/install -name "*~" | xargs rm -f
 	find $(FOLDER)/install -name "*.bak" | xargs rm -f
 	rm -f $(FOLDER)/install/modules/addons/ispapibackorder/crons/batch_test.php
