@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.0...v2.0.1) (2018-10-18)
+
+
+### Bug Fixes
+
+* **IDNAConvert:** switch to new library ([889746c](https://github.com/hexonet/whmcs-ispapi-backorder/commit/889746c))
+
 # [2.0.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v1.1.3...v2.0.0) (2018-10-18)
 
 
