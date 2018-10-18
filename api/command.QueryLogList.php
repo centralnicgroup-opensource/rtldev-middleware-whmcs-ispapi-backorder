@@ -1,9 +1,12 @@
 <?php
 use WHMCS\Database\Capsule;
-try{
-	$pdo = Capsule::connection()->getPdo();
 
-    if(!isset($_SESSION['adminid']) || $_SESSION['adminid'] <= 0) return backorder_api_response(531, "AUTHORIZATION FAILED");
+try {
+    $pdo = Capsule::connection()->getPdo();
+
+    if (!isset($_SESSION['adminid']) || $_SESSION['adminid'] <= 0) {
+        return backorder_api_response(531, "AUTHORIZATION FAILED");
+    }
 
     $r = backorder_api_response(200);
 
@@ -15,10 +18,7 @@ try{
     }
 
     return $r;
-}catch(\Exception $e){
-   logmessage("command.QueryLogList", "DB error", $e->getMessage());
-   return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
+} catch (\Exception $e) {
+    logmessage("command.QueryLogList", "DB error", $e->getMessage());
+    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
-
-
-?>

@@ -49,4 +49,3 @@ $_LANG['notybackordersuccessfullydeleted'] = 'Backorder wurde gelöscht.';
 $_LANG['notyerroroccured'] = 'An error occured.';
 $_LANG['showmore'] = 'Mehr';
 $_LANG['hidemore'] = 'Vergeben';
-?>

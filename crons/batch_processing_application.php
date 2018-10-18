@@ -6,110 +6,110 @@ require_once dirname(__FILE__)."/../../../../init.php";
 require_once dirname(__FILE__)."/../backend/api.php";
 
 use WHMCS\Database\Capsule;
-try{
-	$pdo = Capsule::connection()->getPdo();
 
-	function get_contact_details($pdo, $type="USER", $userid = NULL){
-		if($type == "USER"){
-			$command = "getclientsdetails";
-			$params["clientid"] = $userid;
-			$results = localAPI($command, $params);
+try {
+    $pdo = Capsule::connection()->getPdo();
 
-			$values["FIRSTNAME"] = $results["firstname"];
-			$values["LASTNAME"] = $results["lastname"];
-			$values["ORGANIZATION"] = $results["companyname"];
-			$values["STREET"] = $results["address1"];
-			$values["CITY"] = $results["city"];
-			$values["STATE"] = $results["fullstate"];
-			$values["ZIP"] = $results["postcode"];
-			$values["COUNTRY"] = $results["country"];
-			$values["PHONE"] = $results["phonenumber"];
-			$values["EMAIL"] = $results["email"];
-		}else{
-			$values = array();
-			$stmt = $pdo->prepare("SELECT * FROM tblconfiguration");
-			$stmt->execute();
-			$configurations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    function get_contact_details($pdo, $type = "USER", $userid = null)
+    {
+        if ($type == "USER") {
+            $command = "getclientsdetails";
+            $params["clientid"] = $userid;
+            $results = localAPI($command, $params);
 
-			foreach ($configurations as $configuration) {
-				if($configuration["setting"] == "RegistrarAdminFirstName"){
-					$values["FIRSTNAME"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminLastName"){
-					$values["LASTNAME"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminCompanyName"){
-					$values["ORGANIZATION"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminAddress1"){
-					$values["STREET"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminCity"){
-					$values["CITY"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminStateProvince"){
-					$values["STATE"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminPostalCode"){
-					$values["ZIP"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminCountry"){
-					$values["COUNTRY"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminPhone"){
-					$values["PHONE"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminFax"){
-					$values["FAX"] = $configuration["value"];
-				}
-				if($configuration["setting"] == "RegistrarAdminEmailAddress"){
-					$values["EMAIL"] = $configuration["value"];
-				}
-			}
-		}
-		return $values;
-	}
+            $values["FIRSTNAME"] = $results["firstname"];
+            $values["LASTNAME"] = $results["lastname"];
+            $values["ORGANIZATION"] = $results["companyname"];
+            $values["STREET"] = $results["address1"];
+            $values["CITY"] = $results["city"];
+            $values["STATE"] = $results["fullstate"];
+            $values["ZIP"] = $results["postcode"];
+            $values["COUNTRY"] = $results["country"];
+            $values["PHONE"] = $results["phonenumber"];
+            $values["EMAIL"] = $results["email"];
+        } else {
+            $values = array();
+            $stmt = $pdo->prepare("SELECT * FROM tblconfiguration");
+            $stmt->execute();
+            $configurations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	$stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status='PROCESSING'");
-	$stmt->execute();
-	$locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($configurations as $configuration) {
+                if ($configuration["setting"] == "RegistrarAdminFirstName") {
+                    $values["FIRSTNAME"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminLastName") {
+                    $values["LASTNAME"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminCompanyName") {
+                    $values["ORGANIZATION"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminAddress1") {
+                    $values["STREET"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminCity") {
+                    $values["CITY"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminStateProvince") {
+                    $values["STATE"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminPostalCode") {
+                    $values["ZIP"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminCountry") {
+                    $values["COUNTRY"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminPhone") {
+                    $values["PHONE"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminFax") {
+                    $values["FAX"] = $configuration["value"];
+                }
+                if ($configuration["setting"] == "RegistrarAdminEmailAddress") {
+                    $values["EMAIL"] = $configuration["value"];
+                }
+            }
+        }
+        return $values;
+    }
 
-	foreach ($locals as $local) {
-		if($local["reference"] == ""){
-			//SEND APPLICATION TO THE BACKEND
-			$command = array(
-			 	"COMMAND" => "AddDomainApplication",
-				"NEW" => 1,
-				//"INCOMPLETE" => 1,
-				"CLASS" => "BACKORDER", //strtoupper($local["tld"])."_BACKORDER",
-				"DOMAIN" => $local["domain"].".".$local["tld"],
-				"OWNERCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
-				"ADMINCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
-				"TECHCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
-				"BILLINGCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]) //get_contact_details($pdo, "SYSTEM")
-			);
-			$backorder = ispapi_api_call($command);
+    $stmt = $pdo->prepare("SELECT * FROM backorder_domains WHERE status='PROCESSING'");
+    $stmt->execute();
+    $locals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-			if($backorder["CODE"] == 200){
-				$update_stmt = $pdo->prepare("UPDATE backorder_domains SET reference=?, updateddate=NOW() WHERE id=?");
-				$update_stmt->execute(array($backorder["PROPERTY"]["APPLICATION"][0], $local["id"]));
+    foreach ($locals as $local) {
+        if ($local["reference"] == "") {
+            //SEND APPLICATION TO THE BACKEND
+            $command = array(
+                "COMMAND" => "AddDomainApplication",
+                "NEW" => 1,
+                //"INCOMPLETE" => 1,
+                "CLASS" => "BACKORDER", //strtoupper($local["tld"])."_BACKORDER",
+                "DOMAIN" => $local["domain"].".".$local["tld"],
+                "OWNERCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
+                "ADMINCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
+                "TECHCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]),
+                "BILLINGCONTACT0" => get_contact_details($pdo, "USER", $local["userid"]) //get_contact_details($pdo, "SYSTEM")
+            );
+            $backorder = ispapi_api_call($command);
 
-				if($update_stmt->rowCount() != 0){
-					$message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." SENT TO HEXONET (reference=".$backorder["PROPERTY"]["APPLICATION"][0].")";
-					logmessage($cronname, "ok", $message);
-				}
-			}else{
-				$message = "ERROR SENDING BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") TO HEXONET: ".$backorder["DESCRIPTION"];
-				logmessage($cronname, "error", $message);
-			}
-		}
-	}
+            if ($backorder["CODE"] == 200) {
+                $update_stmt = $pdo->prepare("UPDATE backorder_domains SET reference=?, updateddate=NOW() WHERE id=?");
+                $update_stmt->execute(array($backorder["PROPERTY"]["APPLICATION"][0], $local["id"]));
 
-	//logmessage($cronname, "ok", "$cronname done");
-	echo date("Y-m-d H:i:s")." $cronname done.\n";
+                if ($update_stmt->rowCount() != 0) {
+                    $message = "BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." SENT TO HEXONET (reference=".$backorder["PROPERTY"]["APPLICATION"][0].")";
+                    logmessage($cronname, "ok", $message);
+                }
+            } else {
+                $message = "ERROR SENDING BACKORDER APPLICATION ".$local["domain"].".".$local["tld"]." (backorderid=".$local["id"].", userid=".$local["userid"].") TO HEXONET: ".$backorder["DESCRIPTION"];
+                logmessage($cronname, "error", $message);
+            }
+        }
+    }
+
+    //logmessage($cronname, "ok", "$cronname done");
+    echo date("Y-m-d H:i:s")." $cronname done.\n";
 } catch (\Exception $e) {
-   logmessage($cronname, "DB error", $e->getMessage());
-   return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
+    logmessage($cronname, "DB error", $e->getMessage());
+    return backorder_api_response(599, "COMMAND FAILED. Please contact Support.");
 }
-
-?>

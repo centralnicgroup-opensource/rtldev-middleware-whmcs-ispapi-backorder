@@ -27,11 +27,23 @@ $( document ).ready(function() {
 
 <?php
 echo '<div id="tabs"><ul class="nav nav-tabs admin-tabs" role="tablist">';
-if($_GET["tab"] == 0){$active = "active";}else{$active="";}
+if ($_GET["tab"] == 0) {
+    $active = "active";
+} else {
+    $active="";
+}
 echo '<li id="tab0" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Manage</a></li>';
-if($_GET["tab"] == 1){$active = "active";}else{$active="";}
+if ($_GET["tab"] == 1) {
+    $active = "active";
+} else {
+    $active="";
+}
 echo '<li id="tab1" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Pricing</a></li>';
-if($_GET["tab"] == 2){$active = "active";}else{$active="";}
+if ($_GET["tab"] == 2) {
+    $active = "active";
+} else {
+    $active="";
+}
 echo '<li id="tab2" class="tab '.$active.'" data-toggle="tab" role="tab" aria-expanded="true"><a href="javascript:;">Logs</a></li>';
 
 echo '</ul></div>';

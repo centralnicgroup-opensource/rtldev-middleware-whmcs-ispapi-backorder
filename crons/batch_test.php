@@ -13,4 +13,3 @@ require_once dirname(__FILE__)."/../backend/api.php";
 // echo "</pre>";
 
 echo date("Y-m-d H:i:s")." $cronname done.\n";
-?>
