@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.4...v2.1.0) (2018-10-19)
+
+
+### Features
+
+* **releaseInfo:** add json file covering repository info ([37d83ab](https://github.com/hexonet/whmcs-ispapi-backorder/commit/37d83ab))
+
 ## [2.0.4](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.3...v2.0.4) (2018-10-19)
 
 
