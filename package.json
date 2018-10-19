@@ -95,7 +95,8 @@
           "package.json",
           "composer.json",
           "ispapibackorder.php",
-          "whmcs-ispapi-backorder-latest.zip"
+          "whmcs-ispapi-backorder-latest.zip",
+          "release.json"
         ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
