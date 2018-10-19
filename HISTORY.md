@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.3...v2.0.4) (2018-10-19)
+
+
+### Bug Fixes
+
+* **IDNAConvert:** review adding vendor folder to archives ([7a2a432](https://github.com/hexonet/whmcs-ispapi-backorder/commit/7a2a432))
+
 ## [2.0.3](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.2...v2.0.3) (2018-10-18)
 
 
