@@ -1,3 +1,11 @@
+## [2.2.1](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.0...v2.2.1) (2018-11-20)
+
+
+### Bug Fixes
+
+* **pendingdomainlist:** Fixed code style ([b554a9e](https://github.com/hexonet/whmcs-ispapi-backorder/commit/b554a9e))
+* **pendingdomainlist:** Fixed minor issue ([c9b2ac2](https://github.com/hexonet/whmcs-ispapi-backorder/commit/c9b2ac2))
+
 # [2.2.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.1.0...v2.2.0) (2018-10-24)
 
 # [2.1.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.0.4...v2.1.0) (2018-10-19)
