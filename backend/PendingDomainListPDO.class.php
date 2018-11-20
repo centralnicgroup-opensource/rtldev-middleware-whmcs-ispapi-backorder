@@ -2,6 +2,8 @@
 
 namespace HEXONET;
 
+use PDO as PDO;
+
 /**
  * PendingDomainListPDO
  *
