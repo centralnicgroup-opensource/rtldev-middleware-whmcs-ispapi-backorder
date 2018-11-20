@@ -1,6 +1,7 @@
 <?php
 
 namespace HEXONET;
+
 use PDO as PDO;
 
 /**
