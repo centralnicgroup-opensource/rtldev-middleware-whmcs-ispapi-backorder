@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.1...v2.2.2) (2018-11-21)
+
+
+### Bug Fixes
+
+* **pendingdomainlist:** Fixed exception issues ([adb2646](https://github.com/hexonet/whmcs-ispapi-backorder/commit/adb2646))
+
 ## [2.2.1](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.0...v2.2.1) (2018-11-20)
 
 
