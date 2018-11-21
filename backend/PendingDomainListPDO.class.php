@@ -69,7 +69,7 @@ class PendingDomainListPDO
     {
         try {
             $this->instance->query("SELECT 1 FROM backorder_pending_domains LIMIT 1");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->instance->exec('CREATE TABLE backorder_pending_domains (
 					domain_index int(11) NOT NULL AUTO_INCREMENT,
 					zone varchar(7) NOT NULL,
@@ -97,7 +97,7 @@ class PendingDomainListPDO
     {
         try {
             $this->instance->exec('DROP TABLE backorder_pending_domains');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             die($e->getMessage());
         }
     }
@@ -109,7 +109,7 @@ class PendingDomainListPDO
     {
         try {
             $this->instance->exec('DELETE FROM backorder_pending_domains');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             die($e->getMessage());
         }
     }
@@ -295,7 +295,7 @@ class PendingDomainListPDO
     {
         try {
             $this->instance->query("SELECT 1 FROM backorder_pending_domains LIMIT 1");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             die($e->getMessage());
         }
         $list = array();
@@ -318,7 +318,7 @@ class PendingDomainListPDO
     {
         try {
             $this->instance->query("SELECT 1 FROM backorder_pending_domains LIMIT 1");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             die($e->getMessage());
         }
         $list = array();
