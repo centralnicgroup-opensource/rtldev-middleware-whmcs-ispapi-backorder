@@ -34,7 +34,7 @@ This Repository covers the WHMCS Backorder Module of HEXONET. It provides the fo
 
 ## Resources ##
 
-* [Usage Guide](https://github.com/hexonet/whmcs-ispapi-backorder/blob/master/README.md#usage-guide)
+* [Usage Guide](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide)
 * [Release Notes](https://github.com/hexonet/whmcs-ispapi-backorder/releases)
 * [Development Guide](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Development-Guide)
 
@@ -44,9 +44,10 @@ NOTE: We introduced sematic-release starting with v2.0.0. This is why older Rele
 
 Download the ZIP archive including the latest release version [here](https://github.com/hexonet/whmcs-ispapi-backorder/raw/master/whmcs-ispapi-backorder-latest.zip).
 
-Unpack and copy the whole "ispapibackorder" folder to the "modules/addons/" directory.
+Read the following to get more information ...
 
-Login to the WHMCS Admin Area and navigate to `Setup > Addon Modules` to activate.
+  * [Getting Started](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#getting-started)
+  * [Configuration](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#4-configuration)
 
 ## Minimum Requirements ##
 
