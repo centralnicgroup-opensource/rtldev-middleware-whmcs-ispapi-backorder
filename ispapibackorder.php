@@ -19,7 +19,7 @@ function ispapibackorder_config()
     "name" => "ISPAPI Backorder",
     "description" => "This addon allows you to provide backorders to your customers.",
     "version" => $module_version,
-    "author" => "",
+    "author" => "HEXONET",
     "language" => "english"
     );
     return $configarray;
