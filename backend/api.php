@@ -1,6 +1,14 @@
 <?php
 date_default_timezone_set('UTC');
-require_once dirname(__FILE__).'/../../../../init.php';
+$init_path_symlink = implode(DIRECTORY_SEPARATOR, array($_SERVER["DOCUMENT_ROOT"],"init.php"));
+$init_path = implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "..", "..", "..", "..","init.php"));
+if (file_exists($init_path)) {
+    require_once($init_path);
+} elseif (file_exists($init_path_symlink)) {
+    require_once($init_path_symlink);
+} else {
+    exit("cannot found init.php");
+}
 require_once dirname(__FILE__).'/../vendor/autoload.php';
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
 use WHMCS\Database\Capsule;
