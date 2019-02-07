@@ -124,7 +124,11 @@ class PendingDomainListPDO
         if (!isset($GLOBALS["downloads_dir"])) {
             die("Cannot find tmp directory!");
         }
-        $download = $GLOBALS["downloads_dir"]."pending_delete_list_tmp.zip";
+        $path = $GLOBALS["downloads_dir"];
+        if (!preg_match("/" . preg_quote(DIRECTORY_SEPARATOR) . "$/", $path)) { // installation not secured
+            $path .= DIRECTORY_SEPARATOR;
+        }
+        $download = $path . "pending_delete_list_tmp.zip";
         $fp = fopen($download, 'w+');
         $ch = curl_init(str_replace(" ", "%20", self::PENDING_DELETE_LIST_FILE_URL));
 
@@ -155,8 +159,11 @@ class PendingDomainListPDO
             $handle = fopen($file, "r");
         } else {
             $this->downloadPendingDeleteList();
-            $handle = fopen('zip://'.$GLOBALS["downloads_dir"].'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
-
+            $path = $GLOBALS["downloads_dir"];
+            if (!preg_match("/" . preg_quote(DIRECTORY_SEPARATOR) . "$/", $path)) { // installation not secured
+                $path .= DIRECTORY_SEPARATOR;
+            }
+            $handle = fopen('zip://'. $path .'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
             //throw an error message when the zip extension is missing
             if (empty($handle)) {
                 die("Failed to import the drop list. Could it be that ZIP extension is not installed?");

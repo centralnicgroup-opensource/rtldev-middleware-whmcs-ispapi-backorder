@@ -2,12 +2,15 @@
 date_default_timezone_set('UTC');
 $init_path_symlink = implode(DIRECTORY_SEPARATOR, array($_SERVER["DOCUMENT_ROOT"],"init.php"));
 $init_path = implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "..", "..", "..", "..","init.php"));
-if (file_exists($init_path)) {
+$cron_path = implode(DIRECTORY_SEPARATOR, array_slice(explode(DIRECTORY_SEPARATOR, $argv[0]), 0, 4)) . DIRECTORY_SEPARATOR . "init.php";
+if (file_exists($init_path)) {// customer environment (folder copy)
     require_once($init_path);
-} elseif (file_exists($init_path_symlink)) {
+} elseif (file_exists($init_path_symlink)) {// our development environment (symlink)
     require_once($init_path_symlink);
+} elseif (file_exists($cron_path)) {// cronjob call
+    require_once($cron_path);
 } else {
-    exit("cannot found init.php");
+    exit("cannot find init.php");
 }
 require_once dirname(__FILE__).'/../vendor/autoload.php';
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
