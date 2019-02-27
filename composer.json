@@ -47,7 +47,7 @@
     },
 	"require": {
 		"php": ">=5.6.0",
-		"mso/idna-convert": "^1.1"
+		"mso/idna-convert": "^1.1 || ^2.0"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "@stable",
