@@ -2,7 +2,7 @@
 date_default_timezone_set('UTC');
 $root_path = $_SERVER["DOCUMENT_ROOT"];
 $script_path = preg_replace("/.modules.addons..+$/", "", dirname($_SERVER["SCRIPT_NAME"]));
-if (!empty($script_path)){
+if (!empty($script_path)) {
     $root_path .= $script_path;
 }
 $init_path = implode(DIRECTORY_SEPARATOR, array($root_path,"init.php"));
