@@ -1,14 +1,13 @@
 <?php
 date_default_timezone_set('UTC');
-$init_path_symlink = implode(DIRECTORY_SEPARATOR, array($_SERVER["DOCUMENT_ROOT"],"init.php"));
-$init_path = implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "..", "..", "..", "..","init.php"));
-$cron_path = implode(DIRECTORY_SEPARATOR, array_slice(explode(DIRECTORY_SEPARATOR, $argv[0]), 0, 4)) . DIRECTORY_SEPARATOR . "init.php";
-if (file_exists($init_path)) {// customer environment (folder copy)
+$root_path = $_SERVER["DOCUMENT_ROOT"];
+$script_path = preg_replace("/.modules.addons..+$/", "", dirname($_SERVER["SCRIPT_NAME"]));
+if (!empty($script_path)){
+    $root_path .= $script_path;
+}
+$init_path = implode(DIRECTORY_SEPARATOR, array($root_path,"init.php"));
+if (file_exists($init_path)) {
     require_once($init_path);
-} elseif (file_exists($init_path_symlink)) {// our development environment (symlink)
-    require_once($init_path_symlink);
-} elseif (file_exists($cron_path)) {// cronjob call
-    require_once($cron_path);
 } else {
     exit("cannot find init.php");
 }
