@@ -1,3 +1,11 @@
+## [2.2.4](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.3...v2.2.4) (2019-03-14)
+
+
+### Bug Fixes
+
+* **init.php:** path detection and IDNA Converter dep-bump ([0710b74](https://github.com/hexonet/whmcs-ispapi-backorder/commit/0710b74))
+* **makefile:** version detection ([c5be536](https://github.com/hexonet/whmcs-ispapi-backorder/commit/c5be536))
+
 ## [2.2.3](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.2...v2.2.3) (2019-03-11)
 
 
