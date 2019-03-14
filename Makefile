@@ -1,4 +1,4 @@
-VERSION := $(shell php -r 'include "ispapibackorder.php"; print $$module_version;')
+VERSION := $(shell node -p "require('./release.json').version")
 REPOID := whmcs-ispapi-backorder
 FOLDER := pkg/$(REPOID)-$(VERSION)
 
