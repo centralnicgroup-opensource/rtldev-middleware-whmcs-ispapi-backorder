@@ -1,5 +1,17 @@
 <?php
-require_once dirname(__FILE__).'/../../../../init.php';
+$root_path = $_SERVER["DOCUMENT_ROOT"];
+$script_path = preg_replace("/.modules.addons..+$/", "", dirname($_SERVER["SCRIPT_NAME"]));
+if (!empty($script_path)) {
+    $root_path .= $script_path;
+}
+$init_path = implode(DIRECTORY_SEPARATOR, array($root_path,"init.php"));
+$init_path = preg_replace("/(\/|\\\)" . $GLOBALS["customadminpath"] . "(\/|\\\)init.php$/", DIRECTORY_SEPARATOR . "init.php", $init_path);
+if (file_exists($init_path)) {
+    require_once($init_path);
+} else {
+    exit("cannot find init.php");
+}
+
 use WHMCS\Database\Capsule;
 
 //INSERT ALL MISSING PRICES - NEEDED WHEN RESELLER ADDS NEW CURRENCIES

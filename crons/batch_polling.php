@@ -1,7 +1,6 @@
 <?php
 date_default_timezone_set('UTC');
 $cronname = "BATCH_POLLING";
-require_once dirname(__FILE__)."/../../../../init.php";
 require_once dirname(__FILE__)."/../backend/api.php";
 
 use WHMCS\Database\Capsule;

@@ -1,6 +1,7 @@
 <?php
 //inlude this _language file in all controllers
-include(dirname(__FILE__)."/_language.php");
+require_once implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), '..', 'backend', 'api.php'));
+include dirname(__FILE__) . DIRECTORY_SEPARATOR . "_language.php";
 
 $vars["breadcrumb"][] = array("last" => false, "link" => "", "label" => "Backorder" );
 $vars["breadcrumb"][] = array("last" => true, "link" => "", "label" => $_LANG["managebackorders"]);
@@ -32,8 +33,6 @@ if (isset($_POST['COMMAND'])) {
                 $mypost[$postname]= $postvalue;
             }
         }
-
-        require_once '../backend/api.php';
         $command = array_change_key_case($mypost, CASE_UPPER);
         $result = backorder_api_query_list($command);
 
@@ -50,6 +49,7 @@ if (isset($_POST['COMMAND'])) {
         $datatableobject["recordsFiltered"] = $result['TOTAL'];
         $datatableobject["data"] = array();
         $newitem = array();
+
         foreach ($result["ITEMS"] as $cnt => $item) {
             $newitem = array();#
             foreach ($fields as $field) {

@@ -3,15 +3,15 @@
 	"type": "library",
 	"description": "The ISPAPI Backorder Module for WHMCS.",
 	"keywords": [
-        "whmcs",
-        "web host automation platform",
-        "backorder module",
-        "domain backorder module",
+		"whmcs",
+		"web host automation platform",
+		"backorder module",
+		"domain backorder module",
 		"hexonet",
 		"ispapi",
-        "domain",
-        "isp",
-        "ssl",
+		"domain",
+		"isp",
+		"ssl",
 		"cert",
 		"dns",
 		"backorder",
@@ -25,29 +25,29 @@
 	"license": "MIT",
 	"authors": [
 		{
-            "name": "Anthony Schneider",
-            "homepage": "https://github.com/anthonyschn",
+			"name": "Anthony Schneider",
+			"homepage": "https://github.com/anthonyschn",
 			"role": "Developer"
 		},
 		{
-            "name": "Kai Schwarz",
-            "homepage": "https://github.com/papakai",
+			"name": "Kai Schwarz",
+			"homepage": "https://github.com/papakai",
 			"role": "Developer"
 		},
 		{
-            "name": "Tulasi Seelamkurthi",
-            "homepage": "https://github.com/tulsi91",
+			"name": "Tulasi Seelamkurthi",
+			"homepage": "https://github.com/tulsi91",
 			"role": "Developer"
 		}
-    ],
-    "support": {
-        "email": "support@hexonet.net",
-        "issues": "https://github.com/hexonet/whmcs-ispapi-backorder/issues",
-        "source": "https://github.com/hexonet/whmcs-ispapi-backorder"
-    },
+	],
+	"support": {
+		"email": "support@hexonet.net",
+		"issues": "https://github.com/hexonet/whmcs-ispapi-backorder/issues",
+		"source": "https://github.com/hexonet/whmcs-ispapi-backorder"
+	},
 	"require": {
 		"php": ">=5.6.0",
-		"mso/idna-convert": "^1.1 || ^2.0"
+		"algo26-matthias/idna-convert": "^1.1 || ^2.1"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "@stable",
@@ -55,7 +55,7 @@
 	},
 	"scripts": {
 		"codeCheck": "./vendor/bin/phpcs --standard=PSR2 -q -n --colors *.php api backend controller crons lang tests",
-        "codeFix": "./vendor/bin/phpcbf --standard=PSR2 -q *.php api backend controller crons lang tests",
-        "test": "./vendor/bin/phpunit"
+		"codeFix": "./vendor/bin/phpcbf --standard=PSR2 -q *.php api backend controller crons lang tests",
+		"test": "./vendor/bin/phpunit"
 	}
 }
