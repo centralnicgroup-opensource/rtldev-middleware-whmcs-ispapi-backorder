@@ -1,3 +1,10 @@
+## [2.2.5](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.4...v2.2.5) (2019-03-14)
+
+
+### Bug Fixes
+
+* **init.php:** review path detection ([4cd6e6b](https://github.com/hexonet/whmcs-ispapi-backorder/commit/4cd6e6b))
+
 ## [2.2.4](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.3...v2.2.4) (2019-03-14)
 
 
