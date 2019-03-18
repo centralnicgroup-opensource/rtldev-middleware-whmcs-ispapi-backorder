@@ -247,8 +247,7 @@ function backorder_api_check_syntax_domain($domain)
     if (version_compare(phpversion(), '7.2.0', '<')) {
         $IDN = new Algo26\IdnaConvert\IdnaConvert();
         $converted = $IDN->encode($domain);
-    }
-    else {
+    } else {
         $IDN = new Algo26\IdnaConvert\ToIdn();
         $converted = $IDN->convert($domain);
     }
@@ -267,8 +266,7 @@ function backorder_api_check_valid_tld($domain, $userid)
     if (version_compare(phpversion(), '7.2.0', '<')) {
         $IDN = new Algo26\IdnaConvert\IdnaConvert();
         $converted = $IDN->encode($domain);
-    }
-    else {
+    } else {
         $IDN = new Algo26\IdnaConvert\ToIdn();
         $converted = $IDN->convert($domain);
     }
