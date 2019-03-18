@@ -18,7 +18,7 @@ if (file_exists($init_path)) {
 require_once dirname(__FILE__).'/../vendor/autoload.php';
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
 use WHMCS\Database\Capsule;
-use Algo26\IdnaConvert\ToIdn;
+use Algo26\IdnaConvert;
 
 //############################
 //HELPER FUNCTIONS
@@ -244,11 +244,18 @@ function backorder_api_response($code, $info = "")
 //CHECK THE DOMAIN SYNTAX
 function backorder_api_check_syntax_domain($domain)
 {
-    $IDN = new ToIdn();
+    if (version_compare(phpversion(), '7.2.0', '<')) {
+        $IDN = new Algo26\IdnaConvert\IdnaConvert();
+        $converted = $IDN->encode($domain);
+    }
+    else {
+        $IDN = new Algo26\IdnaConvert\ToIdn();
+        $converted = $IDN->convert($domain);
+    }
     if (strlen($domain) > 223) {
         return false;
     }
-    if (!preg_match('/^([a-z0-9](\-*[a-z0-9])*)(\.([a-z0-9](\-*[a-z0-9]+)*))+$/i', $IDN->convert($domain))) {
+    if (!preg_match('/^([a-z0-9](\-*[a-z0-9])*)(\.([a-z0-9](\-*[a-z0-9]+)*))+$/i', $converted)) {
         return false;
     }
     return true;
@@ -257,9 +264,17 @@ function backorder_api_check_syntax_domain($domain)
 //CHECK IF TLD IN THE PRICELIST
 function backorder_api_check_valid_tld($domain, $userid)
 {
+    if (version_compare(phpversion(), '7.2.0', '<')) {
+        $IDN = new Algo26\IdnaConvert\IdnaConvert();
+        $converted = $IDN->encode($domain);
+    }
+    else {
+        $IDN = new Algo26\IdnaConvert\ToIdn();
+        $converted = $IDN->convert($domain);
+    }
     try {
         $pdo = Capsule::connection()->getPdo();
-        $IDN = new ToIdn();
+        
         $currencyid = null;
 
         $stmt = $pdo->prepare("SELECT currency FROM tblclients WHERE id=?");
@@ -276,7 +291,7 @@ function backorder_api_check_valid_tld($domain, $userid)
             $tlds .= "|.".$value["extension"];
         }
         $tld_list = substr($tlds, 1);
-        if (!preg_match('/^([a-z0-9](\-*[a-z0-9])*)\\'.$tld_list.'$/i', $IDN->convert($domain))) {
+        if (!preg_match('/^([a-z0-9](\-*[a-z0-9])*)\\'.$tld_list.'$/i', $converted)) {
             return false;
         }
         return true;
