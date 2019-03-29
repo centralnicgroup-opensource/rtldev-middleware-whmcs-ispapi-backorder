@@ -62,9 +62,9 @@ try {
                 //echo "Backorder id=".$backorder["id"]." costs ".$backorder_price."<br>";
 
                 //GET CURRENT CREDIT BALANCE
-                  $command = array(
-                      "COMMAND" => "GetAvailableFunds",
-                      "USER" => $key
+                $command = array(
+                    "COMMAND" => "GetAvailableFunds",
+                    "USER" => $key
                 );
                 $result = backorder_backend_api_call($command);
 
