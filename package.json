@@ -114,8 +114,5 @@
         "cmd": "node whmcsmarketplace.js ${nextRelease.version} \"${nextRelease.notes}\""
       }
     ]
-  },
-  "scripts": {
-    "semantic-release": "semantic-release"
   }
 }
