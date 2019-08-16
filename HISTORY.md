@@ -1,3 +1,10 @@
+## [2.2.6](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.5...v2.2.6) (2019-08-16)
+
+
+### Bug Fixes
+
+* **logo:** updated to our new logo design ([857101c](https://github.com/hexonet/whmcs-ispapi-backorder/commit/857101c))
+
 ## [2.2.5](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.4...v2.2.5) (2019-03-14)
 
 
