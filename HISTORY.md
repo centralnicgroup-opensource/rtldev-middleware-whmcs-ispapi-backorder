@@ -1,3 +1,10 @@
+## [2.2.7](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.6...v2.2.7) (2019-09-13)
+
+
+### Bug Fixes
+
+* **dep-bump:** Migrate CI to semantic-release-whmcs ([375a4ec](https://github.com/hexonet/whmcs-ispapi-backorder/commit/375a4ec))
+
 ## [2.2.6](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.5...v2.2.6) (2019-08-16)
 
 
