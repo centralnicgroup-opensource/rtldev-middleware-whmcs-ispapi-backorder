@@ -45,8 +45,7 @@
 		"algo26-matthias/idna-convert": "^1.1 || ^2.1 || 3.0 || ^3.0"
 	},
 	"scripts": {
-		"codeCheck": "phpcs --ignore=\"*/vendor/*\" --standard=PSR2 -q -n --colors *.php api backend controller crons lang tests",
-		"codeFix": "phpcbf --ignore=\"*/vendor/*\" --standard=PSR2 -q *.php api backend controller crons lang tests",
-		"test": "phpunit"
+		"codeCheck": "phpcs --ignore=\"*/vendor/*\" --standard=PSR2 -q -n --colors *.php api backend controller crons lang",
+		"codeFix": "phpcbf --ignore=\"*/vendor/*\" --standard=PSR2 -q *.php api backend controller crons lang"
 	}
 }
