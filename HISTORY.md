@@ -1,3 +1,10 @@
+## [2.2.8](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.7...v2.2.8) (2019-09-17)
+
+
+### Bug Fixes
+
+* **release process:** switch to shared semantic-release configuration ([5a62f34](https://github.com/hexonet/whmcs-ispapi-backorder/commit/5a62f34))
+
 ## [2.2.7](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.6...v2.2.7) (2019-09-13)
 
 
