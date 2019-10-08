@@ -1,3 +1,12 @@
+## [2.2.9](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.8...v2.2.9) (2019-10-08)
+
+
+### Bug Fixes
+
+* **hooks:** review hooks usage ([464d876](https://github.com/hexonet/whmcs-ispapi-backorder/commit/464d876))
+* **lang:** review language files for $_ADDONLANG ([b5c8e4a](https://github.com/hexonet/whmcs-ispapi-backorder/commit/b5c8e4a))
+* **lang:** review language usage and controller access ([5bd93d8](https://github.com/hexonet/whmcs-ispapi-backorder/commit/5bd93d8))
+
 ## [2.2.8](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.7...v2.2.8) (2019-09-17)
 
 
