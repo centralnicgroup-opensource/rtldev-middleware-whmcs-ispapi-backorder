@@ -1,16 +1,16 @@
 <?php
 //inlude this _language file in all controllers
-include(dirname(__FILE__)."/_language.php");
+include(dirname(__FILE__). DIRECTORY_SEPARATOR . "_language.php");
 
-$statusheader = $_LANG['setallbackorder'];
+$statusheader = $_ADDONLANG['setallbackorder'];
 
 $fields = array(); //fieldname, apifieldname
 $fields[]=array ("fieldname" => "",     "apifieldname" => "BACKORDERTYPE");
-$fields[]=array ("fieldname" => $_LANG['domainname'],   "apifieldname" => "DOMAIN");
-$fields[]=array ("fieldname" => $_LANG['dropdate'],     "apifieldname" => "DROPDATE");
-$fields[]=array ("fieldname" => $_LANG['chars'],        "apifieldname" => "NUMBEROFCHARACTERS");
-$fields[]=array ("fieldname" => $_LANG['digits'],       "apifieldname" => "NUMBEROFDIGITS");
-$fields[]=array ("fieldname" => $_LANG['hyphens'],      "apifieldname" => "NUMBEROFHYPHENS");
+$fields[]=array ("fieldname" => $_ADDONLANG['domainname'],   "apifieldname" => "DOMAIN");
+$fields[]=array ("fieldname" => $_ADDONLANG['dropdate'],     "apifieldname" => "DROPDATE");
+$fields[]=array ("fieldname" => $_ADDONLANG['chars'],        "apifieldname" => "NUMBEROFCHARACTERS");
+$fields[]=array ("fieldname" => $_ADDONLANG['digits'],       "apifieldname" => "NUMBEROFDIGITS");
+$fields[]=array ("fieldname" => $_ADDONLANG['hyphens'],      "apifieldname" => "NUMBEROFHYPHENS");
 
 $vars["fields"] = $fields;
 
@@ -75,5 +75,5 @@ if (isset($_POST['COMMAND'])) {
 }
 
 $vars["breadcrumb"][] = array("last" => false, "link" => "", "label" => "Backorder" );
-$vars["breadcrumb"][] = array("last" => true, "link" => "", "label" => $_LANG["domainheader"]);
-$vars["displayTitle"] = $_LANG["domainheader"];
+$vars["breadcrumb"][] = array("last" => true, "link" => "", "label" => $_ADDONLANG["domainheader"]);
+$vars["displayTitle"] = $_ADDONLANG["domainheader"];

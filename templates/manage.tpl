@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
 
-<div class="container" style="text-align:right;padding-right:45px;margin-bottom:10px;"><a class="btn btn-default" href="index.php?m=ispapibackorder&p=dropdomains">{$LANG.domainheader}</a></div>
+<div class="container" style="text-align:right;padding-right:45px;margin-bottom:10px;"><a class="btn btn-default" href="index.php?m=ispapibackorder&p=dropdomains">{$_lang.domainheader}</a></div>
 
 <!--############################### MAIN AREA #######################################-->
 <div class="col-md-9 pull-md-right">
@@ -93,14 +93,14 @@
                     success: function(data) {
                         if (data['CODE']=="200") {
                             reloadBackorderOverview();
-                            noty({text: "{/literal}{$LANG.notybackordersuccessfullycreated}{literal}"});
+                            noty({text: "{/literal}{$_lang.notybackordersuccessfullycreated}{literal}"});
                             oTable.fnDraw();
                         } else {
                             noty({text: data['DESCRIPTION'], type: "error"});
                         }
                     },
                     error: function(data) {
-                        noty({text: "{/literal}{$LANG.notyerroroccured}{literal}", type: "error"});
+                        noty({text: "{/literal}{$_lang.notyerroroccured}{literal}", type: "error"});
                     }
             });
         });
@@ -130,7 +130,7 @@
                     if(total > 0){
                         output  = '<tr><td><hr style="margin:5px;"></td></tr>';
                         output += '<tr value="ALL" class="setValue" field="status">';
-                        output += '<td class="bold" style="text-align:center;">{/literal}{$LANG.showall}{literal} ('+total+')</td>';
+                        output += '<td class="bold" style="text-align:center;">{/literal}{$_lang.showall}{literal} ('+total+')</td>';
                         output += '</tr>';
                         $("#overviewbackorderstatus").append(output);
                         $("#overviewbackorderstatus_box").show();
@@ -171,7 +171,7 @@
                 });
                 var output="";
                 output += '<tr>';
-                output += '<td colspan="2" align="center"><button action="show" style="margin-top:8px;" class="form-control input-sm btn-default" id="morepricing"><i class="fa fa-caret-down" aria-hidden="true"></i> {/literal}{$LANG.showmore}{literal}</button></td>';
+                output += '<td colspan="2" align="center"><button action="show" style="margin-top:8px;" class="form-control input-sm btn-default" id="morepricing"><i class="fa fa-caret-down" aria-hidden="true"></i> {/literal}{$_lang.showmore}{literal}</button></td>';
                 output += '</tr>';
                 $("#pricelist").append(output);
             },
@@ -182,13 +182,13 @@
         //show/hide pricing logic
         $(document).on('click', '#morepricing', function (e) {
             if($(this).attr("action") == "show") {
-                $(this).html("<i class='fa fa-caret-up' aria-hidden='true'></i> {/literal}{$LANG.hidemore}{literal}");
+                $(this).html("<i class='fa fa-caret-up' aria-hidden='true'></i> {/literal}{$_lang.hidemore}{literal}");
                 $.each( $(".pricing_row"), function(obj) {
                     $(this).removeClass("hide");
                 });
                 $(this).attr("action", "hide")
             }else{
-                $(this).html("<i class='fa fa-caret-down' aria-hidden='true'></i> {/literal}{$LANG.showmore}{literal}");
+                $(this).html("<i class='fa fa-caret-down' aria-hidden='true'></i> {/literal}{$_lang.showmore}{literal}");
                 $.each( $(".pricing_row"), function(obj) {
                     $(this).addClass("hide");
                 });
@@ -218,7 +218,7 @@
                     if(data["CODE"]==200){
                         button.closest('tr').remove();
                         reloadBackorderOverview();
-                        noty({text: "{/literal}{$LANG.notybackordersuccessfullydeleted}{literal}"});
+                        noty({text: "{/literal}{$_lang.notybackordersuccessfullydeleted}{literal}"});
                     }
                     else{
                         noty({text: data['DESCRIPTION'], type: "error"});
@@ -282,21 +282,21 @@
     <!-- ########################### MY ACCOUNT ######################### -->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-user-circle-o"></i>&nbsp;{$LANG.creditvolume}</h3>
+            <h3 class="panel-title"><i class="fa fa-user-circle-o"></i>&nbsp;{$_lang.creditvolume}</h3>
         </div>
         <div class="panel-body">
             <div id="creditvolume" class="row" style="padding:0px 10px;">
-                <div style="float:left;">{$LANG.creditbalance}:</div>
+                <div style="float:left;">{$_lang.creditbalance}:</div>
                 <div style="float:right;"><span id="creditbalance"></span></div>
                 <div style="clear:both"></div>
-                <div style="float:left;">{$LANG.reservedamount}:</div>
+                <div style="float:left;">{$_lang.reservedamount}:</div>
                 <div style="float:right;">- <span id="reservedamount"></span></div>
                 <div style="clear:both"></div>
-                <div style="float:left;">{$LANG.unpaidinvoices}:</div>
+                <div style="float:left;">{$_lang.unpaidinvoices}:</div>
                 <div style="float:right;">- <span id="unpaidinvoices"></span></div>
                 <div style="clear:both"></div>
                 <div style="border-bottom:1px solid grey;"></div>
-                <div style="float:left;font-weight:bold;">{$LANG.amountavailable}:</div>
+                <div style="float:left;font-weight:bold;">{$_lang.amountavailable}:</div>
                 <div style="float:right;font-weight:bold;"><span id="amountavailable"></span></div>
             </div>
         </div>
@@ -306,7 +306,7 @@
     <!-- ########## BACKORDER STATUS ########## -->
     <div menuitemname="Client Details" class="panel panel-default" id="overviewbackorderstatus_box" style="display:none;">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-filter"></i>&nbsp;{$LANG.overviewbackorderstatus}</h3>
+            <h3 class="panel-title"><i class="fa fa-filter"></i>&nbsp;{$_lang.overviewbackorderstatus}</h3>
         </div>
         <div class="panel-body">
         	<table width="100%" id="overviewbackorderstatus"></table>
@@ -317,13 +317,13 @@
     <!-- ########## CREATE BACKORDER ########## -->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-shopping-cart"></i> {$LANG.createbackorder}</h3>
+            <h3 class="panel-title"><i class="fa fa-shopping-cart"></i> {$_lang.createbackorder}</h3>
         </div>
         <div class="panel-body">
             <input style="width:100%;" type="text" name="domain" class="form-control" id="createnewbackorder" placeholder="domain.tld">
         </div>
         <div class="panel-footer clearfix">
-            <input type="submit" value="{$LANG.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
+            <input type="submit" value="{$_lang.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
         </div>
     </div>
     <!-- ###################################### -->
@@ -331,13 +331,13 @@
     <!--###################################### PRICING ##########################################-->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-usd"></i> {$LANG.pricelist}</h3>
+            <h3 class="panel-title"><i class="fa fa-usd"></i> {$_lang.pricelist}</h3>
         </div>
         <div class="panel-body">
             <table width="100%">
                 <tr>
                     <td align="center" width="33%"><b>TLD</b></td>
-                    <td align="center"><b>{$LANG.tldprice}</b></td>
+                    <td align="center"><b>{$_lang.tldprice}</b></td>
                 </tr>
             </table>
             <hr style="margin:5px;">

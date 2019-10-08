@@ -165,7 +165,7 @@ function ispapibackorder_clientarea($vars)
         $key = "ispapibackorder";
         $language = (isset($_SESSION["language"]) ? $_SESSION["language"] : "english");
         $file = getcwd() . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . $key . DIRECTORY_SEPARATOR . "lang" . DIRECTORY_SEPARATOR . $language . ".php";
-        if (file_exists($file)){
+        if (file_exists($file)) {
             include($file);
         }
         
@@ -191,35 +191,27 @@ function ispapibackorder_clientarea($vars)
     });
 
     $modulename = "ispapibackorder";
-    $modulepath = "modules/addons/".$modulename;
+    $modulepath = "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . $modulename;
 
-    //include language files
-    $language = $_SESSION["Language"];
-    if (!isset($language)) {
-        $language = "english";
+    if (!preg_match("/^(manage|dropdomains)$/", $_GET["p"])) {
+        //just to ensure %00 attacks are not working - WHMCS filters it out, but still white-listing is more secure
+        die("not allowed");
     }
-    $file = getcwd()."/lang/".$language.".php";
-    $file_backorder = getcwd()."/modules/addons/ispapibackorder/lang/".$language.".php";
-    include($file);
-    if (file_exists($file_backorder)) {
-        include($file_backorder);
-    }
-
-    //include controller file
-    $vars = array();
-    $controller = getcwd()."/modules/addons/".$modulename."/controller/".$_GET["p"].".php";
+    $controller = getcwd() . DIRECTORY_SEPARATOR . $modulepath . DIRECTORY_SEPARATOR . "controller"  . DIRECTORY_SEPARATOR . $_GET["p"] . ".php";
     if (file_exists($controller)) {
-        include  $controller;
+        include $controller;
+    } else {
+        die("controller not found");
     }
+    
+    $vars["moduletemplatepath"] = $modulepath . DIRECTORY_SEPARATOR . "templates";
+    $vars["modulepath"] = $modulepath . DIRECTORY_SEPARATOR;
 
     return array(
-            'pagetitle' => "Backorder",
-            'breadcrumb' => array('index.php?m=ispapibackorder'=>'Backorder'),
-            'templatefile' => "templates/".$_GET["p"],
-            'requirelogin' => true,
-            'vars' => array_merge($vars, array(
-                    'moduletemplatepath' => $modulepath."/templates",
-                    'modulepath' => $modulepath."/"
-            )),
+        'pagetitle' => "Backorder",
+        'breadcrumb' => array('index.php?m=ispapibackorder'=>'Backorder'),
+        'templatefile' => "templates/" . $_GET["p"],
+        'requirelogin' => true,
+        'vars' => $vars
     );
 }

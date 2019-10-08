@@ -6,7 +6,7 @@
 <script src="modules/addons/ispapibackorder/templates/js/backorder.js"></script>
 <link rel="stylesheet" href="modules/addons/ispapibackorder/templates/css/styles.css">
 
-<div class="container" style="text-align:right;padding-right:45px;margin-bottom:10px;"><a class="btn btn-default" href="index.php?m=ispapibackorder&p=manage">{$LANG.managebackorders} (<span style="font-weight:bold;" id="nb_backorders">0</span>)</a></div>
+<div class="container" style="text-align:right;padding-right:45px;margin-bottom:10px;"><a class="btn btn-default" href="index.php?m=ispapibackorder&p=manage">{$_lang.managebackorders} (<span style="font-weight:bold;" id="nb_backorders">0</span>)</a></div>
 
 <!--############################### MAIN AREA #######################################-->
 <div class="col-md-9 pull-md-right">
@@ -85,14 +85,14 @@
                         success: function(data) {
                             if (data['CODE']=="200") {
                                 updateBackorderNumber();
-                                noty({text: "{/literal}{$LANG.notybackordersuccessfullycreated}{literal}"});
+                                noty({text: "{/literal}{$_lang.notybackordersuccessfullycreated}{literal}"});
                                 oTable.fnDraw();
                             } else {
                                 noty({text: data['DESCRIPTION'], type: "error"});
                             }
                         },
                         error: function(data) {
-                            noty({text: "{/literal}{$LANG.notyerroroccured}{literal}", type: "error"});
+                            noty({text: "{/literal}{$_lang.notyerroroccured}{literal}", type: "error"});
                         }
                 });
             });
@@ -141,7 +141,7 @@
                     var output ='';
                     output +='<a onclick="setdate(\'total\');" class="list-group-item">';
                     output +='	<div class="row"><div class="col-lg-8"><i class="fa fa-circle-o"></i>&nbsp;';
-                    output +='	<span><strong>{/literal}{$LANG.all}{literal}</strong></span></div>';
+                    output +='	<span><strong>{/literal}{$_lang.all}{literal}</strong></span></div>';
                     output +='</div>';
                     output +='</a>';
                     $("#droppingdomains").append(output);
@@ -199,19 +199,19 @@
                         if(command=="CreateBackorder" && data["CODE"]==200){
                             button.addClass("active btn-success");
                             updateBackorderNumber();
-                            noty({text: "{/literal}{$LANG.notybackordersuccessfullycreated}{literal}"});
+                            noty({text: "{/literal}{$_lang.notybackordersuccessfullycreated}{literal}"});
                         }
                         else if(command=="DeleteBackorder" && data["CODE"]==200){
                             button.removeClass("active btn-success");
                             updateBackorderNumber();
-                            noty({text: "{/literal}{$LANG.notybackordersuccessfullydeleted}{literal}"});
+                            noty({text: "{/literal}{$_lang.notybackordersuccessfullydeleted}{literal}"});
                         }
                         else{
                             noty({text: data['DESCRIPTION'], type: "error"});
                         }
                     },
                     error: function(data) {
-                        noty({text: "{/literal}{$LANG.notyerroroccured}{literal}", type: "error"});
+                        noty({text: "{/literal}{$_lang.notyerroroccured}{literal}", type: "error"});
                     }
                 });
             });
@@ -245,7 +245,7 @@
                     });
                     var output="";
                     output += '<tr>';
-                    output += '<td colspan="2" align="center"><button action="show" style="margin-top:8px;" class="form-control input-sm btn-default" id="morepricing"><i class="fa fa-caret-down" aria-hidden="true"></i> {/literal}{$LANG.showmore}{literal}</button></td>';
+                    output += '<td colspan="2" align="center"><button action="show" style="margin-top:8px;" class="form-control input-sm btn-default" id="morepricing"><i class="fa fa-caret-down" aria-hidden="true"></i> {/literal}{$_lang.showmore}{literal}</button></td>';
                     output += '</tr>';
                     $("#pricelist").append(output);
                 },
@@ -256,13 +256,13 @@
             //show/hide pricing logic
             $(document).on('click', '#morepricing', function (e) {
                 if($(this).attr("action") == "show") {
-                    $(this).html("<i class='fa fa-caret-up' aria-hidden='true'></i> {/literal}{$LANG.hidemore}{literal}");
+                    $(this).html("<i class='fa fa-caret-up' aria-hidden='true'></i> {/literal}{$_lang.hidemore}{literal}");
                     $.each( $(".pricing_row"), function(obj) {
                         $(this).removeClass("hide");
                     });
                     $(this).attr("action", "hide")
                 }else{
-                    $(this).html("<i class='fa fa-caret-down' aria-hidden='true'></i> {/literal}{$LANG.showmore}{literal}");
+                    $(this).html("<i class='fa fa-caret-down' aria-hidden='true'></i> {/literal}{$_lang.showmore}{literal}");
                     $.each( $(".pricing_row"), function(obj) {
                         $(this).addClass("hide");
                     });
@@ -340,21 +340,21 @@
     <!-- ##################### MY ACCOUNT ###################### -->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-user-circle-o"></i>&nbsp;{$LANG.creditvolume}</h3>
+            <h3 class="panel-title"><i class="fa fa-user-circle-o"></i>&nbsp;{$_lang.creditvolume}</h3>
         </div>
         <div class="panel-body">
             <div id="creditvolume" class="row" style="padding:0px 10px;">
-                <div style="float:left;">{$LANG.creditbalance}:</div>
+                <div style="float:left;">{$_lang.creditbalance}:</div>
                 <div style="float:right;"><span id="creditbalance"></span></div>
                 <div style="clear:both"></div>
-                <div style="float:left;">{$LANG.reservedamount}:</div>
+                <div style="float:left;">{$_lang.reservedamount}:</div>
                 <div style="float:right;">- <span id="reservedamount"></span></div>
                 <div style="clear:both"></div>
-                <div style="float:left;">{$LANG.unpaidinvoices}:</div>
+                <div style="float:left;">{$_lang.unpaidinvoices}:</div>
                 <div style="float:right;">- <span id="unpaidinvoices"></span></div>
                 <div style="clear:both"></div>
                 <div style="border-bottom:1px solid grey;"></div>
-                <div style="float:left;font-weight:bold;">{$LANG.amountavailable}:</div>
+                <div style="float:left;font-weight:bold;">{$_lang.amountavailable}:</div>
                 <div style="float:right;font-weight:bold;"><span id="amountavailable"></span></div>
             </div>
         </div>
@@ -365,25 +365,25 @@
     <div menuitemname="Client Details" class="panel panel-default">
 
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-search"></i> {$LANG.refinesearch}</h3>
+                <h3 class="panel-title"><i class="fa fa-search"></i> {$_lang.refinesearch}</h3>
             </div>
             <form id="settings">
             <div class="panel-body">
                 <div class="form-group" style="margin-bottom:5px;">
-                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindoescontain}</label>
+                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$_lang.domaindoescontain}</label>
                     <input class="form-control" name="DOMAINREGEXP" id="DOMAINREGEXP" value="">
-                    <span style="font-weight:normal;font-size:12px;">* {$LANG.regexsupported}</span>
+                    <span style="font-weight:normal;font-size:12px;">* {$_lang.regexsupported}</span>
                 </div>
 
                 <div class="form-group" style="margin-bottom:5px;">
-                    <label style="margin:0px;" for="" class="control-label">{$LANG.domainsearchtld}</label>
+                    <label style="margin:0px;" for="" class="control-label">{$_lang.domainsearchtld}</label>
                     <select class="form-control input-sm" name="tld" id="tld">
-                        <option value="_all_">{$LANG.all}</option>
+                        <option value="_all_">{$_lang.all}</option>
                     </select>
                 </div>
 
                 <div class="form-group" style="margin-bottom:5px;">
-                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainresults}</label>
+                    <label style="margin:0px;" for="inputFirstName" class="control-label">{$_lang.domainresults}</label>
                     <select class="form-control input-sm" name="results" id="results">
                         <option value="20">20</option>
                         <option value="50">50</option>
@@ -394,17 +394,17 @@
                 <div id="settingsdiv">
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:10px;">
-                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainchars}</label>
+                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$_lang.domainchars}</label>
                         <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.min}:</span>
+                                    <span class="input-group-addon">{$_lang.min}:</span>
                                     <input class="form-control input-sm" name="chars_count_min" id="chars_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.max}:</span>
+                                    <span class="input-group-addon">{$_lang.max}:</span>
                                     <input class="form-control input-sm" name="chars_count_max" id="chars_count_max" value="">
                                 </div>
                             </div>
@@ -413,17 +413,17 @@
 
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:10px;">
-                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainletters}</label>
+                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$_lang.domainletters}</label>
                         <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.min}:</span>
+                                    <span class="input-group-addon">{$_lang.min}:</span>
                                     <input class="form-control input-sm" name="letters_count_min" id="letters_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.max}:</span>
+                                    <span class="input-group-addon">{$_lang.max}:</span>
                                     <input class="form-control input-sm" name="letters_count_max" id="letters_count_max" value="">
                                 </div>
                             </div>
@@ -432,17 +432,17 @@
 
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:10px;">
-                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindigits}</label>
+                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$_lang.domaindigits}</label>
                         <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.min}:</span>
+                                    <span class="input-group-addon">{$_lang.min}:</span>
                                     <input class="form-control input-sm" name="digits_count_min" id="digits_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.max}:</span>
+                                    <span class="input-group-addon">{$_lang.max}:</span>
                                     <input class="form-control input-sm" name="digits_count_max" id="digits_count_max" value="">
                                 </div>
                             </div>
@@ -451,17 +451,17 @@
 
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:5px;">
-                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domainhyphens}</label>
+                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$_lang.domainhyphens}</label>
                         <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.min}:</span>
+                                    <span class="input-group-addon">{$_lang.min}:</span>
                                     <input class="form-control input-sm" name="hyphens_count_min" id="hyphens_count_min" value="">
                                 </div>
                             </div>
                             <div class="col-lg-6" style="margin-bottom:5px;">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon">{$LANG.max}:</span>
+                                    <span class="input-group-addon">{$_lang.max}:</span>
                                     <input class="form-control input-sm" name="hyphens_count_max" id="hyphens_count_max" value="">
                                 </div>
                             </div>
@@ -470,11 +470,11 @@
 
                     <hr style="margin:10px 0px 10px 0px;">
                     <div class="form-group" style="margin-bottom:5px;">
-                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$LANG.domaindropdate}</label>
+                        <label style="margin:0px;" for="inputFirstName" class="control-label">{$_lang.domaindropdate}</label>
                         <div class="row" style="margin-bottom:5px;">
                             <div class="col-lg-12">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon" style="width:70px;">{$LANG.from}:</span>
+                                    <span class="input-group-addon" style="width:70px;">{$_lang.from}:</span>
                                     <input class="form-control input-sm" name="dropdate_from" id="dropdate_from" value="">
                                 </div>
                             </div>
@@ -482,7 +482,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="input-group m-bot15">
-                                    <span class="input-group-addon" style="width:70px;">{$LANG.to}:</span>
+                                    <span class="input-group-addon" style="width:70px;">{$_lang.to}:</span>
                                     <input class="form-control input-sm" name="dropdate_to" id="dropdate_to" value="">
                                 </div>
                             </div>
@@ -491,11 +491,11 @@
                 </div>
 
                 <div class="form-group" style="margin-top:10px; margin-bottom:5px;">
-                    <input class="form-control input-sm btn-default" type="button" value="{$LANG.domainsearchsettings}" id="openfilter">
+                    <input class="form-control input-sm btn-default" type="button" value="{$_lang.domainsearchsettings}" id="openfilter">
                 </div>
             </div>
             <div class="panel-footer clearfix">
-                <input type="submit" class="btn btn-block btn-success" value="{$LANG.domainsearch}" id="searchbutton">
+                <input type="submit" class="btn btn-block btn-success" value="{$_lang.domainsearch}" id="searchbutton">
             </div>
         </form>
 
@@ -505,7 +505,7 @@
     <!-- ########################## UPCOMING DROPS ######################### -->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-calendar"></i>&nbsp; {$LANG.upcomingdrops}</h3>
+        <h3 class="panel-title"><i class="fa fa-calendar"></i>&nbsp; {$_lang.upcomingdrops}</h3>
         </div>
         <div class="list-group" id="droppingdomains"></div>
     </div>
@@ -514,13 +514,13 @@
     <!--############################### CREATE BACKORDER #######################################-->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-shopping-cart"></i> {$LANG.createbackorder}</h3>
+            <h3 class="panel-title"><i class="fa fa-shopping-cart"></i> {$_lang.createbackorder}</h3>
         </div>
         <div class="panel-body">
             <input style="width:100%;" type="text" name="domain" class="form-control" id="createnewbackorder" placeholder="domain.tld">
         </div>
         <div class="panel-footer clearfix">
-            <input type="submit" value="{$LANG.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
+            <input type="submit" value="{$_lang.createbackorder}" id="createnewbackorderbutton" class="btn btn-block btn-success">
         </div>
     </div>
     <!--#######################################################################################-->
@@ -528,13 +528,13 @@
     <!--############################### PRICING #######################################-->
     <div menuitemname="Client Details" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-usd"></i> {$LANG.pricelist}</h3>
+            <h3 class="panel-title"><i class="fa fa-usd"></i> {$_lang.pricelist}</h3>
         </div>
         <div class="panel-body">
             <table width="100%">
                 <tr>
                     <td align="center" width="33%"><b>TLD</b></td>
-                    <td align="center"><b>{$LANG.tldprice}</b></td>
+                    <td align="center"><b>{$_lang.tldprice}</b></td>
                 </tr>
             </table>
             <hr style="margin:5px;">

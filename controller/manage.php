@@ -4,17 +4,17 @@ require_once implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__), '..', 'backen
 include dirname(__FILE__) . DIRECTORY_SEPARATOR . "_language.php";
 
 $vars["breadcrumb"][] = array("last" => false, "link" => "", "label" => "Backorder" );
-$vars["breadcrumb"][] = array("last" => true, "link" => "", "label" => $_LANG["managebackorders"]);
-$vars["displayTitle"] = $_LANG["managebackorders"];
+$vars["breadcrumb"][] = array("last" => true, "link" => "", "label" => $_ADDONLANG["managebackorders"]);
+$vars["displayTitle"] = $_ADDONLANG["managebackorders"];
 
-$statusheader = $_LANG['setallbackorder'];
+$statusheader = $_ADDONLANG['setallbackorder'];
 
 $fields = array(); //fieldname, apifieldname
 $fields[]=array ("fieldname" => "",     "apifieldname" => "BACKORDERTYPE");
 $fields[]=array ("fieldname" => "ID",   "apifieldname" => "ID");
-$fields[]=array ("fieldname" => $_LANG["domainname"],   "apifieldname" => "DOMAIN");
-$fields[]=array ("fieldname" => $_LANG["dropdate"],     "apifieldname" => "DROPDATE");
-$fields[]=array ("fieldname" => $_LANG["status"],       "apifieldname" => "STATUS");
+$fields[]=array ("fieldname" => $_ADDONLANG["domainname"],   "apifieldname" => "DOMAIN");
+$fields[]=array ("fieldname" => $_ADDONLANG["dropdate"],     "apifieldname" => "DROPDATE");
+$fields[]=array ("fieldname" => $_ADDONLANG["status"],       "apifieldname" => "STATUS");
 
 $vars["fields"] = $fields;
 
@@ -57,7 +57,7 @@ if (isset($_POST['COMMAND'])) {
                     $tmpfield = '<div class="btn-group btn-group">';
                     //DISPLAY DELETE BUTTON ONLY FOR: "PENDING-PAYMENT", "AUCTION-PENDING", "PROCESSING"
                     if (!in_array($item['STATUS'], array("PENDING-PAYMENT", "AUCTION-PENDING", "PROCESSING"))) {
-                        $tmpfield .= '<button placeholder2="'.$item['DROPDATE'].'" placeholder="'.$cnt.'" value="'.$item['DOMAIN'].'" class="line'.$cnt.' setbackorder btn btn-default btn-sm active">'.$_LANG['deletebutton'].'</button>';
+                        $tmpfield .= '<button placeholder2="'.$item['DROPDATE'].'" placeholder="'.$cnt.'" value="'.$item['DOMAIN'].'" class="line'.$cnt.' setbackorder btn btn-default btn-sm active">'.$_ADDONLANG['deletebutton'].'</button>';
                     }
                     $tmpfield .= '</div>';
                     $newitem[] = $tmpfield;
