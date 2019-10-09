@@ -1,3 +1,10 @@
+## [2.2.10](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.9...v2.2.10) (2019-10-09)
+
+
+### Bug Fixes
+
+* **hooks:** move ClientAreaPrimaryNavbar back into hooks.php ([5583e78](https://github.com/hexonet/whmcs-ispapi-backorder/commit/5583e78db63afc7a06c99d977076e0ccb2704661))
+
 ## [2.2.9](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.8...v2.2.9) (2019-10-08)
 
 
