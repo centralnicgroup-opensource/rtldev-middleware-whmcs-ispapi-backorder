@@ -21,7 +21,6 @@ if (file_exists($init_path)) {
 }
 
 use WHMCS\Database\Capsule;
-use WHMCS\View\Menu\Item as MenuItem;
 
 function ispapibackorder_config()
 {
@@ -35,8 +34,6 @@ function ispapibackorder_config()
     );
     return $configarray;
 }
-
-
 
 function ispapibackorder_activate()
 {
@@ -95,7 +92,6 @@ function ispapibackorder_activate()
         return array('status'=>'error','description'=> $e->getMessage());
     }
 }
-
 
 function ispapibackorder_deactivate()
 {
@@ -161,35 +157,6 @@ function ispapibackorder_logs_content($modulelink)
 
 function ispapibackorder_clientarea($vars)
 {
-    add_hook('ClientAreaPrimaryNavbar', 1, function (MenuItem $primaryNavbar) {
-        $key = "ispapibackorder";
-        $language = (isset($_SESSION["language"]) ? $_SESSION["language"] : "english");
-        $file = getcwd() . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . $key . DIRECTORY_SEPARATOR . "lang" . DIRECTORY_SEPARATOR . $language . ".php";
-        if (file_exists($file)) {
-            include($file);
-        }
-        
-        $primaryNavbar->addChild($key, array(
-            "label" => $_ADDONLANG["backorder_nav"],
-            "uri" => "index.php?m={$key}&p=manage",
-            "order" => "70"
-        ));
-
-        $pc = $primaryNavbar->getChild($key);
-        if (!is_null($pc)) {
-            $pc->addChild($key . "_manage", array(
-                "label" => $_ADDONLANG["managebackorders"],
-                "uri" => "index.php?m={$key}&p=manage",
-                "order" => "20"
-            ));
-            $pc->addChild($key . "_droplist", array(
-                "label" => $_ADDONLANG["domainheader"],
-                "uri" => "index.php?m={$key}&p=dropdomains",
-                "order" => "10"
-            ));
-        }
-    });
-
     $modulename = "ispapibackorder";
     $modulepath = "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . $modulename;
 
