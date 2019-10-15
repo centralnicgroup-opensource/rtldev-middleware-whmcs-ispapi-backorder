@@ -1,3 +1,10 @@
+## [2.2.11](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.10...v2.2.11) (2019-10-15)
+
+
+### Bug Fixes
+
+* **translation:** fix typo in session key ([5096a50](https://github.com/hexonet/whmcs-ispapi-backorder/commit/5096a506c6a2d72ffde6de68f7a0fda07601fd0c))
+
 ## [2.2.10](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.9...v2.2.10) (2019-10-09)
 
 
