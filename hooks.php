@@ -4,7 +4,7 @@ use WHMCS\View\Menu\Item as MenuItem;
 
 add_hook('ClientAreaPrimaryNavbar', 1, function (MenuItem $primaryNavbar) {
     $key = "ispapibackorder";
-    $language = (isset($_SESSION["language"]) ? $_SESSION["language"] : "english");
+    $language = (isset($_SESSION["Language"]) ? $_SESSION["Language"] : "english");
     $file = getcwd() . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . $key . DIRECTORY_SEPARATOR . "lang" . DIRECTORY_SEPARATOR . $language . ".php";
     if (file_exists($file)) {
         include($file);
