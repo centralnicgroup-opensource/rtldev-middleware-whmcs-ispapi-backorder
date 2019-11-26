@@ -15,10 +15,8 @@ if (file_exists($init_path)) {
     exit("cannot find init.php");
 }
 
-require_once dirname(__FILE__).'/../vendor/autoload.php';
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
 use WHMCS\Database\Capsule;
-use Algo26\IdnaConvert;
 
 //############################
 //HELPER FUNCTIONS
@@ -241,19 +239,26 @@ function backorder_api_response($code, $info = "")
     return $r;
 }
 
+// perform idn conversion
+function backoder_idnconvert($input)
+{
+    ispapi_api_call([
+        "COMMAND" => "ConvertIDN",
+        "DOMAIN0" => $input
+    ]);
+    if ($r["CODE"] == 200 && !empty($r["PROPERTY"]["ACE"][0])) {
+        return $r["PROPERTY"]["ACE"][0];// punycode xn--...
+    }
+    return $input;
+}
+
 //CHECK THE DOMAIN SYNTAX
 function backorder_api_check_syntax_domain($domain)
 {
-    if (version_compare(phpversion(), '7.2.0', '<')) {
-        $IDN = new Algo26\IdnaConvert\IdnaConvert();
-        $converted = $IDN->encode($domain);
-    } else {
-        $IDN = new Algo26\IdnaConvert\ToIdn();
-        $converted = $IDN->convert($domain);
-    }
     if (strlen($domain) > 223) {
         return false;
     }
+    $converted = backoder_idnconvert($domain);
     if (!preg_match('/^([a-z0-9](\-*[a-z0-9])*)(\.([a-z0-9](\-*[a-z0-9]+)*))+$/i', $converted)) {
         return false;
     }
@@ -263,16 +268,8 @@ function backorder_api_check_syntax_domain($domain)
 //CHECK IF TLD IN THE PRICELIST
 function backorder_api_check_valid_tld($domain, $userid)
 {
-    if (version_compare(phpversion(), '7.2.0', '<')) {
-        $IDN = new Algo26\IdnaConvert\IdnaConvert();
-        $converted = $IDN->encode($domain);
-    } else {
-        $IDN = new Algo26\IdnaConvert\ToIdn();
-        $converted = $IDN->convert($domain);
-    }
     try {
         $pdo = Capsule::connection()->getPdo();
-        
         $currencyid = null;
 
         $stmt = $pdo->prepare("SELECT currency FROM tblclients WHERE id=?");
@@ -289,6 +286,7 @@ function backorder_api_check_valid_tld($domain, $userid)
             $tlds .= "|.".$value["extension"];
         }
         $tld_list = substr($tlds, 1);
+        $converted = backoder_idnconvert($domain);
         if (!preg_match('/^([a-z0-9](\-*[a-z0-9])*)\\'.$tld_list.'$/i', $converted)) {
             return false;
         }
