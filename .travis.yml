@@ -17,6 +17,7 @@ branches:
     - master
     - /^dependabot.*$/
 before_install:
+  - export PATH="$HOME/.config/composer/vendor/bin:$PATH"
   - export TRAVIS_NODE_VERSION="lts/*"
 addonns:
   apt:
