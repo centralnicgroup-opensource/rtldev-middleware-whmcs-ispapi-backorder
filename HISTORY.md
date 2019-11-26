@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.11...v3.0.0) (2019-11-26)
+
+
+### improvement
+
+* **idn converter:** replaced to consider API Command ([3cc63d0](https://github.com/hexonet/whmcs-ispapi-backorder/commit/3cc63d04d57adad447d2827f833b64f10a0c6a1d))
+
+
+### BREAKING CHANGES
+
+* **idn converter:** drop php-side composer module: algo26-matthias/idna-convert
+
 ## [2.2.11](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.10...v2.2.11) (2019-10-15)
 
 
