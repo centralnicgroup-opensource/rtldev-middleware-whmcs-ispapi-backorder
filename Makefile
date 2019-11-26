@@ -17,7 +17,7 @@ buildsources:
 	# copy files (archive contents)
 	cp README.md HISTORY.md HISTORY.old CONTRIBUTING.md LICENSE /tmp/$(REPOID)/*.md $(FOLDER)/docs
 	cp *.php $(FOLDER)/install/modules/addons/ispapibackorder
-	cp -a api backend controller crons lang templates vendor $(FOLDER)/install/modules/addons/ispapibackorder
+	cp -a api backend controller crons lang templates $(FOLDER)/install/modules/addons/ispapibackorder
 	rm -rf $(FOLDER)/docs/_*.md $(FOLDER)/docs/Home.md /tmp/$(REPOID)
 	# convert all necessary files to html
 	find $(FOLDER)/docs -maxdepth 1 -name "*.md" -exec bash -c 'pandoc "$${0}" -f markdown -t html -s --self-contained -o "$${0/\.md/}.html"' {} \;
