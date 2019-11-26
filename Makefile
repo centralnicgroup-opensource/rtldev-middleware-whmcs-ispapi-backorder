@@ -4,10 +4,8 @@ FOLDER := pkg/$(REPOID)-$(VERSION)
 
 clean:
 	rm -rf $(FOLDER)
-	composer install
 
 buildsources:
-	composer install --no-dev
 	# create folder structure for archives
 	mkdir -p $(FOLDER)/docs
 	mkdir -p $(FOLDER)/install/modules/addons/ispapibackorder
