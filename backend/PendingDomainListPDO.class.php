@@ -139,6 +139,8 @@ class PendingDomainListPDO
 
         $data = curl_exec($ch);
         curl_close($ch);
+
+        fclose($fp);
         //file_put_contents("../tmp/pending_delete_list_tmp.zip", fopen(self::PENDING_DELETE_LIST_FILE_URL, 'r'));
         //exec("wget -O ../tmp/pending_delete_list_tmp.zip ".self::PENDING_DELETE_LIST_FILE_URL);
     }
@@ -150,28 +152,25 @@ class PendingDomainListPDO
      *
      * @param string $file Path of the file you want to import
      */
-    public function import($tlds = array(), $file = null)
+    public function import()
     {
         $values = "";
         $line = 0;
 
-        if (isset($file)) {
-            $handle = fopen($file, "r");
+        $this->downloadPendingDeleteList();
+        $path = $GLOBALS["downloads_dir"];
+        if (!preg_match("/" . preg_quote(DIRECTORY_SEPARATOR) . "$/", $path)) { // installation not secured
+            $path .= DIRECTORY_SEPARATOR;
+        }
+
+        if (function_exists('zip_open')) {
+            $handle = zip_open($path .'pending_delete_list_tmp.zip#pending_delete_domain_list.csv');
         } else {
-            $this->downloadPendingDeleteList();
-            $path = $GLOBALS["downloads_dir"];
-            if (!preg_match("/" . preg_quote(DIRECTORY_SEPARATOR) . "$/", $path)) { // installation not secured
-                $path .= DIRECTORY_SEPARATOR;
-            }
             $handle = fopen('zip://'. $path .'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
-            //throw an error message when the zip extension is missing
-            if (empty($handle)) {
-                die("Failed to import the drop list. Could it be that ZIP extension is not installed?");
-            }
         }
 
         $sql = 'INSERT IGNORE INTO backorder_pending_domains (domain, zone, drop_date, domain_number_of_characters, domain_number_of_hyphens, domain_number_of_digits) VALUES ';
-
+        
         if ($handle !== false) {
             $this->instance->beginTransaction();
             while (($data = fgetcsv($handle, 1000, ";")) !== false) {
@@ -203,13 +202,19 @@ class PendingDomainListPDO
                     $line = 0;
                 }
             }
+
             $values = substr($values, 0, -1);
             try {
                 $this->instance->exec($sql.$values);
             } catch (PDOException $ex) {
             }
             $this->instance->commit();
-            fclose($handle);
+
+            if (function_exists('zip_open')) {
+                zip_close($handle);
+            } else {
+                fclose($handle);
+            }
         }
 
         //delete domains with drop_date in the past
