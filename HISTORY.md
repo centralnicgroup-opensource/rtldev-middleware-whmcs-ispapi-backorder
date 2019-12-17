@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v3.0.0...v3.0.1) (2019-12-17)
+
+
+### Performance Improvements
+
+* **zip-extension:** support fopen() and zip_open() ([ed590b1](https://github.com/hexonet/whmcs-ispapi-backorder/commit/ed590b14ef7c67b1ca682e022a0ddc49155f6cbd))
+
 # [3.0.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v2.2.11...v3.0.0) (2019-11-26)
 
 
