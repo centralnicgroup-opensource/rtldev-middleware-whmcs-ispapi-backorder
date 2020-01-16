@@ -164,7 +164,26 @@ class PendingDomainListPDO
         }
 
         if (function_exists('zip_open')) {
-            $handle = zip_open($path .'pending_delete_list_tmp.zip#pending_delete_domain_list.csv');
+            $zip = zip_open($path .'pending_delete_list_tmp.zip');
+            //ref: https://www.php.net/manual/en/ref.zip.php
+            while ($zip_entry = zip_read($zip)) {
+                //open the entry
+                if (zip_entry_open($zip, $zip_entry, "r")) {
+                    //the name of the file to save on the disk
+                    $file_name = $path.zip_entry_name($zip_entry);
+                    //get the content of the zip entry
+                    $fstream = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
+                    file_put_contents($file_name, $fstream);
+                    //set the rights
+                    chmod($file_name, 0777);
+                    //close the entry
+                    zip_entry_close($zip_entry);
+                }
+            }
+            //close the zip-file
+            zip_close($zip);
+            
+            $handle = fopen($path .'pending_delete_domain_list.csv', 'r');
         } else {
             $handle = fopen('zip://'. $path .'pending_delete_list_tmp.zip#pending_delete_domain_list.csv', 'r');
         }
@@ -209,12 +228,8 @@ class PendingDomainListPDO
             } catch (PDOException $ex) {
             }
             $this->instance->commit();
-
-            if (function_exists('zip_open')) {
-                zip_close($handle);
-            } else {
-                fclose($handle);
-            }
+            
+            fclose($handle);
         }
 
         //delete domains with drop_date in the past
