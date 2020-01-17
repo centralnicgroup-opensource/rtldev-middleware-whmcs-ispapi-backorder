@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v3.0.1...v3.0.2) (2020-01-16)
+
+
+### Bug Fixes
+
+* **zip-extension:** update in using zip_open() ([8c3df85](https://github.com/hexonet/whmcs-ispapi-backorder/commit/8c3df8579c06ea15f614a321f0ee53cbeebd29f2))
+
 ## [3.0.1](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v3.0.0...v3.0.1) (2019-12-17)
 
 

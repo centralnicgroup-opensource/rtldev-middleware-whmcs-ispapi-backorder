@@ -1,6 +1,6 @@
 <?php
 
-$module_version = "3.0.1";
+$module_version = "3.0.2";
 
 //if (!defined("WHMCS"))
 //    die("This file cannot be accessed directly");
