@@ -16,7 +16,9 @@ if (file_exists($init_path)) {
 }
 
 require_once dirname(__FILE__)."/helper.php"; //HELPER WHICH CONTAINS HELPER FUNCTIONS
+
 use WHMCS\Database\Capsule;
+use WHMCS\Module\Registrar\Ispapi\Ispapi;
 
 //############################
 //HELPER FUNCTIONS
@@ -35,52 +37,27 @@ function logmessage($cronname, $status, $message, $query = null)
 //THIS FUNCTION CALLS OUR HEXONET API AND IS USED FOR CRONS AND IN THE WHMCS ADMIN AREA
 function ispapi_api_call($command)
 {
-    require_once(dirname(__FILE__)."/../../../../includes/registrarfunctions.php");
-    $higher_version_required_message = "The ISPAPI DomainCheck Module requires ISPAPI Registrar Module v1.0.15 or higher!";
-
-    //CHECK IF THE ISPAPI REGISTRAR MODULE IS INSTALLED
-    $error = false;
-    $message = "";
-    if (file_exists(dirname(__FILE__)."/../../../../modules/registrars/ispapi/ispapi.php")) {
-        $file = "ispapi";
-        require_once(dirname(__FILE__)."/../../../../modules/registrars/".$file."/".$file.".php");
-        $funcname = $file.'_GetISPAPIModuleVersion';
-        if (function_exists($file.'_GetISPAPIModuleVersion')) {
-            $version = call_user_func($file.'_GetISPAPIModuleVersion');
-            //check if version = 1.0.15 or higher
-            if (version_compare($version, '1.0.15') >= 0) {
-                //check authentication
-                $registrarconfigoptions = getregistrarconfigoptions($file);
-                $ispapi_config = ispapi_config($registrarconfigoptions);
-                $checkAuthenticationCommand = array(
-                        "command" => "CheckAuthentication",
-                );
-                $checkAuthentication = ispapi_call($checkAuthenticationCommand, $ispapi_config);
-                if ($checkAuthentication["CODE"] != "200") {
-                    $error = true;
-                    $message = "The \"".$file."\" registrar authentication failed! Please verify your registrar credentials and try again.";
-                }
-            } else {
-                $error = true;
-                $message = $higher_version_required_message;
-            }
-        } else {
-            $error = true;
-            $message = $higher_version_required_message;
-        }
-    } else {
-        $error = true;
-        $message = $higher_version_required_message;
+    //check registrar module availability and version number
+    $higher_version_required_message = "The ISPAPI Backorder Module requires ISPAPI Registrar Module v3.0.0 or higher!";
+    $version = Ispapi::getRegistrarModuleVersion('ispapi');
+    if ($version == "N/A" || version_compare($version, '3.0.0') < 0) {
+        return [
+            "CODE" => 549,
+            "DESCRIPTION" => $higher_version_required_message
+        ];
+    }
+    //check authentication
+    $r = Ispapi::call([
+        "COMMAND" => "CheckAuthentication"
+    ]);
+    if ($r["CODE"] != "200") {
+        return [
+            "CODE" => 549,
+            "DESCRIPTION" => "The ISPAPI registrar authentication failed! Please verify your registrar credentials and try again."
+        ];
     }
 
-    $response = array();
-    if ($error) {
-        $response["CODE"] = 549;
-        $response["DESCRIPTION"] = $message;
-    } else {
-        $response = ispapi_call($command, $ispapi_config);
-    }
-    return $response;
+    return Ispapi::call($command);
 }
 
 //THIS FUNCTION CALLS OUR LOCAL API AND IS USED FOR CUSTOMER AND ADMIN
