@@ -53,7 +53,7 @@ Read the following to get more information ...
 
 * WHMCS version 7.0 or higher
 * PHP with ZIP Extension installed
-* [ISPAPI Registrar Module](https://github.com/hexonet/whmcs-ispapi-registrar/raw/master/whmcs-ispapi-registrar-latest.zip) version 1.0.44 or higher
+* [ISPAPI Registrar Module](https://github.com/hexonet/whmcs-ispapi-registrar/raw/master/whmcs-ispapi-registrar-latest.zip) version 3.0.0 or higher
 * HEXONET [Live System](https://hexonet.net/sign-up) or [Test System](https://hexonet.net/signup-ote) Account
 * Server time to be set to UTC
 
