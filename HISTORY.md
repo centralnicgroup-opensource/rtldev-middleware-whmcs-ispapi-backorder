@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v3.0.2...v4.0.0) (2020-04-27)
+
+
+### Code Refactoring
+
+* **migration:** to support v3.x.x of the ispapi registrar module ([4ceb7b4](https://github.com/hexonet/whmcs-ispapi-backorder/commit/4ceb7b47985d529fa634e3b3f834931209d32928))
+
+
+### BREAKING CHANGES
+
+* **migration:** compatible with ispapi registrar module >= v3.0.0
+
 ## [3.0.2](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v3.0.1...v3.0.2) (2020-01-16)
 
 
