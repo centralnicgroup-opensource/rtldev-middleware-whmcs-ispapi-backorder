@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.0...v4.0.1) (2020-05-27)
+
+
+### Bug Fixes
+
+* **versioning:** move global var into config function ([a2bfea1](https://github.com/hexonet/whmcs-ispapi-backorder/commit/a2bfea18b4b737221b66ef9263e09c2306ab2802))
+
 # [4.0.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v3.0.2...v4.0.0) (2020-04-27)
 
 
