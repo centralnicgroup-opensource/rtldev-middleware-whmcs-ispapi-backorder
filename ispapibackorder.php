@@ -1,7 +1,5 @@
 <?php
 
-$module_version = "4.0.0";
-
 //if (!defined("WHMCS"))
 //    die("This file cannot be accessed directly");
 
@@ -24,15 +22,13 @@ use WHMCS\Database\Capsule;
 
 function ispapibackorder_config()
 {
-    global $module_version;
-    $configarray = array(
+    return [
         "name" => "ISPAPI Backorder",
         "description" => "This addon allows you to provide backorders to your customers.",
-        "version" => $module_version,
         "author" => "HEXONET",
-        "language" => "english"
-    );
-    return $configarray;
+        "language" => "english",
+        "version" => "4.0.0"
+    ];
 }
 
 function ispapibackorder_activate()
