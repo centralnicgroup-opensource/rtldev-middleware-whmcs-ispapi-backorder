@@ -15,7 +15,12 @@ if (isset($GLOBALS["customadminpath"])) {
 if (file_exists($init_path)) {
     require_once($init_path);
 } else {
-    exit("cannot find init.php");
+    // case of whmcs sync cron
+    if (file_exists($root_path . DIRECTORY_SEPARATOR . "bootstrap.php")) {
+        require_once $root_path . DIRECTORY_SEPARATOR . "bootstrap.php";
+    } else {
+        exit("cannot find init.php");
+    }
 }
 
 use WHMCS\Database\Capsule;
