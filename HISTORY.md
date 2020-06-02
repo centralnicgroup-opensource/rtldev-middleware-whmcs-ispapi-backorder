@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.1...v4.0.2) (2020-06-02)
+
+
+### Bug Fixes
+
+* **init.php:** fixed path detection for init.php (cron environment) ([2ffd5a8](https://github.com/hexonet/whmcs-ispapi-backorder/commit/2ffd5a8dbadec94f0d149d2b6689348c33d85f4b))
+
 ## [4.0.1](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.0...v4.0.1) (2020-05-27)
 
 
