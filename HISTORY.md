@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.2...v4.0.3) (2020-06-15)
+
+
+### Bug Fixes
+
+* **menu:** fixed to be shown only when being logged in ([302d221](https://github.com/hexonet/whmcs-ispapi-backorder/commit/302d221842dabe29b6f9232b53db64e28d75cdb7))
+
 ## [4.0.2](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.1...v4.0.2) (2020-06-02)
 
 
