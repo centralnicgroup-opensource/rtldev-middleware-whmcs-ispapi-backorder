@@ -48,6 +48,7 @@
     "@hexonet/semantic-release-github-whmcs-config": "^1.0.0"
   },
   "scripts": {
+    "phpCompatibility": "./scripts/phpcompatibility.sh",
     "codeFix": "phpcbf --standard=PSR1,PSR2 -q *.php api backend controller crons lang",
     "codeCheck": "phpcs --standard=PSR1,PSR2 -q -n --colors *.php api backend controller crons lang"
   }
