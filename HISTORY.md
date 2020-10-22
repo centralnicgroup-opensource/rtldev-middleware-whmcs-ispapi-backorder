@@ -1,3 +1,10 @@
+## [4.0.4](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.3...v4.0.4) (2020-10-22)
+
+
+### Bug Fixes
+
+* **cron:** set time limit to unlimited ([dff8f32](https://github.com/hexonet/whmcs-ispapi-backorder/commit/dff8f32f61ec73bd9d92cc0c7c6270095842a573))
+
 ## [4.0.3](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.2...v4.0.3) (2020-06-15)
 
 
