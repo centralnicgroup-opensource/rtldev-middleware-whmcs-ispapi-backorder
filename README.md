@@ -1,7 +1,7 @@
 # WHMCS "ISPAPI" Backorder Module #
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Build Status](https://travis-ci.com/hexonet/whmcs-ispapi-backorder.svg?branch=master)](https://travis-ci.com/hexonet/whmcs-ispapi-backorder)
+[![Build Status](https://github.com/hexonet/whmcs-ispapi-backorder/workflows/Release/badge.svg?branch=master)](https://github.com/hexonet/whmcs-ispapi-backorder/workflows/Release/badge.svg?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/hexonet/whmcs-ispapi-backorder/blob/master/CONTRIBUTING.md)
 
@@ -46,8 +46,8 @@ Download the ZIP archive including the latest release version [here](https://git
 
 Read the following to get more information ...
 
-  * [Getting Started](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#getting-started)
-  * [Configuration](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#4-configuration)
+* [Getting Started](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#getting-started)
+* [Configuration](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#4-configuration)
 
 ## Minimum Requirements ##
 
@@ -66,9 +66,8 @@ Please read [our development guide](https://github.com/hexonet/whmcs-ispapi-back
 
 ## Authors ##
 
-* **Anthony Schneider** - *development* - [AnthonySchn](https://github.com/anthonyschn)
+* **Anthony Schneider** - *original work* - [AnthonySchn](https://github.com/anthonyschn)
 * **Kai Schwarz** - *development* - [PapaKai](https://github.com/papakai)
-* **Tulasi Seelamkurthi** - *development* - [Tulsi91](https://github.com/tulsi91)
 
 See also the list of [contributors](https://github.com/hexonet/whmcs-ispapi-backorder/graphs/contributors) who participated in this project.
 
