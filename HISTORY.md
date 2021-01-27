@@ -1,3 +1,11 @@
+## [4.0.5](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.4...v4.0.5) (2021-01-27)
+
+
+### Bug Fixes
+
+* **ci:** add missing nodejs deps ([119ab7a](https://github.com/hexonet/whmcs-ispapi-backorder/commit/119ab7a851ad57cb424e2e85bf60b6a184939fd8))
+* **ci:** migration to github actions and gulp ([92b15c8](https://github.com/hexonet/whmcs-ispapi-backorder/commit/92b15c826fa357f6651806326b0c12c25bfc5e1b))
+
 ## [4.0.4](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.3...v4.0.4) (2020-10-22)
 
 
