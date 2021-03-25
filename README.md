@@ -34,42 +34,14 @@ This Repository covers the WHMCS Backorder Module of HEXONET. It provides the fo
 
 ## Resources ##
 
-* [Usage Guide](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide)
+Download the ZIP archive [here](https://github.com/hexonet/whmcs-ispapi-backorder/raw/master/whmcs-ispapi-backorder-latest.zip) and Continue with the Usage Guide.
+
+* [Usage Guide](https://centralnic-reseller.github.io/centralnic-reseller/docs/hexonet/whmcs/whmcs-ispapi-backorder/)
 * [Release Notes](https://github.com/hexonet/whmcs-ispapi-backorder/releases)
-* [Development Guide](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Development-Guide)
-
-NOTE: We introduced sematic-release starting with v2.0.0. This is why older Release Versions do not appear in the [current changelog](https://github.com/hexonet/whmcs-ispapi-backorder/blob/master/HISTORY.md). But these versions appear in the [release overview](https://github.com/hexonet/whmcs-ispapi-backorder/releases) and in the [old changelog](https://github.com/hexonet/whmcs-ispapi-backorder/blob/master/HISTORY.old).
-
-## Usage Guide ##
-
-Download the ZIP archive including the latest release version [here](https://github.com/hexonet/whmcs-ispapi-backorder/raw/master/whmcs-ispapi-backorder-latest.zip).
-
-Read the following to get more information ...
-
-* [Getting Started](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#getting-started)
-* [Configuration](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Usage-Guide#4-configuration)
-
-## Minimum Requirements ##
-
-* WHMCS version 7.0 or higher
-* PHP with ZIP Extension installed
-* [ISPAPI Registrar Module](https://github.com/hexonet/whmcs-ispapi-registrar/raw/master/whmcs-ispapi-registrar-latest.zip) version 3.0.0 or higher
-* HEXONET [Live System](https://hexonet.net/sign-up) or [Test System](https://hexonet.net/signup-ote) Account
-* Server time to be set to UTC
-
-For the latest WHMCS minimum system requirements, please refer to
-[https://docs.whmcs.com/System_Requirements](https://docs.whmcs.com/System_Requirements)
-
-## Contributing ##
-
-Please read [our development guide](https://github.com/hexonet/whmcs-ispapi-backorder/wiki/Development-Guide) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors ##
 
-* **Anthony Schneider** - *original work* - [AnthonySchn](https://github.com/anthonyschn)
 * **Kai Schwarz** - *development* - [PapaKai](https://github.com/papakai)
-
-See also the list of [contributors](https://github.com/hexonet/whmcs-ispapi-backorder/graphs/contributors) who participated in this project.
 
 ## License ##
 
