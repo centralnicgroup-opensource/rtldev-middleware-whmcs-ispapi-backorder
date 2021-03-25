@@ -7,36 +7,11 @@
 
 This Repository covers the WHMCS Backorder Module of HEXONET. It provides the following features in WHMCS:
 
-## Supported Features ##
-
-* High performance drop-catching technology
-* Supports gTLDs: .ASIA .BIZ .CLUB .COM .INFO .MOBI .NET .ORG .PRO .TOP and more
-* Supports many Afilias, CentralNic, Donuts and Rightside TLDs
-* Supports ccTLDs: .AC .AG .BZ .CC .CH .CO .DE .FM .IO .LC .LI .ME .MN .SC .SH .TV .US .VC
-* Commissions paid to resellers for successful backorders
-* Backorders are free to place and the backorder fee is paid only on successful registration
-* Multiple currencies supported
-* Multi-lingual (available in English, German with more to come)
-* Includes a backorder domain name search engine
-* Automatic drop list update
-* Auction platform for handling multiple backorders
-* Easy to install and operate
-* Frontend features:
-  * Display of funds details
-  * Regex support for searching domain names
-  * Search results based on specific TLD selection
-  * Selection of amount of displayed results
-  * Filter domains by upcoming drop rate
-  * Showcase TLD's backorder pricing
-  * Filtering of backordered domains based on their status
-
-... and MORE!
-
 ## Resources ##
 
 Download the ZIP archive [here](https://github.com/hexonet/whmcs-ispapi-backorder/raw/master/whmcs-ispapi-backorder-latest.zip) and Continue with the Usage Guide.
 
-* [Usage Guide](https://centralnic-reseller.github.io/centralnic-reseller/docs/hexonet/whmcs/whmcs-ispapi-backorder/)
+* [Documentation](https://centralnic-reseller.github.io/centralnic-reseller/docs/hexonet/whmcs/whmcs-ispapi-backorder/)
 * [Release Notes](https://github.com/hexonet/whmcs-ispapi-backorder/releases)
 
 ## Authors ##
