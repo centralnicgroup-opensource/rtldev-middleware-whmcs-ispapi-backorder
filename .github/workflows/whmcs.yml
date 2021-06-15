@@ -10,7 +10,6 @@ on:
 jobs:
   test:
     name: Test @ PHP ${{ matrix.php-version }} - x86 - ubuntu-latest
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.actor != 'dependabot[bot]')
     strategy:
       matrix:
         php-version:
