@@ -1,3 +1,10 @@
+## [4.0.6](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.5...v4.0.6) (2021-08-09)
+
+
+### Bug Fixes
+
+* **HX logo:** HX logo.png + configuration ([3acd11d](https://github.com/hexonet/whmcs-ispapi-backorder/commit/3acd11d61ceffc8b6f388de3e4528c4c110fca24))
+
 ## [4.0.5](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.4...v4.0.5) (2021-01-27)
 
 
