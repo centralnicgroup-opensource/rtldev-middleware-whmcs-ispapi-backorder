@@ -1,3 +1,10 @@
+## [4.0.7](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.6...v4.0.7) (2021-08-11)
+
+
+### Bug Fixes
+
+* **path issue:** fixed a php warning when building the download path ([fea4dca](https://github.com/hexonet/whmcs-ispapi-backorder/commit/fea4dca7d23a89f00355fd871170073d4ba220ca))
+
 ## [4.0.6](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.5...v4.0.6) (2021-08-09)
 
 
