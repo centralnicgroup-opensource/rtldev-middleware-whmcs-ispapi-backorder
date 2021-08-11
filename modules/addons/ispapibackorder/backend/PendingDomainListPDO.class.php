@@ -125,7 +125,7 @@ class PendingDomainListPDO
             die("Cannot find tmp directory!");
         }
         $path = $GLOBALS["downloads_dir"];
-        if (!preg_match("/" . preg_quote(DIRECTORY_SEPARATOR) . "$/", $path)) { // installation not secured
+        if (substr($path, -1) !== DIRECTORY_SEPARATOR) { // installation not secured
             $path .= DIRECTORY_SEPARATOR;
         }
         $download = $path . "pending_delete_list_tmp.zip";
@@ -159,7 +159,7 @@ class PendingDomainListPDO
 
         $this->downloadPendingDeleteList();
         $path = $GLOBALS["downloads_dir"];
-        if (!preg_match("/" . preg_quote(DIRECTORY_SEPARATOR) . "$/", $path)) { // installation not secured
+        if (substr($path, -1) !== DIRECTORY_SEPARATOR) { // installation not secured
             $path .= DIRECTORY_SEPARATOR;
         }
 
