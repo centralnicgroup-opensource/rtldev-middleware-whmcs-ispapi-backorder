@@ -25,13 +25,15 @@ try {
             if (!isset($list[$local["userid"]])) {
                  $list[$local["userid"]]["backorders"] = array();
             }
-            $list[$local["userid"]]["backorders"][] = array("id" => $local["id"],
-                                                          "tld" => $local["tld"],
-                                                            "type" => $local["type"],
-                                                          "domain" => $local["domain"] . "." . $local["tld"],
-                                                            "dropdate" => $local["dropdate"],
-                                                          "status" => $local["status"],
-                                                          "lowbalance_notification" => $local["lowbalance_notification"] );
+            $list[$local["userid"]]["backorders"][] = array(
+                "id" => $local["id"],
+                "tld" => $local["tld"],
+                "type" => $local["type"],
+                "domain" => $local["domain"] . "." . $local["tld"],
+                "dropdate" => $local["dropdate"],
+                "status" => $local["status"],
+                "lowbalance_notification" => $local["lowbalance_notification"]
+            );
         }
     }
 
