@@ -18,29 +18,9 @@ const PENDING_DELETE_LIST_FILE_URL = "https://www.hexonet.net/files/domain-backo
  */
 class PendingDomainList
 {
-    private function getPath() {
-        if (!isset($GLOBALS["downloads_dir"])) {
-            die("Cannot find tmp directory!");
-        }
-        $path = $GLOBALS["downloads_dir"];
-        if (substr($path, -1) !== DIRECTORY_SEPARATOR) { // installation not secured
-            $path .= DIRECTORY_SEPARATOR;
-        }
-        return $path;
-    }
-
     public function __construct()
     {
         set_time_limit(0);
-    }
-
-    /**
-     * Clear the table.
-     */
-    public function clearTable()
-    {
-        file_put_contents(DB_FILE, "[]");
-        return $this;
     }
 
     /**
@@ -55,6 +35,7 @@ class PendingDomainList
         if ($fp === FALSE) {
             die("Unable to create file $tmpfile");
        }
+
 
        $ch = curl_init(PENDING_DELETE_LIST_FILE_URL);
        curl_setopt_array($ch, [
@@ -75,11 +56,7 @@ class PendingDomainList
     }
 
     /**
-     * Import the Pending Delete List.
-     * - If file given, import the file in the database
-     * - Else download the file from the Hexonet's website and import it
-     *
-     * @param string $file Path of the file you want to import
+     * Import the Pending Delete List using the ZIP archive.
      */
     public function import()
     {
@@ -114,7 +91,7 @@ class PendingDomainList
             die("Unable to open csv file.");
         }
 
-        $json = [];
+        file_put_contents(DB_FILE, "["); // this replaces the file
         while (($data = fgetcsv($handle, 1000, ";")) !== false) {
             // skip wrong domain names
             if (!(bool)preg_match("/^([^.]*)\.(.*)$/", strtolower($data[0]), $m)) {
@@ -129,8 +106,7 @@ class PendingDomainList
             // build up json list
             list($domain, $zone) = $m;
             $dnDigits = preg_match_all("/[0-9]/", $domain);            
-
-            $json[] = [
+            $row = [
                 "domain" => $domain,
                 "zone"  => $zone,
                 "dropdate" => $dropdate,
@@ -138,11 +114,38 @@ class PendingDomainList
                 "dnHyphens" => substr_count($domain, '-'),
                 "dnDigits" => $dnDigits === false ? 0 : $dnDigits
             ];
+            file_put_contents(DB_FILE, json_encode($row), FILE_APPEND | LOCK_EX);
+            //echo date("Y-m-d H:i:s ") . implode(" | ", array_values($row)) . "\n";
         }
+        file_put_contents(DB_FILE, "]", FILE_APPEND | LOCK_EX);
 
         fclose($handle);
         
-        file_put_contents(DB_FILE, json_encode($json));
         return $this;
+    }
+
+    private function SyncDropDate() {
+        if ($local["dropdate"] != $online["drop_date"] && $online["drop_date"] > date("Y-m-d H:i:s")) {
+            $old_dropdate = $local["dropdate"];
+            $new_dropdate = $online["drop_date"];
+
+            $update_stmt = $pdo->prepare("UPDATE backorder_domains SET dropdate=?, updateddate=NOW() WHERE domain=? AND tld=?");
+            $update_stmt->execute(array($online["drop_date"], $local["domain"], $local["tld"]));
+            if ($update_stmt->rowCount() != 0) {
+                $message = "DROPDATE OF BACKORDER " . $local["domain"] . "." . $local["tld"] . " (backorderid=" . $local["id"] . ") SYNCHRONIZED ($old_dropdate => $new_dropdate)";
+                logmessage($cronname, "ok", $message);
+            }
+        }
+    }
+
+    private function getPath() {
+        if (!isset($GLOBALS["downloads_dir"])) {
+            die("Cannot find tmp directory!");
+        }
+        $path = $GLOBALS["downloads_dir"];
+        if (substr($path, -1) !== DIRECTORY_SEPARATOR) { // installation not secured
+            $path .= DIRECTORY_SEPARATOR;
+        }
+        return $path;
     }
 }
