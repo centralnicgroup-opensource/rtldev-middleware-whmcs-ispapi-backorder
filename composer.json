@@ -1,0 +1,8 @@
+{
+  "config": {
+    "vendor-dir": "modules/addons/ispapibackorder/vendor"
+  },
+  "require": {
+    "rakibtg/sleekdb": "^2.13"
+  }
+}

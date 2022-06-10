@@ -1,0 +1,1 @@
+An error occured <small>($CODE $DESCRIPTION)</small>.

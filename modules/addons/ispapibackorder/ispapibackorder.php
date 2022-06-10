@@ -1,29 +1,13 @@
 <?php
 
-//if (!defined("WHMCS"))
-//    die("This file cannot be accessed directly");
-
-$root_path = $_SERVER["DOCUMENT_ROOT"];
-$script_path = preg_replace("/.modules.addons..+$/", "", dirname($_SERVER["SCRIPT_NAME"]));
-if (!empty($script_path)) {
-    $root_path .= $script_path;
-}
-$init_path = implode(DIRECTORY_SEPARATOR, array($root_path,"init.php"));
-if (isset($GLOBALS["customadminpath"])) {
-    $init_path = preg_replace("/(\/|\\\)" . $GLOBALS["customadminpath"] . "(\/|\\\)init.php$/", DIRECTORY_SEPARATOR . "init.php", $init_path);
-}
-if (file_exists($init_path)) {
-    require_once($init_path);
-} else {
-    // case of whmcs sync cron
-    if (file_exists($root_path . DIRECTORY_SEPARATOR . "bootstrap.php")) {
-        require_once $root_path . DIRECTORY_SEPARATOR . "bootstrap.php";
-    } else {
-        exit("cannot find init.php");
-    }
-}
-
 use WHMCS\Database\Capsule;
+use WHMCS\Module\Addon\ispapibackorder\Xhr\XhrDispatcher;
+use WHMCS\Module\Addon\ispapibackorder\Admin\AdminDispatcher;
+use WHMCS\Module\Addon\ispapibackorder\Client\ClientDispatcher;
+
+if (!defined("WHMCS")) {
+    die("This file cannot be accessed directly");
+}
 
 function ispapibackorder_config()
 {
@@ -99,38 +83,65 @@ function ispapibackorder_activate()
 function ispapibackorder_deactivate()
 {
     //DO NOT DELETE TABLES WHEN DEACTIVATING DOMAINS - DEVELOPPER HAS TO DO IT MANUALLY IF WANTED
-    //full_query("DROP TABLE backorder_domains");
-    //full_query("DROP TABLE backorder_pricing");
-    //full_query("DROP TABLE backorder_logs");
-    //full_query("DROP TABLE backorder_pending_domains");
-    //full_query("DELETE FROM tblemailtemplates WHERE name='backorder_lowbalance_notification'");
+    full_query("DROP TABLE backorder_domains");
+    full_query("DROP TABLE backorder_pricing");
+    full_query("DROP TABLE backorder_logs");
+    full_query("DROP TABLE backorder_pending_domains");
+    full_query("DELETE FROM tblemailtemplates WHERE name='backorder_lowbalance_notification'");
     return array("status" => "success","description" => "Uninstalled (All database tables starting with 'backorder_' have to be deleted manually)");
 }
 
-function ispapibackorder_upgrade($vars)
-{
-    $version = $vars['version'];
-    # Run SQL Updates for V1.0 to V1.1
-    /*if ($version < 1.1) {
-        $query = "CREATE TABLE `mylogs4` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron` varchar(255) NOT NULL, `date` datetime, `status` varchar(20) NOT NULL, `message` text, `query` text, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-        $result = mysql_query($query);
-    }*/
-}
-
+/**
+ * Admin Area ...
+ */
 function ispapibackorder_output($vars)
 {
-    if (!isset($_GET["tab"])) {
-        $_GET["tab"] = 0;
+    add_hook('AdminAreaHeadOutput', 1, function ($vars) {
+        $cfg = ispapibackorder_config();
+        $version = $cfg["version"];
+        $wr = $vars['WEB_ROOT'];
+        return <<<HTML
+        <script>
+            const wr = "{$wr}";
+            const xr = wr.replace(/admin\/addonmodules\.php.+$/, '');
+        </script>
+HTML;
+        //<script src="{$wr}/modules/addons/ispapidomaincheck/lib/Admin/assets/admin.all.min.js?t={$version}"></script>
+        //<link href="{$wr}/modules/addons/ispapidomaincheck/lib/Admin/assets/admin.all.min.css?t={$version}" rel="stylesheet" type="text/css" />
+    });
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (isset($data["type"]) && $data["type"] === "xhr") {
+        $dispatcher = new XHRDispatcher();
+        $r = $dispatcher->dispatch($data["action"], $vars);
+
+        //send json response headers
+        header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header('Content-type: application/json; charset=utf-8');
+        //do not echo as this would add template html code around!
+        die(json_encode($r));
     }
-    $modulelink = $vars['modulelink'];
 
-    //includes MENU with JS and CSS
-    include(dirname(__FILE__) . "/controller/backend.mainpage.php");
-
-    //includes all tabs
-    ispapibackorder_managebackorders_content($modulelink . "&tab=0");
-    ispapibackorder_pricing_content($modulelink . "&tab=1");
-    ispapibackorder_logs_content($modulelink . "&tab=2");
+    //init smarty and call admin dispatcher
+    $smarty = new Smarty();
+    $smarty->escape_html = true;
+    $smarty->caching = false;
+    $smarty->setCompileDir($GLOBALS['templates_compiledir']);
+    $smarty->setTemplateDir(implode(DIRECTORY_SEPARATOR, [__DIR__, "lib", "Admin", "templates"]));
+    $smarty->assign($vars);
+    //call the dispatcher with action and data
+    $dispatcher = new AdminDispatcher();
+    $r = $dispatcher->dispatch($_REQUEST['action'], $vars, $smarty);
+    if ($_REQUEST['action']) {
+        //send json response headers
+        header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header('Content-type: application/json; charset=utf-8');
+        //do not echo as this would add template html code around!
+        die(json_encode($r));
+    }
+    echo $r;
 }
 
 function ispapibackorder_managebackorders_content($modulelink)
