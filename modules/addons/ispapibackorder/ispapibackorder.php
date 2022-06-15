@@ -34,7 +34,7 @@ function ispapibackorder_config()
         "description" => "This addon allows you to provide backorders to your customers.",
         "author" => '<a href="https://www.hexonet.net/" target="_blank"><img style="max-width:100px" src="' . $logo_data . '" alt="HEXONET" /></a>',
         "language" => "english",
-        "version" => "4.0.7"
+        "version" => "4.0.8"
     ];
 }
 

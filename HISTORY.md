@@ -1,3 +1,10 @@
+## [4.0.8](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.7...v4.0.8) (2022-06-15)
+
+
+### Bug Fixes
+
+* **dep-bump:** upgrade jquery-ui from 1.12.1 to 1.13.1 ([3aea47d](https://github.com/hexonet/whmcs-ispapi-backorder/commit/3aea47d39bbef024493564c873f6b0f0211cc436))
+
 ## [4.0.7](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.6...v4.0.7) (2021-08-11)
 
 
