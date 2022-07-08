@@ -39,9 +39,9 @@
     "registration",
     "application"
   ],
-  "overrides":{
-		"glob-parent":"^6.0.2"
-	},
+  "overrides": {
+    "glob-parent": "^6.0.2"
+  },
   "devDependencies": {
     "@hexonet/semantic-release-github-whmcs-config": "^3.0.1",
     "gulp": "^4.0.2",
@@ -50,7 +50,6 @@
     "semantic-release": "^19.0.3"
   },
   "scripts": {
-    "phpCompatibility": "./scripts/phpcompatibility.sh",
     "codeFix": "phpcbf --standard=PSR12 -q --extensions=php --ignore=node_modules,vendor,templates_c .",
     "codeCheck": "phpcs --standard=PSR12 -q -n --colors --extensions=php --ignore=node_modules,vendor,templates_c ."
   }
