@@ -1,3 +1,10 @@
+## [4.0.9](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.8...v4.0.9) (2022-07-11)
+
+
+### Bug Fixes
+
+* **gulp:** cleanup package-info and phpcompatibility ([ea48984](https://github.com/hexonet/whmcs-ispapi-backorder/commit/ea4898453cacb8bc1b2c0300382db26ad8c18103))
+
 ## [4.0.8](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.7...v4.0.8) (2022-06-15)
 
 
