@@ -47,7 +47,7 @@
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-zip": "^5.0.2",
-    "semantic-release": "^19.0.3"
+    "semantic-release": "^19.0.4"
   },
   "scripts": {
     "codeFix": "phpcbf --standard=PSR12 -q --extensions=php --ignore=node_modules,vendor,templates_c .",
