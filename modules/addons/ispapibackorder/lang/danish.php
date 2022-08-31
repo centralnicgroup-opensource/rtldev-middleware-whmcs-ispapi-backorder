@@ -1,4 +1,5 @@
 <?php
+
 $_ADDONLANG['deleteddomains'] = "RGP Domæner";
 $_ADDONLANG['managebackorders'] = "Mine backorders";
 $_ADDONLANG['refinesearch'] = "Søg";
