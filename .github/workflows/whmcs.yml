@@ -29,7 +29,7 @@ jobs:
       - name: Install Dependencies::PHP${{ matrix.php-version }}
         run: |
           echo "$HOME/.composer/vendor/bin" >> $GITHUB_PATH
-          composer global require dealerdirect/phpcodesniffer-composer-installer roave/security-advisories:dev-master squizlabs/php_codesniffer phpcompatibility/php-compatibility
+          composer global require squizlabs/php_codesniffer
         # TODO migrate the below to gulp calls
       - name: Check PSR12 Standard
         run: phpcs --standard=PSR12 -q -n --colors --extensions=php,inc,lib --ignore=node_modules,vendor,templates_c,modules/registrars/ispapi/lib,modules/registrars/ispapi/migration,modules/registrars/ispapi/hooks_migration .
