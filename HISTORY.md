@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.9...v4.1.0) (2022-08-31)
+
+
+### Features
+
+* **translation:** danish translation added ([e3de2b3](https://github.com/hexonet/whmcs-ispapi-backorder/commit/e3de2b321f15a5f684f0581ebb68a0d95a897879))
+
 ## [4.0.9](https://github.com/hexonet/whmcs-ispapi-backorder/compare/v4.0.8...v4.0.9) (2022-07-11)
 
 
