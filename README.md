@@ -5,7 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/hexonet/whmcs-ispapi-backorder/blob/master/CONTRIBUTING.md)
 
-This Repository covers the WHMCS Backorder Module of HEXONET. It provides the following features in WHMCS:
+This Repository covers the WHMCS Backorder Module of HEXONET.
+
+> NOTE: We temporarily archived this Module as of a necessary Revamp that is pending in our Backlog. Have an eye on the github issues reported that are the basic reasons for this step as well. This module will be re-alived in future and merged into the CentralNic Software Bundle for WHMCS.
 
 ## Resources ##
 
